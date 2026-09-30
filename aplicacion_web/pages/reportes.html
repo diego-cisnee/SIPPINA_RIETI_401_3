@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Consulta y seguimiento de reportes registrados en RIETI." />
+    <title>Gestión de reportes | RIETI</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body class="dashboard-page reports-management-page">
+    <div class="dashboard-shell">
+      <!-- La barra lateral conserva la navegación y la sesión simulada del dashboard. -->
+      <aside class="sidebar" aria-label="Navegación principal">
+        <div class="brand-lockup">
+          <span class="brand-lockup__mark" aria-hidden="true">R</span>
+          <div><strong>RIETI</strong><span>Panel de Control</span></div>
+        </div>
+
+<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil de administrador" title="Ver mi perfil">
+          <span class="user-summary__avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
+          </span>
+          <!-- INTEGRACIÓN FUTURA: estos datos se obtendrán de la sesión autenticada. -->
+          <strong data-field="user-name">RIETI Admin</strong>
+          <span data-field="user-role">Panel de Control</span>
+        </a>
+
+        <nav class="sidebar-nav">
+          <a class="sidebar-nav__item" href="dashboard.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3Z" /></svg>
+            Dashboard
+          </a>
+          <span class="sidebar-nav__item is-active" aria-current="page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
+            Gestión de reportes
+          </span>
+          <a class="sidebar-nav__item" href="estadisticas.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
+            Estadísticas
+          </a>
+        </nav>
+
+<button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg>
+          Cerrar sesión
+        </button>
+      </aside>
+
+      <main class="dashboard-main reports-main">
+        <header class="management-header">
+          <div>
+            <p class="eyebrow">Administración</p>
+            <h1>Gestión de reportes</h1>
+            <p>Administra y da seguimiento a los reportes de trabajo infantil.</p>
+          </div>
+
+          <!-- Estas acciones muestran avisos; se conectarán con API y archivos después. -->
+          <div class="management-actions">
+            <a class="action-button action-button--secondary" href="#actualizar-pendiente" data-action="refresh-reports">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6.1 8.5A7 7 0 0 1 18.7 7L20 12M4 12l1.3 5a7 7 0 0 0 12.6-1.5" /></svg>
+              Actualizar
+            </a>
+            <a class="action-button action-button--primary" href="#descarga-pendiente" data-action="download-reports">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 19h16" /></svg>
+              Exportar CSV
+            </a>
+          </div>
+        </header>
+
+        <!--
+          FILTROS DEL PROTOTIPO
+          Las opciones usan los mismos valores que los atributos data-* de cada
+          reporte. app.js filtra los datos ficticios; después consultará la API.
+        -->
+        <form class="report-filters" id="report-filters">
+          <label class="filter-field">
+            <span>Municipio</span>
+            <select name="municipality" data-filter="municipality">
+              <option value="">Todos los municipios</option>
+              <option value="Naucalpan de Juárez">Naucalpan de Juárez</option>
+              <option value="Tlalnepantla de Baz">Tlalnepantla de Baz</option>
+              <option value="Coacalco">Coacalco</option>
+              <option value="Villa del Carbón">Villa del Carbón</option>
+              <option value="Huixquilucan">Huixquilucan</option>
+              <option value="Tultitlán">Tultitlán</option>
+              <option value="Atizapán de Zaragoza">Atizapán de Zaragoza</option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>Estado</span>
+            <select name="status" data-filter="status">
+              <option value="">Todos</option>
+              <option value="Recibido">Recibido</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="En proceso">En proceso</option>
+              <option value="Resuelto">Resuelto</option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>Prioridad</span>
+            <select name="priority" data-filter="priority">
+              <option value="">Todas</option>
+              <option value="Baja">Baja</option>
+              <option value="Media">Media</option>
+              <option value="Alta">Alta</option>
+              <option value="Urgente">Urgente</option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span>Fecha inicio</span>
+            <input name="start-date" type="date" data-filter="start-date" />
+          </label>
+
+          <label class="filter-field">
+            <span>Fecha fin</span>
+            <input name="end-date" type="date" data-filter="end-date" />
+          </label>
+
+          <button class="filter-submit" type="submit" aria-label="Aplicar filtros">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></svg>
+          </button>
+        </form>
+
+        <p class="filter-feedback" id="filter-feedback" aria-live="polite">Mostrando 10 reportes</p>
+
+        <!-- Los totales se reemplazarán con valores agregados entregados por la API. -->
+        <section class="metric-grid management-metrics" aria-label="Resumen de reportes">
+          <article class="metric-card"><span>Total de reportes</span><strong data-field="reports-total">39</strong></article>
+          <article class="metric-card metric-card--warning"><span>Pendientes</span><strong data-field="reports-pending">33</strong></article>
+          <article class="metric-card metric-card--progress"><span>En proceso</span><strong data-field="reports-progress">4</strong></article>
+          <article class="metric-card metric-card--success"><span>Resueltos</span><strong data-field="reports-resolved">2</strong></article>
+        </section>
+
+        <section class="panel management-table-panel" aria-labelledby="reports-table-title">
+          <h2 class="sr-only" id="reports-table-title">Listado de reportes</h2>
+          <div class="table-scroll">
+            <table class="reports-table management-table">
+              <thead>
+                <tr><th>Folio</th><th>Denunciante</th><th>Municipio</th><th>Estatus</th><th>Prioridad</th><th>Fecha</th><th><span class="sr-only">Acciones</span></th></tr>
+              </thead>
+              <!--
+                LISTADO DE DATOS FICTICIOS
+                Cualquier parte no interactiva del renglón abre el aviso de detalle.
+                data-list y data-field marcan la futura conexión con la base de datos.
+              -->
+              <tbody data-list="reports">
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-NAU-2026-0001" data-report-row data-report-id="RIETI-NAU-2026-0001" data-municipality="Naucalpan de Juárez" data-status="Recibido" data-priority="Alta" data-date="2026-10-22">
+                  <td data-label="Folio"><strong>RIETI-NAU-2026-0001</strong></td><td data-label="Denunciante" data-field="reporter">Juan López García</td><td data-label="Municipio">Naucalpan de Juárez</td><td data-label="Estatus"><span class="status status--received">Recibido</span></td><td data-label="Prioridad"><span class="priority">Alta</span></td><td data-label="Fecha">22/10/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-NAU-2026-0001">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-TLA-2026-0002" data-report-row data-report-id="RIETI-TLA-2026-0002" data-municipality="Tlalnepantla de Baz" data-status="Recibido" data-priority="Baja" data-date="2026-10-13">
+                  <td data-label="Folio"><strong>RIETI-TLA-2026-0002</strong></td><td data-label="Denunciante">Raúl Pérez Hernández</td><td data-label="Municipio">Tlalnepantla de Baz</td><td data-label="Estatus"><span class="status status--received">Recibido</span></td><td data-label="Prioridad"><span class="priority">Baja</span></td><td data-label="Fecha">13/10/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-TLA-2026-0002">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-NAU-2026-0003" data-report-row data-report-id="RIETI-NAU-2026-0003" data-municipality="Naucalpan de Juárez" data-status="En proceso" data-priority="Media" data-date="2026-10-06">
+                  <td data-label="Folio"><strong>RIETI-NAU-2026-0003</strong></td><td data-label="Denunciante">Santiago Hernández López</td><td data-label="Municipio">Naucalpan de Juárez</td><td data-label="Estatus"><span class="status status--progress">En proceso</span></td><td data-label="Prioridad"><span class="priority">Media</span></td><td data-label="Fecha">06/10/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-NAU-2026-0003">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-COA-2026-0004" data-report-row data-report-id="RIETI-COA-2026-0004" data-municipality="Coacalco" data-status="En proceso" data-priority="Media" data-date="2026-09-28">
+                  <td data-label="Folio"><strong>RIETI-COA-2026-0004</strong></td><td data-label="Denunciante">Valeria Martínez García</td><td data-label="Municipio">Coacalco</td><td data-label="Estatus"><span class="status status--progress">En proceso</span></td><td data-label="Prioridad"><span class="priority">Media</span></td><td data-label="Fecha">28/09/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-COA-2026-0004">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-VDC-2026-0005" data-report-row data-report-id="RIETI-VDC-2026-0005" data-municipality="Villa del Carbón" data-status="En proceso" data-priority="Urgente" data-date="2026-09-22">
+                  <td data-label="Folio"><strong>RIETI-VDC-2026-0005</strong></td><td data-label="Denunciante">Diego Ramírez Torres</td><td data-label="Municipio">Villa del Carbón</td><td data-label="Estatus"><span class="status status--progress">En proceso</span></td><td data-label="Prioridad"><span class="priority priority--urgent">Urgente</span></td><td data-label="Fecha">22/09/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-VDC-2026-0005">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-HUI-2026-0006" data-report-row data-report-id="RIETI-HUI-2026-0006" data-municipality="Huixquilucan" data-status="En proceso" data-priority="Alta" data-date="2026-09-16">
+                  <td data-label="Folio"><strong>RIETI-HUI-2026-0006</strong></td><td data-label="Denunciante">Fernanda Sánchez Morales</td><td data-label="Municipio">Huixquilucan</td><td data-label="Estatus"><span class="status status--progress">En proceso</span></td><td data-label="Prioridad"><span class="priority">Alta</span></td><td data-label="Fecha">16/09/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-HUI-2026-0006">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-NAU-2026-0007" data-report-row data-report-id="RIETI-NAU-2026-0007" data-municipality="Naucalpan de Juárez" data-status="Pendiente" data-priority="Baja" data-date="2026-09-11">
+                  <td data-label="Folio"><strong>RIETI-NAU-2026-0007</strong></td><td data-label="Denunciante">Alejandro González Reyes</td><td data-label="Municipio">Naucalpan de Juárez</td><td data-label="Estatus"><span class="status status--pending">Pendiente</span></td><td data-label="Prioridad"><span class="priority">Baja</span></td><td data-label="Fecha">11/09/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-NAU-2026-0007">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-TUL-2026-0008" data-report-row data-report-id="RIETI-TUL-2026-0008" data-municipality="Tultitlán" data-status="Resuelto" data-priority="Media" data-date="2026-09-04">
+                  <td data-label="Folio"><strong>RIETI-TUL-2026-0008</strong></td><td data-label="Denunciante">Camila Rodríguez Flores</td><td data-label="Municipio">Tultitlán</td><td data-label="Estatus"><span class="status status--resolved">Resuelto</span></td><td data-label="Prioridad"><span class="priority">Media</span></td><td data-label="Fecha">04/09/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-TUL-2026-0008">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-ATZ-2026-0009" data-report-row data-report-id="RIETI-ATZ-2026-0009" data-municipality="Atizapán de Zaragoza" data-status="Resuelto" data-priority="Urgente" data-date="2026-08-25">
+                  <td data-label="Folio"><strong>RIETI-ATZ-2026-0009</strong></td><td data-label="Denunciante">Sebastián Castillo Vargas</td><td data-label="Municipio">Atizapán de Zaragoza</td><td data-label="Estatus"><span class="status status--resolved">Resuelto</span></td><td data-label="Prioridad"><span class="priority priority--urgent">Urgente</span></td><td data-label="Fecha">25/08/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-ATZ-2026-0009">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-COA-2026-0010" data-report-row data-report-id="RIETI-COA-2026-0010" data-municipality="Coacalco" data-status="Pendiente" data-priority="Baja" data-date="2026-08-20">
+                  <td data-label="Folio"><strong>RIETI-COA-2026-0010</strong></td><td data-label="Denunciante">Mariana Cruz Mendoza</td><td data-label="Municipio">Coacalco</td><td data-label="Estatus"><span class="status status--pending">Pendiente</span></td><td data-label="Prioridad"><span class="priority">Baja</span></td><td data-label="Fecha">20/08/2026</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-COA-2026-0010">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                </tr>
+                <tr class="empty-table-row" data-empty-row hidden><td colspan="7">No hay reportes que coincidan con los filtros seleccionados.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- La paginación es visual hasta conectar el listado completo. -->
+        <nav class="pagination" aria-label="Paginación de reportes">
+          <span class="pagination__disabled">‹ Previo</span><span class="is-current" aria-current="page">1</span><span aria-disabled="true">2</span><span aria-hidden="true">…</span><span aria-disabled="true">5</span><span aria-disabled="true">Siguiente ›</span>
+        </nav>
+      </main>
+    </div>
+
+    <!-- Avisos provisionales para acciones cuyas funciones se crearán después. -->
+    <aside class="route-notice" id="actualizar-pendiente" role="dialog" aria-labelledby="refresh-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↻</span><h2 id="refresh-notice-title">Actualización pendiente</h2><p>La actualización se conectará con la base de datos en una etapa posterior.</p><a href="#">Volver a reportes</a></div></aside>
+    <aside class="route-notice" id="descarga-pendiente" role="dialog" aria-labelledby="download-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↓</span><h2 id="download-notice-title">Descarga pendiente</h2><p>La exportación CSV se habilitará cuando conectemos los datos reales.</p><a href="#">Volver a reportes</a></div></aside>
+
+
+    <!-- FORMULARIOS DEL PROTOTIPO: los datos escritos solo viven en memoria.
+         INTEGRACIÓN FUTURA: conectar el envío con la API antes de confirmar cambios. -->
+    <dialog class="report-dialog" id="status-dialog" aria-labelledby="status-dialog-title">
+      <form method="dialog" id="status-form">
+        <h2 id="status-dialog-title">Cambiar estado del reporte:<span data-dialog-report-id></span></h2>
+        <div class="current-value"><p>Estado actual</p><span class="status status--received" data-current-status></span></div>
+        <label class="dialog-field">Nuevo estado
+          <select name="status" required>
+            <option>Recibido</option><option>Pendiente</option><option>En proceso</option><option>Resuelto</option><option>Cancelado</option>
+          </select>
+        </label>
+        <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>
+        <label class="dialog-field">Nueva prioridad
+          <select name="priority" required><option>Baja</option><option>Media</option><option>Alta</option><option>Urgente</option></select>
+        </label>
+        <label class="dialog-field">Comentarios
+          <textarea name="comments" rows="3" maxlength="2000" placeholder="Escribe los comentarios…"></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancelar</button>
+          <button type="submit" class="dialog-primary">Actualizar estado</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="report-dialog" id="authority-dialog" aria-labelledby="authority-dialog-title">
+      <form method="dialog" id="authority-form">
+        <h2 id="authority-dialog-title">Asignar autoridad al reporte:<span data-dialog-report-id></span></h2>
+        <div class="current-value"><p>Autoridad actual</p><span class="priority">Sin asignar</span></div>
+        <label class="dialog-field">Nueva autoridad
+          <!-- No agregar autoridades reales hasta recibir el catálogo aprobado. -->
+          <select name="authority" required>
+            <option value="" disabled selected>Seleccionar…</option>
+            <option value="Por definir">Por definir</option>
+          </select>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancelar</button>
+          <button type="submit" class="dialog-primary">Actualizar autoridad</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="report-dialog confirmation-dialog" id="update-confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-description">
+      <span class="confirmation-check" aria-hidden="true">✓</span>
+      <h2 id="confirmation-title">Actualización simulada</h2>
+      <p id="confirmation-description">La solicitud se completó en el prototipo. No se guardaron cambios ni se enviaron datos.</p>
+      <dl class="confirmation-summary" data-confirmation-summary></dl>
+      <div class="dialog-actions"><button type="button" class="dialog-primary" data-close-dialog>Entendido</button></div>
+    </dialog>
+
+    <script src="../js/app.js" defer></script>
+    <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
+    <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
+      <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
+      <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
+      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
+      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <div class="dialog-actions">
+        <button type="button" data-cancel-logout autofocus>Cancelar</button>
+        <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>
+      </div>
+    </dialog>
+    <script src="../js/session.js" defer></script>
+    <!-- ELIMINACIÓN DE PRUEBA: requiere aceptación explícita y no borra registros. -->
+    <dialog class="report-dialog delete-dialog" id="delete-report-dialog" aria-labelledby="delete-report-title" aria-describedby="delete-report-description">
+      <h2 id="delete-report-title">¿Eliminar este reporte?</h2>
+      <p class="delete-dialog__folio">Folio <strong data-delete-folio></strong></p>
+      <p id="delete-report-description" class="delete-dialog__warning">¿Estás seguro de que quieres eliminar este folio? Esta acción no puede deshacerse.</p>
+      <p class="delete-dialog__demo">En este prototipo, la eliminación es simulada: no se borrará ningún reporte.</p>
+      <form id="delete-report-form">
+        <label class="delete-acknowledgement">
+          <input type="checkbox" id="delete-acknowledgement" name="acknowledge" required />
+          <span>Entiendo que la acción no puede deshacerse y confirmo que deseo eliminar este reporte.</span>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-cancel-delete autofocus>Cancelar</button>
+          <button type="submit" class="dialog-danger" data-confirm-delete disabled>Eliminar reporte</button>
+        </div>
+      </form>
+      <div class="dialog-actions" data-delete-result hidden><button type="button" class="dialog-primary" data-finish-delete>Entendido</button></div>
+    </dialog>
+    <script src="../js/delete-report.js" defer></script>
+  </body>
+</html>

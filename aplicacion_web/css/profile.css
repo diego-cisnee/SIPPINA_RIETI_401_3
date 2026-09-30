@@ -1,0 +1,14 @@
+/* PERFIL EXPERIMENTAL: estilos aislados para poder retirar la propuesta sin afectar otros módulos. */
+.profile-trial { display: flex; align-items: baseline; gap: 12px; padding: 14px 18px; margin: 0 0 24px; border: 1px solid #d9e4fc; border-radius: 8px; color: var(--color-muted); background: #f5f8ff; font-size: .8rem; line-height: 1.6; }
+.profile-trial > span { color: var(--color-primary-dark); font-weight: 650; white-space: nowrap; }
+.profile-grid { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 800px; }
+.profile-card { min-width: 0; padding: 24px; }
+.profile-card h2 { margin: 0 0 22px; font-size: 1rem; }
+.profile-fields { margin: 0; }
+.profile-fields > div { padding: 16px 0; border-bottom: 1px solid var(--color-border); }
+.profile-fields > div:first-child { padding-top: 0; }
+.profile-fields > div:last-child { padding-bottom: 0; border-bottom: 0; }
+.profile-fields dt { margin-bottom: 9px; color: var(--color-muted); font-size: .78rem; }
+.profile-fields dd { margin: 0; line-height: 1.6; overflow-wrap: anywhere; }
+@media (max-width: 820px) { .profile-page .sidebar-nav { grid-auto-flow: column; } }
+@media (max-width: 600px) { .profile-grid { grid-template-columns: 1fr; } .profile-card { padding: 20px; } .profile-trial { display: block; } .profile-trial > span { display: block; } }

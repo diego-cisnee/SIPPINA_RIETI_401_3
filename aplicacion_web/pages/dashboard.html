@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Resumen general de los reportes registrados en RIETI." />
+    <title>Dashboard | RIETI</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body class="dashboard-page">
+    <div class="dashboard-shell">
+      <!--
+        NAVEGACIÓN LATERAL
+        En esta etapa solo Dashboard está activo. Los demás módulos se conectarán
+        cuando se diseñen sus respectivas pantallas.
+      -->
+      <aside class="sidebar" aria-label="Navegación principal">
+        <div class="brand-lockup">
+          <span class="brand-lockup__mark" aria-hidden="true">R</span>
+          <div><strong>RIETI</strong><span>Panel de Control</span></div>
+        </div>
+
+<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil de administrador" title="Ver mi perfil">
+          <span class="user-summary__avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
+          </span>
+          <!-- INTEGRACIÓN FUTURA: estos datos vendrán de la sesión del usuario. -->
+          <strong data-field="user-name">RIETI Admin</strong>
+          <span data-field="user-role">Panel de Control</span>
+        </a>
+
+        <nav class="sidebar-nav">
+          <span class="sidebar-nav__item is-active" aria-current="page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3Z" /></svg>
+            Dashboard
+          </span>
+          <a class="sidebar-nav__item" href="reportes.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
+            Gestión de reportes
+          </a>
+          <a class="sidebar-nav__item" href="estadisticas.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
+            Estadísticas
+          </a>
+        </nav>
+
+<button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg>
+          Cerrar sesión
+        </button>
+      </aside>
+
+      <main class="dashboard-main">
+        <header class="dashboard-header">
+          <div><p class="eyebrow">Resumen general</p><h1>Dashboard</h1></div>
+          <p class="dashboard-header__date">Actualizado hoy, 11:56 a. m.</p>
+        </header>
+
+        <!-- Cada data-field se reemplazará con el total recibido desde la API. -->
+        <section class="metric-grid" aria-label="Resumen de reportes">
+          <article class="metric-card"><span>Total de reportes</span><strong data-field="reports-total">39</strong><small>Todos los registros</small></article>
+          <article class="metric-card metric-card--warning"><span>Pendientes</span><strong data-field="reports-pending">33</strong><small>Requieren atención</small></article>
+          <article class="metric-card metric-card--progress"><span>En proceso</span><strong data-field="reports-progress">4</strong><small>Con seguimiento</small></article>
+          <article class="metric-card metric-card--success"><span>Resueltos</span><strong data-field="reports-resolved">2</strong><small>Casos concluidos</small></article>
+        </section>
+
+        <section class="analytics-grid" aria-label="Visualizaciones de reportes">
+          <article class="panel status-panel">
+            <header class="panel__header">
+              <div><p class="panel__kicker">Distribución</p><h2>Reportes por estado</h2></div>
+              <span class="panel__period">Últimos 30 días</span>
+            </header>
+            <ul class="chart-legend" aria-label="Leyenda del gráfico">
+              <li><span class="legend-dot legend-dot--received"></span>Recibidos</li>
+              <li><span class="legend-dot legend-dot--progress"></span>En proceso</li>
+              <li><span class="legend-dot legend-dot--resolved"></span>Resueltos</li>
+              <li><span class="legend-dot legend-dot--cancelled"></span>Cancelados</li>
+            </ul>
+            <!-- INTEGRACIÓN FUTURA: JavaScript sustituirá estos porcentajes ficticios con datos reales. -->
+            <div class="donut-chart" role="img" aria-label="33 recibidos, 4 en proceso y 2 resueltos">
+              <div class="donut-chart__center"><strong data-field="reports-total">39</strong><span>reportes</span></div>
+            </div>
+          </article>
+
+          <article class="panel heatmap-panel">
+            <header class="panel__header">
+              <div><p class="panel__kicker">Ubicación</p><h2>Mapa de calor</h2></div>
+              <span class="panel__period">Estado de México</span>
+            </header>
+            <ul class="chart-legend" aria-label="Leyenda del mapa">
+              <li><span class="legend-dot legend-dot--heat-high"></span>Más casos</li>
+              <li><span class="legend-dot legend-dot--heat-low"></span>Menos casos</li>
+            </ul>
+            <!-- Esta cuadrícula temporal se sustituirá por el mapa conectado a datos municipales. -->
+            <div class="heatmap" role="img" aria-label="Representación temporal de densidad de reportes por zona">
+              <span style="--x:3;--y:1;--heat:.18"></span><span style="--x:4;--y:1;--heat:.24"></span>
+              <span style="--x:2;--y:2;--heat:.22"></span><span style="--x:3;--y:2;--heat:.38"></span><span style="--x:4;--y:2;--heat:.46"></span><span style="--x:5;--y:2;--heat:.31"></span>
+              <span style="--x:2;--y:3;--heat:.28"></span><span style="--x:3;--y:3;--heat:.52"></span><span style="--x:4;--y:3;--heat:.88"></span><span style="--x:5;--y:3;--heat:.71"></span><span style="--x:6;--y:3;--heat:.32"></span>
+              <span style="--x:1;--y:4;--heat:.15"></span><span style="--x:2;--y:4;--heat:.25"></span><span style="--x:3;--y:4;--heat:.64"></span><span style="--x:4;--y:4;--heat:1"></span><span style="--x:5;--y:4;--heat:.83"></span><span style="--x:6;--y:4;--heat:.41"></span>
+              <span style="--x:2;--y:5;--heat:.19"></span><span style="--x:3;--y:5;--heat:.43"></span><span style="--x:4;--y:5;--heat:.67"></span><span style="--x:5;--y:5;--heat:.54"></span><span style="--x:6;--y:5;--heat:.27"></span>
+              <span style="--x:3;--y:6;--heat:.21"></span><span style="--x:4;--y:6;--heat:.35"></span><span style="--x:5;--y:6;--heat:.29"></span><span style="--x:4;--y:7;--heat:.16"></span>
+            </div>
+          </article>
+        </section>
+
+        <section class="dashboard-lower-grid">
+          <!-- data-list identifica la colección que después renderizará JavaScript. -->
+          <article class="panel reports-panel" id="reportes-recientes">
+            <header class="panel__header reports-panel__header">
+              <div><p class="panel__kicker">Actividad</p><h2>Reportes recientes</h2></div>
+              <a class="outline-button" href="reportes.html" data-action="view-all-reports">Ver todos<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg></a>
+            </header>
+            <div class="table-scroll">
+              <table class="reports-table">
+                <thead><tr><th>Folio</th><th>Municipio</th><th>Estado</th><th>Fecha</th><th><span class="sr-only">Acciones</span></th></tr></thead>
+                <tbody data-list="recent-reports">
+                  <!--
+                    Cada fila usa el mismo componente interactivo de Gestión de reportes:
+                    clic en el renglón abre el detalle y los tres puntos abren su menú.
+                  -->
+                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-NAU-2026-0001" data-report-row data-priority="Alta" data-report-id="RIETI-NAU-2026-0001">
+                    <td data-label="Folio"><strong>RIETI-NAU-2026-0001</strong></td><td data-label="Municipio" data-field="municipality">Naucalpan de Juárez</td><td data-label="Estado"><span class="status status--received">Recibido</span></td><td data-label="Fecha">22/10/2026 · 03:32 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-NAU-2026-0001">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                  </tr>
+                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-TLA-2026-0002" data-report-row data-priority="Baja" data-report-id="RIETI-TLA-2026-0002">
+                    <td data-label="Folio"><strong>RIETI-TLA-2026-0002</strong></td><td data-label="Municipio" data-field="municipality">Tlalnepantla de Baz</td><td data-label="Estado"><span class="status status--received">Recibido</span></td><td data-label="Fecha">13/10/2026 · 06:22 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-TLA-2026-0002">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                  </tr>
+                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-CIZ-2026-0003" data-report-row data-priority="Media" data-report-id="RIETI-CIZ-2026-0003">
+                    <td data-label="Folio"><strong>RIETI-CIZ-2026-0003</strong></td><td data-label="Municipio" data-field="municipality">Cuautitlán Izcalli</td><td data-label="Estado"><span class="status status--progress">En proceso</span></td><td data-label="Fecha">06/10/2026 · 01:45 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-CIZ-2026-0003">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                  </tr>
+                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-COA-2026-0004" data-report-row data-priority="Media" data-report-id="RIETI-COA-2026-0004">
+                    <td data-label="Folio"><strong>RIETI-COA-2026-0004</strong></td><td data-label="Municipio" data-field="municipality">Coacalco</td><td data-label="Estado"><span class="status status--progress">En proceso</span></td><td data-label="Fecha">28/09/2026 · 06:45 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-COA-2026-0004">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                  </tr>
+                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-VDC-2026-0005" data-report-row data-priority="Urgente" data-report-id="RIETI-VDC-2026-0005">
+                    <td data-label="Folio"><strong>RIETI-VDC-2026-0005</strong></td><td data-label="Municipio" data-field="municipality">Villa del Carbón</td><td data-label="Estado"><span class="status status--progress">En proceso</span></td><td data-label="Fecha">22/09/2026 · 12:45 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-VDC-2026-0005">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <aside class="kpi-stack" aria-label="Indicadores de desempeño">
+            <article class="kpi-card"><span>Días promedio de resolución</span><div><strong data-field="average-resolution-days">5</strong><small class="trend trend--neutral">+2.5%</small></div></article>
+            <article class="kpi-card"><span>Tasa de resolución</span><div><strong data-field="resolution-rate">5.1%</strong><small class="trend trend--positive">−1.2%</small></div></article>
+            <article class="kpi-card"><span>En proceso</span><div><strong data-field="progress-rate">10.3%</strong><small class="trend trend--neutral">+3.1%</small></div></article>
+            <article class="kpi-card"><span>Pendientes</span><div><strong data-field="pending-rate">84.6%</strong><small class="trend trend--negative">+5.2%</small></div></article>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <!-- Avisos temporales sin JavaScript; se eliminan al crear las pantallas destino. -->
+
+    <!-- FORMULARIOS DEL PROTOTIPO: los datos escritos solo viven en memoria.
+         INTEGRACIÓN FUTURA: conectar el envío con la API antes de confirmar cambios. -->
+    <dialog class="report-dialog" id="status-dialog" aria-labelledby="status-dialog-title">
+      <form method="dialog" id="status-form">
+        <h2 id="status-dialog-title">Cambiar estado del reporte:<span data-dialog-report-id></span></h2>
+        <div class="current-value"><p>Estado actual</p><span class="status status--received" data-current-status></span></div>
+        <label class="dialog-field">Nuevo estado
+          <select name="status" required>
+            <option>Recibido</option><option>Pendiente</option><option>En proceso</option><option>Resuelto</option><option>Cancelado</option>
+          </select>
+        </label>
+        <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>
+        <label class="dialog-field">Nueva prioridad
+          <select name="priority" required><option>Baja</option><option>Media</option><option>Alta</option><option>Urgente</option></select>
+        </label>
+        <label class="dialog-field">Comentarios
+          <textarea name="comments" rows="3" maxlength="2000" placeholder="Escribe los comentarios…"></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancelar</button>
+          <button type="submit" class="dialog-primary">Actualizar estado</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="report-dialog" id="authority-dialog" aria-labelledby="authority-dialog-title">
+      <form method="dialog" id="authority-form">
+        <h2 id="authority-dialog-title">Asignar autoridad al reporte:<span data-dialog-report-id></span></h2>
+        <div class="current-value"><p>Autoridad actual</p><span class="priority">Sin asignar</span></div>
+        <label class="dialog-field">Nueva autoridad
+          <!-- No agregar autoridades reales hasta recibir el catálogo aprobado. -->
+          <select name="authority" required>
+            <option value="" disabled selected>Seleccionar…</option>
+            <option value="Por definir">Por definir</option>
+          </select>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancelar</button>
+          <button type="submit" class="dialog-primary">Actualizar autoridad</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="report-dialog confirmation-dialog" id="update-confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-description">
+      <span class="confirmation-check" aria-hidden="true">✓</span>
+      <h2 id="confirmation-title">Actualización simulada</h2>
+      <p id="confirmation-description">La solicitud se completó en el prototipo. No se guardaron cambios ni se enviaron datos.</p>
+      <dl class="confirmation-summary" data-confirmation-summary></dl>
+      <div class="dialog-actions"><button type="button" class="dialog-primary" data-close-dialog>Entendido</button></div>
+    </dialog>
+
+    <script src="../js/app.js" defer></script>
+    <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
+    <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
+      <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
+      <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
+      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
+      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <div class="dialog-actions">
+        <button type="button" data-cancel-logout autofocus>Cancelar</button>
+        <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>
+      </div>
+    </dialog>
+    <script src="../js/session.js" defer></script>
+    <!-- ELIMINACIÓN DE PRUEBA: requiere aceptación explícita y no borra registros. -->
+    <dialog class="report-dialog delete-dialog" id="delete-report-dialog" aria-labelledby="delete-report-title" aria-describedby="delete-report-description">
+      <h2 id="delete-report-title">¿Eliminar este reporte?</h2>
+      <p class="delete-dialog__folio">Folio <strong data-delete-folio></strong></p>
+      <p id="delete-report-description" class="delete-dialog__warning">¿Estás seguro de que quieres eliminar este folio? Esta acción no puede deshacerse.</p>
+      <p class="delete-dialog__demo">En este prototipo, la eliminación es simulada: no se borrará ningún reporte.</p>
+      <form id="delete-report-form">
+        <label class="delete-acknowledgement">
+          <input type="checkbox" id="delete-acknowledgement" name="acknowledge" required />
+          <span>Entiendo que la acción no puede deshacerse y confirmo que deseo eliminar este reporte.</span>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-cancel-delete autofocus>Cancelar</button>
+          <button type="submit" class="dialog-danger" data-confirm-delete disabled>Eliminar reporte</button>
+        </div>
+      </form>
+      <div class="dialog-actions" data-delete-result hidden><button type="button" class="dialog-primary" data-finish-delete>Entendido</button></div>
+    </dialog>
+    <script src="../js/delete-report.js" defer></script>
+  </body>
+</html>

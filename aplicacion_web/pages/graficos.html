@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Estadísticas de reportes ficticios: tipos de trabajo, observaciones y autoridades." />
+    <title>Estadísticas · Gráficos | RIETI</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/charts.css" />
+  </head>
+  <body class="dashboard-page statistics-page charts-page">
+    <div class="dashboard-shell">
+      <!-- La barra lateral conserva la navegación y la sesión simulada del dashboard. -->
+      <aside class="sidebar" aria-label="Navegación principal">
+        <div class="brand-lockup">
+          <span class="brand-lockup__mark" aria-hidden="true">R</span>
+          <div><strong>RIETI</strong><span>Panel de Control</span></div>
+        </div>
+
+<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil de administrador" title="Ver mi perfil">
+          <span class="user-summary__avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
+          </span>
+          <!-- INTEGRACIÓN FUTURA: estos datos se obtendrán de la sesión autenticada. -->
+          <strong data-field="user-name">RIETI Admin</strong>
+          <span data-field="user-role">Panel de Control</span>
+        </a>
+
+        <nav class="sidebar-nav">
+          <a class="sidebar-nav__item" href="dashboard.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3Z" /></svg>
+            Dashboard
+          </a>
+          <a class="sidebar-nav__item" href="reportes.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
+            Gestión de reportes
+          </a>
+          <span class="sidebar-nav__item is-active" aria-current="page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
+            Estadísticas
+          </span>
+        </nav>
+
+<button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg>
+          Cerrar sesión
+        </button>
+      </aside>
+
+      <main class="dashboard-main reports-main">
+        <header class="management-header">
+          <div>
+            <p class="eyebrow">Análisis</p>
+            <h1>Estadísticas del sistema</h1>
+            <p>Análisis detallado de reportes y métricas de gestión.</p>
+          </div>
+
+          <!-- Estas acciones muestran avisos; se conectarán con API y archivos después. -->
+          <div class="management-actions">
+            <a class="action-button action-button--secondary" href="#actualizar-pendiente" data-action="refresh-reports">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6.1 8.5A7 7 0 0 1 18.7 7L20 12M4 12l1.3 5a7 7 0 0 0 12.6-1.5" /></svg>
+              Actualizar
+            </a>
+            <a class="action-button action-button--primary" href="#descarga-pendiente" data-action="download-reports">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 19h16" /></svg>
+              Exportar
+            </a>
+          </div>
+        </header>
+
+        <!-- Navegación entre las tres vistas de Estadísticas; las gráficas no cambian. -->
+        <nav class="statistics-tabs" aria-label="Apartados de estadísticas">
+          <a href="estadisticas.html">Reportes</a><span aria-current="page">Gráficos</span><a href="rendimiento.html">Rendimiento</a>
+        </nav>
+        <!-- Filtros locales sobre RIETI_REPORTS; sustituir la fuente por la API en el futuro. -->
+        <form class="report-filters statistics-filters" id="chart-filters">
+          <label class="filter-field"><span>Municipio</span><select name="municipality" data-filter="municipality"><option value="">Todos los municipios</option><option value="Naucalpan de Juárez">Naucalpan de Juárez</option><option value="Tlalnepantla de Baz">Tlalnepantla de Baz</option><option value="Coacalco">Coacalco</option><option value="Villa del Carbón">Villa del Carbón</option><option value="Huixquilucan">Huixquilucan</option><option value="Tultitlán">Tultitlán</option><option value="Atizapán de Zaragoza">Atizapán de Zaragoza</option><option value="Cuautitlán Izcalli">Cuautitlán Izcalli</option></select></label>
+          <label class="filter-field"><span>Tipo de trabajo</span><select name="work-type" data-filter="work-type"><option value="">Todos los tipos</option><option value="venta">Venta ambulante en calles o semáforos</option><option value="limpieza">Limpieza de parabrisas</option><option value="comercio">Comercio en mercados o locales</option><option value="agricola">Trabajo agrícola</option><option value="construccion">Construcción</option><option value="domestico">Trabajo doméstico</option></select></label>
+          <label class="filter-field"><span>Fecha inicio</span><input name="start-date" type="date" data-filter="start-date" /></label>
+          <label class="filter-field"><span>Fecha fin</span><input name="end-date" type="date" data-filter="end-date" /></label>
+          <button class="filter-submit" type="submit" aria-label="Aplicar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></svg></button>
+        </form>
+        <div class="chart-filter-footer"><button type="button" class="chart-reset" id="clear-chart-filters">Limpiar filtros</button><p class="filter-feedback" id="chart-feedback" role="status"></p></div>
+        <p class="chart-filter-note" id="municipality-hidden-note" hidden>La gráfica de reportes por municipio se oculta mientras hay filtros activos. Limpia los filtros para volver a verla.</p>
+        <noscript><p>Activa JavaScript para consultar las gráficas interactivas del prototipo.</p></noscript>
+        <section class="analytics-grid" aria-label="Gráficas de reportes">
+          <article class="panel analytics-card " id="card-status">
+            <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
+            <button type="button" class="chart-open" data-chart="status" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Distribución por estatus: ver resumen">
+              <span class="chart-heading">Distribución por estatus</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-status" aria-hidden="true"></span>
+              
+            </button>
+          </article>
+          <article class="panel analytics-card " id="card-heat">
+            <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
+            <button type="button" class="chart-open" data-chart="heat" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Mapa de calor: ver resumen">
+              <span class="chart-heading">Mapa de calor</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-heat" aria-hidden="true"></span>
+              <span class="chart-footnote">Concentración por coordenadas de muestra. Sin límites municipales reales.</span>
+            </button>
+          </article>
+          <article class="panel analytics-card analytics-card--wide" id="card-municipality">
+            <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
+            <button type="button" class="chart-open" data-chart="municipality" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Reportes por municipio: ver resumen">
+              <span class="chart-heading">Reportes por municipio</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-municipality" aria-hidden="true"></span>
+              
+            </button>
+          </article>
+          <article class="panel analytics-card analytics-card--wide" id="card-trend">
+            <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
+            <button type="button" class="chart-open" data-chart="trend" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Tendencia mensual de reportes: ver resumen">
+              <span class="chart-heading">Tendencia mensual de reportes</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-trend" aria-hidden="true"></span>
+              
+            </button>
+          </article>
+        </section>
+        <p class="demo-caption">Datos ficticios del prototipo. Los filtros recalculan las gráficas y sus resúmenes, sin modificar reportes.</p>
+      </main>
+    </div>
+    <!-- Resumen accesible y dinámico de la gráfica seleccionada. No guarda datos. -->
+    <dialog class="report-dialog chart-summary-dialog" id="chart-summary" aria-labelledby="chart-summary-title" aria-describedby="chart-summary-text">
+      <h2 id="chart-summary-title"></h2><p id="chart-summary-text"></p>
+      <dl class="confirmation-summary" id="chart-summary-values"></dl>
+      <div class="dialog-actions"><button type="button" class="dialog-primary" id="close-chart-summary" autofocus>Entendido</button></div>
+    </dialog>
+    <aside class="route-notice" id="actualizar-pendiente" role="dialog" aria-labelledby="refresh-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↻</span><h2 id="refresh-notice-title">Actualización pendiente</h2><p>La actualización se conectará con la base de datos en una etapa posterior.</p><a href="#">Volver a gráficos</a></div></aside>
+    <aside class="route-notice" id="descarga-pendiente" role="dialog" aria-labelledby="download-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↓</span><h2 id="download-notice-title">Exportación pendiente</h2><p>La exportación de gráficas se habilitará en una etapa posterior.</p><a href="#">Volver a gráficos</a></div></aside>
+    <script src="../js/report-data.js" defer></script>
+    <script src="../js/charts.js" defer></script>
+    <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
+    <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
+      <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
+      <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
+      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
+      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <div class="dialog-actions">
+        <button type="button" data-cancel-logout autofocus>Cancelar</button>
+        <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>
+      </div>
+    </dialog>
+    <script src="../js/session.js" defer></script>
+  </body>
+</html>

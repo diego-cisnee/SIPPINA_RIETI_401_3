@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Acceso al panel de control del sistema de reportes RIETI."
+    />
+    <title>Iniciar sesión | RIETI</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="login-page">
+    <main class="login-layout">
+      <!--
+        PANEL DE MARCA
+        Este bloque puede sustituirse por una fotografía, ilustración o logotipo
+        oficial cuando el recurso visual definitivo sea aprobado.
+      -->
+      <section class="login-brand" aria-label="RIETI, sistema de reportes">
+        <div class="login-brand__content">
+          <span class="login-brand__mark" aria-hidden="true">R</span>
+          <p class="login-brand__name">RIETI</p>
+          <p class="login-brand__description">Sistema de gestión de reportes</p>
+        </div>
+      </section>
+
+      <!-- PANEL DE AUTENTICACIÓN -->
+      <section class="login-panel" aria-labelledby="login-title">
+        <form class="login-form">
+          <div class="login-form__heading">
+            <p class="eyebrow">Panel de control</p>
+            <h1 id="login-title">Iniciar sesión</h1>
+            <p>Ingresa tus datos para acceder al dashboard.</p>
+          </div>
+
+          <!--
+            INTEGRACIÓN FUTURA — AUTENTICACIÓN:
+            El atributo name de cada campo permitirá enviar estos valores al backend.
+            JavaScript deberá validar la respuesta del servicio antes de navegar y
+            nunca deberá guardar la contraseña en el HTML o en la URL.
+          -->
+          <div class="form-field">
+            <label for="email">Correo electrónico</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="nombre@institucion.gob.mx"
+              value="control@rieti.gob.mx"
+              required
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="password">Contraseña</label>
+            <div class="password-field">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Ingresa tu contraseña"
+                required
+              />
+              <!--
+                CONTROL DE VISIBILIDAD:
+                app.js cambia el tipo del campo entre password y text. El estado
+                accesible también se actualiza para lectores de pantalla.
+              -->
+              <button
+                class="password-toggle"
+                type="button"
+                aria-label="Mostrar contraseña"
+                aria-controls="password"
+                aria-pressed="false"
+                data-action="toggle-password"
+              >
+                <svg data-icon="show-password" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                  <circle cx="12" cy="12" r="2.7" />
+                </svg>
+                <svg data-icon="hide-password" viewBox="0 0 24 24" aria-hidden="true" hidden>
+                  <path d="M3.2 8.1C1.8 10 1.2 12 1.2 12s3.8 6 10.8 6c1.6 0 3-.3 4.2-.8M8.4 6.6A10.7 10.7 0 0 1 12 6c7 0 10.8 6 10.8 6s-.7 1.2-2 2.5M9.8 9.8A3.1 3.1 0 0 0 14.2 14.2M3 3l18 18" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="login-form__options">
+            <label class="checkbox-control" for="remember">
+              <input id="remember" name="remember" type="checkbox" />
+              <span>Recordar sesión</span>
+            </label>
+
+            <!-- INTEGRACIÓN FUTURA: reemplazar el aviso con la pantalla de recuperación. -->
+            <a href="#recuperar-contrasena-pendiente" data-action="recover-password">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
+          <!--
+            PROTOTIPO:
+            Este enlace simula el acceso sin enviar los datos escritos. Cuando se
+            conecte la autenticación se convertirá en el envío seguro del formulario.
+          -->
+          <a class="primary-button" href="pages/dashboard.html" data-action="login">
+            Iniciar sesión
+          </a>
+
+          <p class="login-form__support">
+            ¿Problemas para ingresar? Contacta al administrador del sistema.
+          </p>
+        </form>
+      </section>
+    </main>
+
+    <!--
+      AVISO TEMPORAL DE RECUPERACIÓN
+      Más adelante este enlace navegará a la página real para solicitar el correo
+      de recuperación y conectarse con el servicio de autenticación.
+    -->
+    <aside
+      class="route-notice"
+      id="recuperar-contrasena-pendiente"
+      role="dialog"
+      aria-labelledby="recovery-notice-title"
+    >
+      <div>
+        <span class="route-notice__icon" aria-hidden="true">→</span>
+        <h2 id="recovery-notice-title">Recuperar contraseña</h2>
+        <p>Esta pantalla se agregará más adelante. El acceso ya está preparado.</p>
+        <a href="#">Volver al inicio de sesión</a>
+      </div>
+    </aside>
+
+    <!-- JavaScript de interacciones locales; no realiza conexiones externas. -->
+    <script src="js/app.js" defer></script>
+  </body>
+</html>

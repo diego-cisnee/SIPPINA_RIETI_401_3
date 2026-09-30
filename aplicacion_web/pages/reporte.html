@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Seguimiento de un reporte ficticio en el prototipo RIETI." />
+    <title>Seguimiento de reporte | RIETI</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body class="dashboard-page report-detail-page">
+    <div class="dashboard-shell">
+      <aside class="sidebar" aria-label="Navegación principal">
+        <div class="brand-lockup">
+          <span class="brand-lockup__mark" aria-hidden="true">R</span>
+          <div><strong>RIETI</strong><span>Panel de Control</span></div>
+        </div>
+
+<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil de administrador" title="Ver mi perfil">
+          <span class="user-summary__avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
+          </span>
+          <!-- INTEGRACIÓN FUTURA: estos datos se obtendrán de la sesión autenticada. -->
+          <strong data-field="user-name">RIETI Admin</strong>
+          <span data-field="user-role">Panel de Control</span>
+        </a>
+
+        <nav class="sidebar-nav">
+          <a class="sidebar-nav__item" href="dashboard.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3Z" /></svg>
+            Dashboard
+          </a>
+          <a class="sidebar-nav__item" href="reportes.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
+            Gestión de reportes
+          </a>
+          <a class="sidebar-nav__item" href="estadisticas.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
+            Estadísticas
+          </a>
+        </nav>
+
+<button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg>
+          Cerrar sesión
+        </button>
+      </aside>
+      <main class="dashboard-main detail-main">
+        <header class="detail-header">
+          <h1>Seguimiento de reporte</h1>
+          <div class="detail-toolbar">
+            <!-- INTEGRACIÓN FUTURA: el origen se recibe en la ruta, no del historial del navegador. -->
+            <nav class="breadcrumbs" aria-label="Ruta de navegación">
+              <a data-origin-link href="reportes.html">Gestión de reportes</a>
+              <span aria-hidden="true">/</span><span>Seguimiento de reporte</span>
+              <span aria-hidden="true">/</span><span aria-current="page" data-detail="id"></span>
+            </nav>
+            <div class="detail-toolbar__actions">
+              <a class="action-button action-button--secondary" data-back-link href="reportes.html">← Volver</a>
+              <button class="action-button action-button--secondary" type="button" data-print-report>Imprimir</button>
+            </div>
+          </div>
+        </header>
+        <noscript>Activa JavaScript para consultar el reporte seleccionado en este prototipo.</noscript>
+        <p class="panel detail-error" data-report-error hidden role="alert">No encontramos ese folio en los datos del prototipo. Puedes volver al listado para seleccionar un reporte.</p>
+
+        <!--
+          CONTEXTO DEL REPORTE
+          report-detail.js coloca los datos ficticios del folio solicitado.
+          app.js reutiliza este contexto para abrir los mismos formularios de las tablas.
+        -->
+        <div id="report-content" data-report-context hidden>
+          <h2 class="detail-folio">Folio <span data-detail="id"></span></h2>
+          <section class="detail-summary" aria-label="Resumen del reporte">
+            <article class="panel"><span>Estado actual</span><strong class="status status--received" data-detail="status"></strong></article>
+            <article class="panel"><span>Prioridad</span><strong class="priority" data-detail="priority"></strong></article>
+            <article class="panel"><span>Fecha de reporte</span><strong data-detail="reportedAt"></strong></article>
+            <article class="panel"><span>Última actualización</span><strong data-detail="updatedAt"></strong></article>
+          </section>
+          <p class="demo-caption">Datos ficticios para revisión del prototipo.</p>
+
+          <div class="detail-columns">
+            <div class="detail-column">
+              <section class="panel detail-panel" aria-labelledby="reporter-title">
+                <h2 id="reporter-title">Información del denunciante</h2>
+                <dl class="detail-fields">
+                  <div><dt>Nombre completo</dt><dd data-detail="reporter"></dd></div>
+                  <div><dt>Correo electrónico</dt><dd data-detail="email"></dd></div>
+                  <div><dt>Teléfono</dt><dd data-detail="phone"></dd></div>
+                </dl>
+              </section>
+
+              <section class="panel detail-panel" aria-labelledby="case-title">
+                <h2 id="case-title">Detalles del caso de trabajo infantil</h2>
+                <dl class="detail-fields detail-fields--split">
+                  <div><dt>Número de niños involucrados</dt><dd data-detail="children"></dd></div>
+                  <div><dt>Rango de edades</dt><dd data-detail="ages"></dd></div>
+                  <div><dt>Tipo de trabajo</dt><dd data-detail="workType"></dd></div>
+                  <div><dt>Horario de trabajo</dt><dd data-detail="workHours"></dd></div>
+                  <div class="detail-fields__full"><dt>Observaciones detalladas</dt><dd data-detail="observations"></dd></div>
+                </dl>
+              </section>
+
+              <section class="panel detail-panel" aria-labelledby="assigned-title">
+                <h2 id="assigned-title">Autoridad asignada</h2>
+                <dl class="detail-fields">
+                  <div><dt>Autoridad</dt><dd>Sin asignar</dd></div>
+                  <div><dt>Administrador</dt><dd>Administrador del sistema<br /><span data-detail="adminEmail"></span></dd></div>
+                  <div><dt>Comentarios</dt><dd>Sin comentarios</dd></div>
+                </dl>
+              </section>
+            </div>
+
+            <div class="detail-column">
+              <section class="panel detail-panel" aria-labelledby="location-title">
+                <h2 id="location-title">Ubicación del caso</h2>
+                <dl class="detail-fields">
+                  <div><dt>Dirección</dt><dd data-detail="address"></dd></div>
+                  <div><dt>Municipio</dt><dd data-detail="municipality"></dd></div>
+                  <div><dt>Puntos de referencia</dt><dd data-detail="reference"></dd></div>
+                  <div><dt>Coordenadas GPS</dt><dd>Lat: <span data-detail="latitude"></span><br />Lng: <span data-detail="longitude"></span></dd></div>
+                </dl>
+                <!-- INTEGRACIÓN FUTURA: reemplazar el aviso por el enlace validado al mapa. -->
+                <a class="detail-text-link" href="#ubicacion-pendiente" data-detail-notice="map">Ver en mapa ↗</a>
+              </section>
+
+              <section class="panel detail-panel" aria-labelledby="attachments-title">
+                <h2 id="attachments-title">Evidencias fotográficas</h2>
+                <!-- INTEGRACIÓN FUTURA: renderizar archivos autorizados con URLs de descarga seguras. -->
+                <ul class="attachment-list" data-list="attachments">
+                  <li><span class="attachment-icon" aria-hidden="true">PNG</span><div><strong>imagen_1.png</strong><span>1.2 MB</span></div><a href="#archivo-pendiente" data-detail-notice="attachment" data-filename="imagen_1.png" aria-label="Descargar imagen_1.png">↓</a></li>
+                  <li><span class="attachment-icon" aria-hidden="true">PNG</span><div><strong>imagen_2.png</strong><span>1.2 MB</span></div><a href="#archivo-pendiente" data-detail-notice="attachment" data-filename="imagen_2.png" aria-label="Descargar imagen_2.png">↓</a></li>
+                </ul>
+              </section>
+
+              <section class="panel detail-panel quick-actions" aria-labelledby="quick-actions-title">
+                <h2 id="quick-actions-title">Acciones rápidas</h2>
+                <button type="button" class="quick-actions__primary" data-report-action="status">Cambiar estado del reporte</button>
+                <button type="button" data-report-action="authority">Reasignar reporte</button>
+                <button type="button" class="quick-actions__danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar reporte</button>
+              </section>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="report-dialog" id="status-dialog" aria-labelledby="status-dialog-title">
+      <form method="dialog" id="status-form">
+        <h2 id="status-dialog-title">Cambiar estado del reporte:<span data-dialog-report-id></span></h2>
+        <div class="current-value"><p>Estado actual</p><span class="status status--received" data-current-status></span></div>
+        <label class="dialog-field">Nuevo estado
+          <select name="status" required>
+            <option>Recibido</option><option>Pendiente</option><option>En proceso</option><option>Resuelto</option><option>Cancelado</option>
+          </select>
+        </label>
+        <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>
+        <label class="dialog-field">Nueva prioridad
+          <select name="priority" required><option>Baja</option><option>Media</option><option>Alta</option><option>Urgente</option></select>
+        </label>
+        <label class="dialog-field">Comentarios
+          <textarea name="comments" rows="3" maxlength="2000" placeholder="Escribe los comentarios…"></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancelar</button>
+          <button type="submit" class="dialog-primary">Actualizar estado</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="report-dialog" id="authority-dialog" aria-labelledby="authority-dialog-title">
+      <form method="dialog" id="authority-form">
+        <h2 id="authority-dialog-title">Asignar autoridad al reporte:<span data-dialog-report-id></span></h2>
+        <div class="current-value"><p>Autoridad actual</p><span class="priority">Sin asignar</span></div>
+        <label class="dialog-field">Nueva autoridad
+          <!-- No agregar autoridades reales hasta recibir el catálogo aprobado. -->
+          <select name="authority" required>
+            <option value="" disabled selected>Seleccionar…</option>
+            <option value="Por definir">Por definir</option>
+          </select>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancelar</button>
+          <button type="submit" class="dialog-primary">Actualizar autoridad</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="report-dialog confirmation-dialog" id="update-confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-description">
+      <span class="confirmation-check" aria-hidden="true">✓</span>
+      <h2 id="confirmation-title">Actualización simulada</h2>
+      <p id="confirmation-description">La solicitud se completó en el prototipo. No se guardaron cambios ni se enviaron datos.</p>
+      <dl class="confirmation-summary" data-confirmation-summary></dl>
+      <div class="dialog-actions"><button type="button" class="dialog-primary" data-close-dialog>Entendido</button></div>
+    </dialog>
+
+
+    <!-- Aviso compartido para mapa y archivos: no abre servicios externos ni descarga archivos. -->
+    <dialog class="report-dialog" id="detail-notice" aria-labelledby="detail-notice-heading">
+      <h2 id="detail-notice-heading"></h2>
+      <p data-detail-notice-message></p>
+      <div class="dialog-actions"><button type="button" class="dialog-primary" data-dismiss-detail-notice>Entendido</button></div>
+    </dialog>
+    <!-- El catálogo y la vista se cargan antes de inicializar las acciones compartidas. -->
+    <script src="../js/report-data.js" defer></script>
+    <script src="../js/report-detail.js" defer></script>
+    <script src="../js/app.js" defer></script>
+    <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
+    <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
+      <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
+      <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
+      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
+      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <div class="dialog-actions">
+        <button type="button" data-cancel-logout autofocus>Cancelar</button>
+        <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>
+      </div>
+    </dialog>
+    <script src="../js/session.js" defer></script>
+    <!-- ELIMINACIÓN DE PRUEBA: requiere aceptación explícita y no borra registros. -->
+    <dialog class="report-dialog delete-dialog" id="delete-report-dialog" aria-labelledby="delete-report-title" aria-describedby="delete-report-description">
+      <h2 id="delete-report-title">¿Eliminar este reporte?</h2>
+      <p class="delete-dialog__folio">Folio <strong data-delete-folio></strong></p>
+      <p id="delete-report-description" class="delete-dialog__warning">¿Estás seguro de que quieres eliminar este folio? Esta acción no puede deshacerse.</p>
+      <p class="delete-dialog__demo">En este prototipo, la eliminación es simulada: no se borrará ningún reporte.</p>
+      <form id="delete-report-form">
+        <label class="delete-acknowledgement">
+          <input type="checkbox" id="delete-acknowledgement" name="acknowledge" required />
+          <span>Entiendo que la acción no puede deshacerse y confirmo que deseo eliminar este reporte.</span>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-cancel-delete autofocus>Cancelar</button>
+          <button type="submit" class="dialog-danger" data-confirm-delete disabled>Eliminar reporte</button>
+        </div>
+      </form>
+      <div class="dialog-actions" data-delete-result hidden><button type="button" class="dialog-primary" data-finish-delete>Entendido</button></div>
+    </dialog>
+    <script src="../js/delete-report.js" defer></script>
+  </body>
+</html>

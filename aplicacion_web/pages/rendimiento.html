@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Rendimiento de autoridades municipales con indicadores y búsqueda automática. Datos ficticios." />
+    <title>Estadísticas · Rendimiento | RIETI</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/performance.css" />
+  </head>
+  <body class="dashboard-page statistics-page performance-page">
+    <div class="dashboard-shell">
+      <!-- La barra lateral conserva la navegación y la sesión simulada del dashboard. -->
+      <aside class="sidebar" aria-label="Navegación principal">
+        <div class="brand-lockup">
+          <span class="brand-lockup__mark" aria-hidden="true">R</span>
+          <div><strong>RIETI</strong><span>Panel de Control</span></div>
+        </div>
+
+<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil de administrador" title="Ver mi perfil">
+          <span class="user-summary__avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
+          </span>
+          <!-- INTEGRACIÓN FUTURA: estos datos se obtendrán de la sesión autenticada. -->
+          <strong data-field="user-name">RIETI Admin</strong>
+          <span data-field="user-role">Panel de Control</span>
+        </a>
+
+        <nav class="sidebar-nav">
+          <a class="sidebar-nav__item" href="dashboard.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3Z" /></svg>
+            Dashboard
+          </a>
+          <a class="sidebar-nav__item" href="reportes.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
+            Gestión de reportes
+          </a>
+          <span class="sidebar-nav__item is-active" aria-current="page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
+            Estadísticas
+          </span>
+        </nav>
+
+<button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg>
+          Cerrar sesión
+        </button>
+      </aside>
+
+      <main class="dashboard-main reports-main">
+        <header class="management-header">
+          <div>
+            <p class="eyebrow">Análisis</p>
+            <h1>Estadísticas del sistema</h1>
+            <p>Análisis detallado de reportes y métricas de gestión.</p>
+          </div>
+
+          <!-- Estas acciones muestran avisos; se conectarán con API y archivos después. -->
+          <div class="management-actions">
+            <a class="action-button action-button--secondary" href="#actualizar-pendiente" data-action="refresh-reports">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6.1 8.5A7 7 0 0 1 18.7 7L20 12M4 12l1.3 5a7 7 0 0 0 12.6-1.5" /></svg>
+              Actualizar
+            </a>
+            <a class="action-button action-button--primary" href="#descarga-pendiente" data-action="download-reports">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 19h16" /></svg>
+              Exportar
+            </a>
+          </div>
+        </header>
+
+        <nav class="statistics-tabs" aria-label="Apartados de estadísticas">
+          <a href="estadisticas.html">Reportes</a><a href="graficos.html">Gráficos</a><span aria-current="page">Rendimiento</span>
+        </nav>
+        <!-- Un municipio corresponde a una autoridad. El filtro actúa al escribir, sin enviar el formulario. -->
+        <section class="performance-search" aria-label="Filtrar rendimiento por municipio">
+          <div class="municipality-combobox" id="municipality-combobox">
+            <label for="municipality-search">Municipio</label>
+            <input id="municipality-search" name="municipality" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="municipality-suggestions" aria-describedby="municipality-help" autocomplete="off" spellcheck="false" placeholder="Escribe un municipio, por ejemplo: Nau…" />
+            <ul id="municipality-suggestions" role="listbox" aria-label="Municipios coincidentes" hidden></ul>
+          </div>
+          <button type="button" class="performance-clear" id="clear-municipality">Limpiar filtro</button>
+          <p id="municipality-help">Los resultados se actualizan mientras escribes. Selecciona una sugerencia para completar el nombre.</p>
+        </section>
+        <p class="performance-feedback" id="performance-feedback" role="status" aria-live="polite"></p>
+        <!-- INTEGRACIÓN FUTURA: indicadores agregados por la API, según el municipio consultado. -->
+        <section class="metric-grid management-metrics" aria-label="Resumen de rendimiento">
+          <article class="metric-card"><span>Días promedio de resolución</span><strong data-performance-metric="average">—</strong><small>Solo reportes finalizados</small></article>
+          <article class="metric-card"><span>Tasa de resolución</span><strong data-performance-metric="resolution">—</strong><small>Finalizados / asignados</small></article>
+          <article class="metric-card"><span>En proceso</span><strong data-performance-metric="progress">—</strong><small>Respecto al total asignado</small></article>
+          <article class="metric-card"><span>Pendientes</span><strong data-performance-metric="pending">—</strong><small>Respecto al total asignado</small></article>
+        </section>
+        <section class="panel performance-panel" aria-labelledby="performance-title">
+          <div class="statistics-list__heading"><h2 id="performance-title">Rendimiento por autoridad</h2><p>Una autoridad por municipio · Datos ficticios</p></div>
+          <div class="performance-scroll" tabindex="0" role="region" aria-label="Tabla de rendimiento, desplazable horizontalmente">
+            <table class="performance-table" aria-describedby="performance-methodology">
+              <thead><tr><th scope="col">Autoridad</th><th scope="col">Municipio</th><th scope="col">Total asignados</th><th scope="col">Pendientes</th><th scope="col">En proceso</th><th scope="col">Finalizados</th><th scope="col">Tiempo promedio</th><th scope="col">Eficiencia</th></tr></thead>
+              <!-- El script crea filas seguras con textContent a partir de performance-data.js. -->
+              <tbody id="performance-rows" data-list="authority-performance"></tbody>
+            </table>
+          </div>
+        </section>
+        <p class="demo-caption" id="performance-methodology">Eficiencia provisional = finalizados ÷ asignados × 100. Tiempo promedio: días de resolución de los casos finalizados. El resumen se calcula sobre las autoridades visibles; “—” indica que no hay base para calcular el indicador.</p>
+        <p class="demo-caption">Muestra independiente para diseñar Rendimiento. No modifica las autoridades ni las asignaciones de los reportes del prototipo. Catálogo y criterios pendientes de aprobación.</p>
+        <noscript><p>Activa JavaScript para ver los datos y utilizar la búsqueda automática.</p></noscript>
+      </main>
+    </div>
+    <!-- Avisos temporales: no se consulta la base de datos ni se generan archivos todavía. -->
+    <aside class="route-notice" id="actualizar-pendiente" role="dialog" aria-labelledby="refresh-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↻</span><h2 id="refresh-notice-title">Actualización pendiente</h2><p>La actualización del rendimiento se conectará con la base de datos en una etapa posterior.</p><a href="#">Volver a rendimiento</a></div></aside>
+    <aside class="route-notice" id="descarga-pendiente" role="dialog" aria-labelledby="download-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↓</span><h2 id="download-notice-title">Exportación pendiente</h2><p>La exportación de estos indicadores se habilitará en una etapa posterior.</p><a href="#">Volver a rendimiento</a></div></aside>
+    <script src="../js/performance-data.js" defer></script>
+    <script src="../js/performance.js" defer></script>
+    <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
+    <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
+      <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
+      <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
+      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
+      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <div class="dialog-actions">
+        <button type="button" data-cancel-logout autofocus>Cancelar</button>
+        <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>
+      </div>
+    </dialog>
+    <script src="../js/session.js" defer></script>
+  </body>
+</html>
