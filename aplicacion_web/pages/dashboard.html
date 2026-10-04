@@ -6,6 +6,8 @@
     <meta name="description" content="Resumen general de los reportes registrados en RIETI." />
     <title>Dashboard | RIETI</title>
     <link rel="stylesheet" href="../css/styles.css" />
+    <script src="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.css" rel="stylesheet" />
   </head>
   <body class="dashboard-page">
     <div class="dashboard-shell">
@@ -92,14 +94,10 @@
               <li><span class="legend-dot legend-dot--heat-low"></span>Menos casos</li>
             </ul>
             <!-- Esta cuadrícula temporal se sustituirá por el mapa conectado a datos municipales. -->
-            <div class="heatmap" role="img" aria-label="Representación temporal de densidad de reportes por zona">
-              <span style="--x:3;--y:1;--heat:.18"></span><span style="--x:4;--y:1;--heat:.24"></span>
-              <span style="--x:2;--y:2;--heat:.22"></span><span style="--x:3;--y:2;--heat:.38"></span><span style="--x:4;--y:2;--heat:.46"></span><span style="--x:5;--y:2;--heat:.31"></span>
-              <span style="--x:2;--y:3;--heat:.28"></span><span style="--x:3;--y:3;--heat:.52"></span><span style="--x:4;--y:3;--heat:.88"></span><span style="--x:5;--y:3;--heat:.71"></span><span style="--x:6;--y:3;--heat:.32"></span>
-              <span style="--x:1;--y:4;--heat:.15"></span><span style="--x:2;--y:4;--heat:.25"></span><span style="--x:3;--y:4;--heat:.64"></span><span style="--x:4;--y:4;--heat:1"></span><span style="--x:5;--y:4;--heat:.83"></span><span style="--x:6;--y:4;--heat:.41"></span>
-              <span style="--x:2;--y:5;--heat:.19"></span><span style="--x:3;--y:5;--heat:.43"></span><span style="--x:4;--y:5;--heat:.67"></span><span style="--x:5;--y:5;--heat:.54"></span><span style="--x:6;--y:5;--heat:.27"></span>
-              <span style="--x:3;--y:6;--heat:.21"></span><span style="--x:4;--y:6;--heat:.35"></span><span style="--x:5;--y:6;--heat:.29"></span><span style="--x:4;--y:7;--heat:.16"></span>
-            </div>
+           <!-- Agregamos el id="map" al contenedor -->
+             <div class="heatmap" id="map" aria-label="Representación temporal de densidad de reportes por zona"></div>
+              
+          
           </article>
         </section>
 
@@ -233,5 +231,6 @@
       <div class="dialog-actions" data-delete-result hidden><button type="button" class="dialog-primary" data-finish-delete>Entendido</button></div>
     </dialog>
     <script src="../js/delete-report.js" defer></script>
+    <script src= '../js/mapa.js'defer></script>
   </body>
 </html>

@@ -476,7 +476,7 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
 }
 
 .status-panel,
-.heatmap-panel { min-height: 390px; padding: 24px; }
+.heatmap-panel { min-height: 400px;  }
 
 .panel__header {
   display: flex;
@@ -547,7 +547,7 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
   grid-template-rows: repeat(7, 33px);
   justify-content: center;
   margin: 30px auto 0;
-  transform: rotate(-4deg);
+  transform: rotate(0deg);
 }
 
 .heatmap span {
