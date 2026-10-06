@@ -34,3 +34,21 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Nuevo reporte en Lng: ${coordenadas.lng}, Lat: ${coordenadas.lat}`);
     });
 });
+
+const mapHover= document.getElementById('hoverMap');
+const botonex=document.getElementById('BotonExpandir');
+
+botonex.addEventListener('click',()=>{
+    if (mapHover.requestFullscreen){
+        mapHover.requestFullscreen();
+    }
+    
+    
+});
+
+document.addEventListener('fullscreenchange',()=>{
+    setTimeout(()=>{
+        map.resize();
+    },200);
+});
+

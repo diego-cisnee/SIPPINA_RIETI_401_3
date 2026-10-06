@@ -1193,3 +1193,65 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
+
+/* Posicionamos el botón en el centro del mapa */
+.ExpandMap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(30, 41, 59, 0.85); /* Color oscuro semitransparente */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  z-index: 10;
+  
+  /* Efecto de aparición */
+  opacity: 0;
+  pointer-events: none; /* Cuando es invisible, los clics pasan a través de él hacia el mapa */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* Cuando el usuario hace hover en el contenedor, mostramos el botón */
+.hoverMap:hover .ExpandMap {
+  opacity: 1;
+  pointer-events: auto; /* Ahora sí puede recibir clics */
+}
+
+
+.hoverMap:fullscreen .ExpandMap {
+  display: none;
+}
+.hovermap:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: white; /* Evita fondos negros si hay algún margen */
+}
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 350px; 
+}
+
+/* El mapa siempre llenará el 100% del contenedor padre */
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Reglas estrictas para pantalla completa */
+.hoverMap:fullscreen,
+.hoverMap:-webkit-full-screen,
+.hoverMap:-moz-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: #f8f9fa; /* Fondo claro por si hay carga lenta */
+}
