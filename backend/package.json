@@ -1,0 +1,21 @@
+{
+  "name": "rieti-backend",
+  "version": "1.0.0",
+  "description": "API básica para conectar el dashboard RIETI con MySQL en AWS RDS.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.1"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "private": true
+}

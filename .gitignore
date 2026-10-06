@@ -1,0 +1,11 @@
+# Dependencias instaladas por Node.js. Se reconstruyen con `npm install`.
+node_modules/
+
+# Variables privadas de entorno. Nunca deben publicarse en GitHub.
+.env
+.env.*
+!.env.example
+
+# Archivos internos creados por macOS.
+.DS_Store
+

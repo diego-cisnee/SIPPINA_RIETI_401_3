@@ -476,7 +476,7 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
 }
 
 .status-panel,
-.heatmap-panel { min-height: 400px;  }
+.heatmap-panel { min-height: 400px; padding: 24px;}
 
 .panel__header {
   display: flex;
