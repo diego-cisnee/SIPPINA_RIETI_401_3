@@ -1,8 +1,8 @@
 /* ESTADÍSTICAS / GRÁFICOS
-   Datos de muestra compartidos con los reportes. No se hacen peticiones ni se guarda información.
-   INTEGRACIÓN FUTURA: reemplazar RIETI_REPORTS por una respuesta autorizada de la API.
-   SVG dibuja únicamente gráficas de datos; el mapa es un esquema GPS, no cartografía oficial. */
-(() => {
+   Reportes consultados por report-data.js. No se escribe información.
+   SVG dibuja estados, municipios y tendencia. El mapa queda pendiente. */
+(async () => {
+  await window.RIETI_READY;
   const records = Object.values(window.RIETI_REPORTS || {});
   const form = document.querySelector('#chart-filters');
   if (!form) return;
@@ -10,14 +10,15 @@
   const dialog = document.querySelector('#chart-summary');
   const buttons = Array.from(document.querySelectorAll('[data-chart]'));
   const colors = ['#dce0e5', '#bfc6ce', '#9ea6b0', '#68717d', '#454d57'];
-  const statuses = ['Recibido', 'Pendiente', 'En proceso', 'Resuelto', 'Cancelado'];
+  const statuses = [...new Set(records.map(r => r.status))];
+  while (colors.length < statuses.length) colors.push('#858e9a');
   const abbreviations = { 'Naucalpan de Juárez': 'NAU', 'Tlalnepantla de Baz': 'TLA', 'Coacalco': 'COA', 'Villa del Carbón': 'VDC', 'Huixquilucan': 'HUI', 'Tultitlán': 'TUL', 'Atizapán de Zaragoza': 'ATZ', 'Cuautitlán Izcalli': 'CIZ' };
   const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
   let summaries = {};
   let returnFocusTo;
   // Toda etiqueta futura se escapa antes de entrar en SVG/HTML; los resúmenes usan textContent.
   const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-  const isoDate = report => report.reportedAt.slice(0, 10).split('/').reverse().join('-');
+  const isoDate = report => report.date;
   const percentage = (count, total) => total ? (count * 100 / total).toLocaleString('es-MX', { maximumFractionDigits: 1 }) + '%' : '0%';
   const svg = (width, height, contents) => `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" focusable="false">${contents}</svg>`;
   const text = (x, y, value, anchor = 'middle') => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="Arial, sans-serif" font-size="12" fill="#68717d">${escape(value)}</text>`;
@@ -51,22 +52,8 @@
   // Esquema de concentración sobre coordenadas ficticias, con escala fija al filtrar.
   // INTEGRACIÓN FUTURA: usar polígonos municipales y un proveedor cartográfico aprobado.
   function renderHeat(selected) {
-    const groups = municipalityCounts(selected);
-    const max = Math.max(1, ...groups.map(([, count]) => count));
-    const allLat = records.map(r => Number(r.latitude));
-    const allLng = records.map(r => Number(r.longitude));
-    const minLat = Math.min(...allLat), maxLat = Math.max(...allLat);
-    const minLng = Math.min(...allLng), maxLng = Math.max(...allLng);
-    const points = groups.map(([name, count]) => {
-      const record = selected.find(r => r.municipality === name);
-      const x = 55 + (Number(record.longitude) - minLng) / (maxLng - minLng || 1) * 300;
-      const y = 255 - (Number(record.latitude) - minLat) / (maxLat - minLat || 1) * 205;
-      return `<circle cx="${x}" cy="${y}" r="${12 + count / max * 12}" fill="#68717d" opacity="${0.18 + count / max * 0.6}" />` + text(x, y + 4, abbreviations[name] || name.slice(0, 3));
-    }).join('');
-    const grid = [60, 110, 160, 210, 260].map(y => `<path d="M25 ${y}H385" stroke="#eef0f4"/>`).join('');
-    setChart('heat', legend([['Más casos', '#68717d'], ['Menos casos', '#dce0e5']]) + (selected.length ? svg(410, 300, grid + text(380, 25, 'N ↑') + points) : empty));
-    const leaders = groups.filter(([, count]) => count === max).map(([name]) => name).join(', ');
-    summaries.heat = { title: 'Mapa de calor', description: selected.length ? `Los ${selected.length} reportes se concentran en ${groups.length} municipio(s). Mayor concentración: ${leaders}, con ${max} reporte(s) por municipio. La intensidad y el tamaño indican la cantidad. Es un esquema de coordenadas ficticias, no un mapa oficial ni una medición de riesgo.` : 'No hay ubicaciones que mostrar con estos filtros.', values: groups.map(([name, count]) => [name, `${count} reporte(s)`]) };
+    setChart('heat', '<span class="chart-empty">Integración del mapa pendiente.</span>');
+    summaries.heat = { title: 'Mapa de calor', description: 'Integración del mapa pendiente.', values: [] };
   }
 
   // Ejes compartidos: escala entera, líneas guía y etiqueta de unidades.
@@ -95,6 +82,7 @@
   }
 
   function renderTrend(selected) {
+    selected = selected.filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r.date));
     if (!selected.length) {
       setChart('trend', empty);
       summaries.trend = { title: 'Tendencia mensual de reportes', description: 'No hay reportes para calcular una tendencia con estos filtros.', values: [] };
@@ -115,10 +103,11 @@
     const labels = groups.map(([label, count], i) => text(points[i][0], 298, groups.length === 12 ? label.slice(0, 3) : label) + `<circle cx="${points[i][0]}" cy="${points[i][1]}" r="4" fill="#68717d"/>`).join('');
     setChart('trend', svg(900, 330, markup + `<polyline points="${points.map(p => p.join(',')).join(' ')}" fill="none" stroke="#858e9a" stroke-width="2.5"/>` + labels + text(450, 325, [...new Set(years)].sort().join(' · '))));
     const peaks = groups.filter(([, count]) => count === peak).map(([label]) => label).join(', ');
-    summaries.trend = { title: 'Tendencia mensual de reportes', description: `Se agrupan ${selected.length} reportes por mes de registro. El máximo es ${peak} en ${peaks}. Los meses con cero no contienen reportes dentro de esta muestra y de los filtros aplicados; no representan estadísticas reales.`, values: groups.map(([label, count]) => [label, `${count} reporte(s)`]) };
+    summaries.trend = { title: 'Tendencia mensual de reportes', description: `Se agrupan ${selected.length} reportes por mes de registro. El máximo es ${peak} en ${peaks}. Los meses con cero no contienen reportes en los datos consultados y de los filtros aplicados.`, values: groups.map(([label, count]) => [label, `${count} reporte(s)`]) };
   }
 
   function render() {
+    if (window.RIETI_API_ERROR) return;
     const filters = Object.fromEntries(Object.entries(controls).map(([key, input]) => [key, input.value]));
     const invalidRange = filters['start-date'] && filters['end-date'] && filters['start-date'] > filters['end-date'];
     controls['end-date'].setCustomValidity(invalidRange ? 'La fecha fin debe ser igual o posterior a la fecha inicio.' : '');
@@ -126,11 +115,11 @@
     const selected = records.filter(report => (!filters.municipality || report.municipality === filters.municipality)
       && (!filters['work-type'] || report.workTypeId === filters['work-type'])
       && (!filters['start-date'] || isoDate(report) >= filters['start-date'])
-      && (!filters['end-date'] || isoDate(report) <= filters['end-date']));
+      && (!filters['end-date'] || (isoDate(report) && isoDate(report) <= filters['end-date'])));
     const active = Object.values(filters).some(Boolean);
     document.querySelector('#card-municipality').hidden = active;
     document.querySelector('#municipality-hidden-note').hidden = !active;
-    document.querySelector('#chart-feedback').textContent = `${selected.length} de ${records.length} reportes de muestra · ${active ? 'Filtros aplicados' : 'Sin filtros'}`;
+    document.querySelector('#chart-feedback').textContent = `${selected.length} de ${records.length} reportes consultados · ${active ? 'Filtros aplicados' : 'Sin filtros'}`;
     renderStatus(selected);
     renderHeat(selected);
     renderMunicipality(selected);
@@ -165,5 +154,11 @@
   dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
   dialog.addEventListener('close', () => returnFocusTo?.focus());
   // Escape y confinamiento del foco provienen del elemento dialog nativo.
+  if (window.RIETI_API_ERROR) {
+    ['status', 'heat', 'municipality', 'trend'].forEach(id => setChart(id, '<span class="chart-empty">Datos no disponibles.</span>'));
+    buttons.forEach(button => { button.disabled = true; });
+    document.querySelector('#chart-feedback').textContent = 'Datos no disponibles.';
+    return;
+  }
   render();
 })();

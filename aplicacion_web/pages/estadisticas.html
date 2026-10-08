@@ -3,11 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Estadísticas de reportes ficticios: tipos de trabajo, observaciones y autoridades." />
+    <meta name="description" content="Estadísticas de reportes registrados: tipos de trabajo, observaciones y autoridades." />
     <title>Estadísticas · Reportes | RIETI</title>
     <link rel="stylesheet" href="../css/styles.css" />
+      <noscript><style>
+      [data-load-block], [data-loading-only] { display: none !important; }
+    </style></noscript>
   </head>
-  <body class="dashboard-page statistics-page">
+  <body data-report-loading class="dashboard-page statistics-page statistics-reports-page">
     <div class="dashboard-shell">
       <!-- La barra lateral conserva la navegación y la sesión simulada del dashboard. -->
       <aside class="sidebar" aria-label="Navegación principal">
@@ -46,7 +49,7 @@
         </button>
       </aside>
 
-      <main class="dashboard-main reports-main">
+      <main aria-busy="true" class="dashboard-main reports-main">
         <header class="management-header">
           <div>
             <p class="eyebrow">Análisis</p>
@@ -54,7 +57,7 @@
             <p>Análisis detallado de reportes y métricas de gestión.</p>
           </div>
 
-          <!-- Estas acciones muestran avisos; se conectarán con API y archivos después. -->
+          <!-- Actualizar vuelve a consultar la API; exportar conserva su aviso provisional. -->
           <div class="management-actions">
             <a class="action-button action-button--secondary" href="#actualizar-pendiente" data-action="refresh-reports">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6.1 8.5A7 7 0 0 1 18.7 7L20 12M4 12l1.3 5a7 7 0 0 0 12.6-1.5" /></svg>
@@ -74,7 +77,7 @@
           <a href="rendimiento.html">Rendimiento</a>
         </nav>
         <!-- INTEGRACIÓN FUTURA: los filtros consultarán la API; el catálogo es provisional. -->
-        <form class="report-filters statistics-filters" id="report-filters">
+        <form class="report-filters statistics-filters" id="report-filters" data-load-block inert aria-busy="true">
           <label class="filter-field"><span>Municipio</span><select name="municipality" data-filter="municipality"><option value="">Todos los municipios</option><option value="Naucalpan de Juárez">Naucalpan de Juárez</option><option value="Tlalnepantla de Baz">Tlalnepantla de Baz</option><option value="Coacalco">Coacalco</option><option value="Villa del Carbón">Villa del Carbón</option><option value="Huixquilucan">Huixquilucan</option><option value="Tultitlán">Tultitlán</option><option value="Atizapán de Zaragoza">Atizapán de Zaragoza</option><option value="Cuautitlán Izcalli">Cuautitlán Izcalli</option></select></label>
           <label class="filter-field"><span>Tipo de trabajo</span><select name="work-type" data-filter="work-type"><option value="">Todos los tipos</option><option value="venta">Venta ambulante en calles o semáforos</option><option value="limpieza">Limpieza de parabrisas</option><option value="comercio">Comercio en mercados o locales</option><option value="agricola">Trabajo agrícola</option><option value="construccion">Construcción</option><option value="domestico">Trabajo doméstico</option></select></label>
           <label class="filter-field"><span>Fecha inicio</span><input name="start-date" type="date" data-filter="start-date" /></label>
@@ -82,162 +85,28 @@
           <button class="filter-submit" type="submit" aria-label="Aplicar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></svg></button>
         </form>
 
-        <p class="filter-feedback" id="filter-feedback" aria-live="polite">Mostrando 11 reportes de muestra</p>
+        <p class="filter-feedback" id="filter-feedback" aria-live="polite">Cargando reportes…</p>
 
         <!-- Los totales se reemplazarán con valores agregados entregados por la API. -->
         <section class="metric-grid management-metrics" aria-label="Resumen de reportes">
-          <article class="metric-card"><span>Total de reportes</span><strong data-field="reports-total" data-filter-count="reports-total">11</strong></article>
-          <article class="metric-card metric-card--warning"><span>Pendientes</span><strong data-field="reports-pending" data-filter-count="reports-pending">4</strong></article>
-          <article class="metric-card metric-card--progress"><span>En proceso</span><strong data-field="reports-progress" data-filter-count="reports-progress">5</strong></article>
-          <article class="metric-card metric-card--success"><span>Resueltos</span><strong data-field="reports-resolved" data-filter-count="reports-resolved">2</strong></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span>Total de reportes</span><strong data-field="reports-total" data-filter-count="reports-total">—</strong></article>
+          <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span>Pendientes</span><strong data-field="reports-pending" data-filter-count="reports-pending">—</strong></article>
+          <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span>En proceso</span><strong data-field="reports-progress" data-filter-count="reports-progress">—</strong></article>
+          <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span>Resueltos</span><strong data-field="reports-resolved" data-filter-count="reports-resolved">—</strong></article>
         </section>
 
-<section class="panel statistics-list" aria-labelledby="statistics-list-title">
-          <header class="statistics-list__heading"><h2 id="statistics-list-title">Lista de reportes <span data-list-count>(11)</span></h2><p>Datos ficticios · Desliza para ver todas las columnas</p></header>
+<section class="panel statistics-list" aria-labelledby="statistics-list-title" data-load-block inert aria-busy="true">
+          <header class="statistics-list__heading"><h2 id="statistics-list-title">Lista de reportes <span data-list-count>(—)</span></h2><p>Datos consultados · Desliza para ver todas las columnas</p></header>
           <!-- CSS muestra puntos suspensivos sin recortar el dato original.
                El detalle conserva la información completa del reporte. -->
           <div class="statistics-scroll" tabindex="0" role="region" aria-label="Tabla de estadísticas con desplazamiento horizontal">
             <table class="stats-table">
 <thead><tr><th scope="col">Folio</th><th scope="col">Tipo de trabajo</th><th scope="col">Observaciones</th><th scope="col">Municipio</th><th scope="col">Autoridad</th><th scope="col">Estatus</th><th scope="col">Prioridad</th><th scope="col">Fecha</th><th scope="col">Denunciante</th><th scope="col"><span class="sr-only">Acciones</span></th></tr></thead>
-              <tbody data-list="statistics-reports">
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-NAU-2026-0001" data-report-row data-report-id="RIETI-NAU-2026-0001" data-municipality="Naucalpan de Juárez" data-status="Recibido" data-priority="Alta" data-date="2026-10-22" data-work-type="venta">
-                  <td><strong>RIETI-NAU-2026-0001</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Venta ambulante en calles o semáforos">Venta ambulante en calles o semáforos</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de venta ambulante en calles o semáforos durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de venta ambulante en calles o semáforos durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Naucalpan de Juárez">Naucalpan de Juárez</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--received">Recibido</span></td>
-                  <td><span class="priority">Alta</span></td>
-                  <td>22/10/2026</td>
-                  <td><span class="cell-preview " title="Juan López García">Juan López García</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-NAU-2026-0001">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-TLA-2026-0002" data-report-row data-report-id="RIETI-TLA-2026-0002" data-municipality="Tlalnepantla de Baz" data-status="Recibido" data-priority="Baja" data-date="2026-10-13" data-work-type="limpieza">
-                  <td><strong>RIETI-TLA-2026-0002</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Limpieza de parabrisas">Limpieza de parabrisas</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de limpieza de parabrisas durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de limpieza de parabrisas durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Tlalnepantla de Baz">Tlalnepantla de Baz</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--received">Recibido</span></td>
-                  <td><span class="priority">Baja</span></td>
-                  <td>13/10/2026</td>
-                  <td><span class="cell-preview " title="Raúl Pérez Hernández">Raúl Pérez Hernández</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-TLA-2026-0002">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-NAU-2026-0003" data-report-row data-report-id="RIETI-NAU-2026-0003" data-municipality="Naucalpan de Juárez" data-status="En proceso" data-priority="Media" data-date="2026-10-06" data-work-type="comercio">
-                  <td><strong>RIETI-NAU-2026-0003</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Comercio en mercados o locales">Comercio en mercados o locales</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de comercio en mercados o locales durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de comercio en mercados o locales durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Naucalpan de Juárez">Naucalpan de Juárez</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--progress">En proceso</span></td>
-                  <td><span class="priority">Media</span></td>
-                  <td>06/10/2026</td>
-                  <td><span class="cell-preview " title="Santiago Hernández López">Santiago Hernández López</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-NAU-2026-0003">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-COA-2026-0004" data-report-row data-report-id="RIETI-COA-2026-0004" data-municipality="Coacalco" data-status="En proceso" data-priority="Media" data-date="2026-09-28" data-work-type="agricola">
-                  <td><strong>RIETI-COA-2026-0004</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Trabajo agrícola">Trabajo agrícola</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de trabajo agrícola durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de trabajo agrícola durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Coacalco">Coacalco</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--progress">En proceso</span></td>
-                  <td><span class="priority">Media</span></td>
-                  <td>28/09/2026</td>
-                  <td><span class="cell-preview " title="Valeria Martínez García">Valeria Martínez García</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-COA-2026-0004">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-VDC-2026-0005" data-report-row data-report-id="RIETI-VDC-2026-0005" data-municipality="Villa del Carbón" data-status="En proceso" data-priority="Urgente" data-date="2026-09-22" data-work-type="construccion">
-                  <td><strong>RIETI-VDC-2026-0005</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Construcción">Construcción</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de construcción durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de construcción durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Villa del Carbón">Villa del Carbón</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--progress">En proceso</span></td>
-                  <td><span class="priority">Urgente</span></td>
-                  <td>22/09/2026</td>
-                  <td><span class="cell-preview " title="Diego Ramírez Torres">Diego Ramírez Torres</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-VDC-2026-0005">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-HUI-2026-0006" data-report-row data-report-id="RIETI-HUI-2026-0006" data-municipality="Huixquilucan" data-status="En proceso" data-priority="Alta" data-date="2026-09-16" data-work-type="domestico">
-                  <td><strong>RIETI-HUI-2026-0006</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Trabajo doméstico">Trabajo doméstico</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de trabajo doméstico durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de trabajo doméstico durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Huixquilucan">Huixquilucan</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--progress">En proceso</span></td>
-                  <td><span class="priority">Alta</span></td>
-                  <td>16/09/2026</td>
-                  <td><span class="cell-preview " title="Fernanda Sánchez Morales">Fernanda Sánchez Morales</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-HUI-2026-0006">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-NAU-2026-0007" data-report-row data-report-id="RIETI-NAU-2026-0007" data-municipality="Naucalpan de Juárez" data-status="Pendiente" data-priority="Baja" data-date="2026-09-11" data-work-type="venta">
-                  <td><strong>RIETI-NAU-2026-0007</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Venta ambulante en calles o semáforos">Venta ambulante en calles o semáforos</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de venta ambulante en calles o semáforos durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de venta ambulante en calles o semáforos durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Naucalpan de Juárez">Naucalpan de Juárez</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--pending">Pendiente</span></td>
-                  <td><span class="priority">Baja</span></td>
-                  <td>11/09/2026</td>
-                  <td><span class="cell-preview " title="Alejandro González Reyes">Alejandro González Reyes</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-NAU-2026-0007">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-TUL-2026-0008" data-report-row data-report-id="RIETI-TUL-2026-0008" data-municipality="Tultitlán" data-status="Resuelto" data-priority="Media" data-date="2026-09-04" data-work-type="limpieza">
-                  <td><strong>RIETI-TUL-2026-0008</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Limpieza de parabrisas">Limpieza de parabrisas</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de limpieza de parabrisas durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de limpieza de parabrisas durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Tultitlán">Tultitlán</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--resolved">Resuelto</span></td>
-                  <td><span class="priority">Media</span></td>
-                  <td>04/09/2026</td>
-                  <td><span class="cell-preview " title="Camila Rodríguez Flores">Camila Rodríguez Flores</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-TUL-2026-0008">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-ATZ-2026-0009" data-report-row data-report-id="RIETI-ATZ-2026-0009" data-municipality="Atizapán de Zaragoza" data-status="Resuelto" data-priority="Urgente" data-date="2026-08-25" data-work-type="comercio">
-                  <td><strong>RIETI-ATZ-2026-0009</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Comercio en mercados o locales">Comercio en mercados o locales</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de comercio en mercados o locales durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de comercio en mercados o locales durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Atizapán de Zaragoza">Atizapán de Zaragoza</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--resolved">Resuelto</span></td>
-                  <td><span class="priority">Urgente</span></td>
-                  <td>25/08/2026</td>
-                  <td><span class="cell-preview " title="Sebastián Castillo Vargas">Sebastián Castillo Vargas</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-ATZ-2026-0009">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-COA-2026-0010" data-report-row data-report-id="RIETI-COA-2026-0010" data-municipality="Coacalco" data-status="Pendiente" data-priority="Baja" data-date="2026-08-20" data-work-type="agricola">
-                  <td><strong>RIETI-COA-2026-0010</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Trabajo agrícola">Trabajo agrícola</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de trabajo agrícola durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de trabajo agrícola durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Coacalco">Coacalco</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--pending">Pendiente</span></td>
-                  <td><span class="priority">Baja</span></td>
-                  <td>20/08/2026</td>
-                  <td><span class="cell-preview " title="Mariana Cruz Mendoza">Mariana Cruz Mendoza</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-COA-2026-0010">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-<tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-CIZ-2026-0003" data-report-row data-report-id="RIETI-CIZ-2026-0003" data-municipality="Cuautitlán Izcalli" data-status="En proceso" data-priority="Media" data-date="2026-10-06" data-work-type="construccion">
-                  <td><strong>RIETI-CIZ-2026-0003</strong></td>
-                  <td><span class="cell-preview cell-preview--work" title="Construcción">Construcción</span></td>
-                  <td><span class="cell-preview cell-preview--observations" title="Se reporta la participación de dos niños en actividades de construcción durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.">Se reporta la participación de dos niños en actividades de construcción durante la jornada, sin supervisión adulta visible. Observación ficticia pendiente de verificación.</span></td>
-                  <td><span class="cell-preview " title="Cuautitlán Izcalli">Cuautitlán Izcalli</span></td>
-                  <td><span class="cell-preview " title="Sin asignar">Sin asignar</span></td>
-                  <td><span class="status status--progress">En proceso</span></td>
-                  <td><span class="priority">Media</span></td>
-                  <td>06/10/2026</td>
-                  <td><span class="cell-preview " title="Santiago Hernández López">Santiago Hernández López</span></td>
-                  <td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-CIZ-2026-0003">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                </tr>
-                <tr class="empty-table-row" data-empty-row hidden><td colspan="10">No hay reportes que coincidan con los filtros seleccionados.</td></tr>
-              </tbody>
+              <tbody data-list="statistics-reports"><tr><td colspan="10">Cargando reportes…</td></tr></tbody>
             </table>
           </div>
         </section>
-        <p class="demo-caption">Catálogo de tipos de trabajo provisional. Las autoridades permanecen sin asignar hasta definir su catálogo.</p>
+        <p class="demo-caption">Tipos de trabajo consultados de los reportes. Autoridad asignada: no disponible en la base actual.</p>
       </main>
     </div>
 
@@ -297,6 +166,7 @@
       <div class="dialog-actions"><button type="button" class="dialog-primary" data-close-dialog>Entendido</button></div>
     </dialog>
 
+    <script src="../js/report-data.js" defer></script>
     <script src="../js/app.js" defer></script>
     <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
     <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">

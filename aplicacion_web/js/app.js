@@ -1,7 +1,9 @@
+(async () => {
+  if (window.RIETI_READY) await window.RIETI_READY;
 /*
   INTERACCIONES DEL PROTOTIPO
   Este archivo contiene únicamente comportamiento local de interfaz.
-  Las conexiones con autenticación, API y base de datos se agregarán después.
+  Los reportes se cargan mediante RIETI_READY; autenticación y escrituras siguen pendientes.
 */
 
 const passwordInput = document.querySelector("#password");
@@ -35,7 +37,7 @@ if (passwordInput && passwordToggle) {
    GESTIÓN DE REPORTES
    ================================================================ */
 const reportRows = Array.from(document.querySelectorAll("[data-report-row]"));
-// Navega al folio conservando el origen; solo se transmiten identificadores ficticios.
+// Navega al folio conservando el origen; se transmite id_reporte.
 const openReport = (row) => {
   const reportId = row.dataset.reportId;
   const from = document.body.classList.contains("statistics-page") ? "estadisticas"
@@ -121,9 +123,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 /*
-  FILTROS CON DATOS FICTICIOS
-  Esta lógica se reemplazará por parámetros enviados a la API cuando el listado
-  provenga de la base de datos.
+  FILTROS LOCALES SOBRE LOS REPORTES CONSULTADOS A LA API.
 */
 const filtersForm = document.querySelector("#report-filters");
 
@@ -158,12 +158,16 @@ if (statusDialog && authorityDialog && confirmationDialog) {
       dialog.querySelector("[data-dialog-report-id]").textContent = selectedReportId;
 
       if (dialog === statusDialog) {
-        const status = row.dataset.status || row.querySelector(".status")?.textContent.trim() || "Recibido";
-        const priority = row.dataset.priority || "Media";
+        const status = row.dataset.status || row.querySelector(".status")?.textContent.trim() || "No disponible";
+        const priority = row.dataset.priority || "No disponible";
         dialog.querySelector("[data-current-status]").textContent = status;
         dialog.querySelector("[data-current-priority]").textContent = priority;
-        form.elements.namedItem("status").value = status;
-        form.elements.namedItem("priority").value = priority;
+        const statusSelect = form.elements.namedItem("status");
+        if (![...statusSelect.options].some(option => option.value === status)) statusSelect.add(new Option(status, status));
+        statusSelect.value = status;
+        const prioritySelect = form.elements.namedItem("priority");
+        if (![...prioritySelect.options].some(option => option.value === priority)) prioritySelect.add(new Option(priority, priority));
+        prioritySelect.value = priority;
       }
 
       // El diálogo nativo retiene el foco y bloquea la interacción con el fondo.
@@ -212,7 +216,7 @@ if (statusDialog && authorityDialog && confirmationDialog) {
   });
 }
 
-if (filtersForm && reportRows.length > 0) {
+if (filtersForm) {
   const municipalityFilter = filtersForm.querySelector('[data-filter="municipality"]');
   const statusFilter = filtersForm.querySelector('[data-filter="status"]');
   const priorityFilter = filtersForm.querySelector('[data-filter="priority"]');
@@ -225,12 +229,17 @@ if (filtersForm && reportRows.length > 0) {
   filtersForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    if (window.RIETI_API_ERROR) return;
     const selectedMunicipality = municipalityFilter?.value ?? "";
     const selectedStatus = statusFilter?.value ?? "";
     const selectedPriority = priorityFilter?.value ?? "";
     const selectedWorkType = workTypeFilter?.value ?? "";
     const selectedStartDate = startDateFilter?.value ?? "";
     const selectedEndDate = endDateFilter?.value ?? "";
+    if (startDateFilter && endDateFilter) {
+      endDateFilter.setCustomValidity(selectedStartDate && selectedEndDate && selectedStartDate > selectedEndDate ? 'La fecha fin debe ser igual o posterior a la fecha inicio.' : '');
+      if (!filtersForm.reportValidity()) return;
+    }
     let visibleReports = 0;
 
     reportRows.forEach((row) => {
@@ -239,7 +248,7 @@ if (filtersForm && reportRows.length > 0) {
       const matchesPriority = !selectedPriority || row.dataset.priority === selectedPriority;
       const matchesWorkType = !selectedWorkType || row.dataset.workType === selectedWorkType;
       const matchesStartDate = !selectedStartDate || row.dataset.date >= selectedStartDate;
-      const matchesEndDate = !selectedEndDate || row.dataset.date <= selectedEndDate;
+      const matchesEndDate = !selectedEndDate || (row.dataset.date && row.dataset.date <= selectedEndDate);
       const isVisible = matchesMunicipality && matchesStatus && matchesPriority && matchesWorkType && matchesStartDate && matchesEndDate;
 
       row.hidden = !isVisible;
@@ -257,9 +266,9 @@ if (filtersForm && reportRows.length > 0) {
     const visibleRows = reportRows.filter((row) => !row.hidden);
     const counts = {
       "reports-total": visibleRows.length,
-      "reports-pending": visibleRows.filter((row) => ["Recibido", "Pendiente"].includes(row.dataset.status)).length,
-      "reports-progress": visibleRows.filter((row) => row.dataset.status === "En proceso").length,
-      "reports-resolved": visibleRows.filter((row) => row.dataset.status === "Resuelto").length,
+      "reports-pending": visibleRows.filter((row) => window.RIETI_STATUS_GROUPS.pending.includes(row.dataset.status)).length,
+      "reports-progress": visibleRows.filter((row) => window.RIETI_STATUS_GROUPS.progress.includes(row.dataset.status)).length,
+      "reports-resolved": visibleRows.filter((row) => window.RIETI_STATUS_GROUPS.resolved.includes(row.dataset.status)).length,
     };
     document.querySelectorAll("[data-filter-count]").forEach((node) => {
       node.textContent = counts[node.dataset.filterCount];
@@ -268,3 +277,5 @@ if (filtersForm && reportRows.length > 0) {
     if (listCount) listCount.textContent = `(${visibleRows.length})`;
   });
 }
+
+})();

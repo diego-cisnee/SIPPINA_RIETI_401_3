@@ -3,11 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Seguimiento de un reporte ficticio en el prototipo RIETI." />
+    <meta name="description" content="Seguimiento de un reporte registrado en RIETI." />
     <title>Seguimiento de reporte | RIETI</title>
     <link rel="stylesheet" href="../css/styles.css" />
+      <noscript><style>
+      [data-load-block], [data-loading-only] { display: none !important; }
+    </style></noscript>
   </head>
-  <body class="dashboard-page report-detail-page">
+  <body data-report-loading class="dashboard-page report-detail-page">
     <div class="dashboard-shell">
       <aside class="sidebar" aria-label="Navegación principal">
         <div class="brand-lockup">
@@ -44,7 +47,7 @@
           Cerrar sesión
         </button>
       </aside>
-      <main class="dashboard-main detail-main">
+      <main aria-busy="true" class="dashboard-main detail-main">
         <header class="detail-header">
           <h1>Seguimiento de reporte</h1>
           <div class="detail-toolbar">
@@ -65,9 +68,10 @@
 
         <!--
           CONTEXTO DEL REPORTE
-          report-detail.js coloca los datos ficticios del folio solicitado.
+          report-detail.js coloca los datos consultados del identificador solicitado.
           app.js reutiliza este contexto para abrir los mismos formularios de las tablas.
         -->
+        <div class="panel detail-loading-skeleton" data-loading-only aria-hidden="true"></div>
         <div id="report-content" data-report-context hidden>
           <h2 class="detail-folio">Folio <span data-detail="id"></span></h2>
           <section class="detail-summary" aria-label="Resumen del reporte">
@@ -76,7 +80,7 @@
             <article class="panel"><span>Fecha de reporte</span><strong data-detail="reportedAt"></strong></article>
             <article class="panel"><span>Última actualización</span><strong data-detail="updatedAt"></strong></article>
           </section>
-          <p class="demo-caption">Datos ficticios para revisión del prototipo.</p>
+          <p class="demo-caption">Consulta de lectura. Los campos ausentes se muestran como no disponibles.</p>
 
           <div class="detail-columns">
             <div class="detail-column">
@@ -103,9 +107,9 @@
               <section class="panel detail-panel" aria-labelledby="assigned-title">
                 <h2 id="assigned-title">Autoridad asignada</h2>
                 <dl class="detail-fields">
-                  <div><dt>Autoridad</dt><dd>Sin asignar</dd></div>
-                  <div><dt>Administrador</dt><dd>Administrador del sistema<br /><span data-detail="adminEmail"></span></dd></div>
-                  <div><dt>Comentarios</dt><dd>Sin comentarios</dd></div>
+                  <div><dt>Autoridad</dt><dd data-detail="authority"></dd></div>
+                  <div><dt>Administrador</dt><dd><span data-detail="adminName"></span><br /><span data-detail="adminEmail"></span></dd></div>
+                  <div><dt>Comentarios</dt><dd>No disponible</dd></div>
                 </dl>
               </section>
             </div>
@@ -126,10 +130,7 @@
               <section class="panel detail-panel" aria-labelledby="attachments-title">
                 <h2 id="attachments-title">Evidencias fotográficas</h2>
                 <!-- INTEGRACIÓN FUTURA: renderizar archivos autorizados con URLs de descarga seguras. -->
-                <ul class="attachment-list" data-list="attachments">
-                  <li><span class="attachment-icon" aria-hidden="true">PNG</span><div><strong>imagen_1.png</strong><span>1.2 MB</span></div><a href="#archivo-pendiente" data-detail-notice="attachment" data-filename="imagen_1.png" aria-label="Descargar imagen_1.png">↓</a></li>
-                  <li><span class="attachment-icon" aria-hidden="true">PNG</span><div><strong>imagen_2.png</strong><span>1.2 MB</span></div><a href="#archivo-pendiente" data-detail-notice="attachment" data-filename="imagen_2.png" aria-label="Descargar imagen_2.png">↓</a></li>
-                </ul>
+                <ul class="attachment-list" data-list="attachments"><li>No disponible</li></ul>
               </section>
 
               <section class="panel detail-panel quick-actions" aria-labelledby="quick-actions-title">

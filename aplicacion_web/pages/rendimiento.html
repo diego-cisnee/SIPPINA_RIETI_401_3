@@ -3,12 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Rendimiento de autoridades municipales con indicadores y búsqueda automática. Datos ficticios." />
+    <meta name="description" content="Rendimiento de autoridades municipales con indicadores y búsqueda automática. Datos consultados." />
     <title>Estadísticas · Rendimiento | RIETI</title>
     <link rel="stylesheet" href="../css/styles.css" />
     <link rel="stylesheet" href="../css/performance.css" />
+      <noscript><style>
+      [data-load-block], [data-loading-only] { display: none !important; }
+    </style></noscript>
   </head>
-  <body class="dashboard-page statistics-page performance-page">
+  <body data-report-loading class="dashboard-page statistics-page performance-page">
     <div class="dashboard-shell">
       <!-- La barra lateral conserva la navegación y la sesión simulada del dashboard. -->
       <aside class="sidebar" aria-label="Navegación principal">
@@ -47,7 +50,7 @@
         </button>
       </aside>
 
-      <main class="dashboard-main reports-main">
+      <main aria-busy="true" class="dashboard-main reports-main">
         <header class="management-header">
           <div>
             <p class="eyebrow">Análisis</p>
@@ -79,18 +82,18 @@
             <ul id="municipality-suggestions" role="listbox" aria-label="Municipios coincidentes" hidden></ul>
           </div>
           <button type="button" class="performance-clear" id="clear-municipality">Limpiar filtro</button>
-          <p id="municipality-help">Los resultados se actualizan mientras escribes. Selecciona una sugerencia para completar el nombre.</p>
+          <p id="municipality-help">Búsqueda no disponible hasta contar con asignaciones a autoridades.</p>
         </section>
         <p class="performance-feedback" id="performance-feedback" role="status" aria-live="polite"></p>
         <!-- INTEGRACIÓN FUTURA: indicadores agregados por la API, según el municipio consultado. -->
         <section class="metric-grid management-metrics" aria-label="Resumen de rendimiento">
-          <article class="metric-card"><span>Días promedio de resolución</span><strong data-performance-metric="average">—</strong><small>Solo reportes finalizados</small></article>
-          <article class="metric-card"><span>Tasa de resolución</span><strong data-performance-metric="resolution">—</strong><small>Finalizados / asignados</small></article>
-          <article class="metric-card"><span>En proceso</span><strong data-performance-metric="progress">—</strong><small>Respecto al total asignado</small></article>
-          <article class="metric-card"><span>Pendientes</span><strong data-performance-metric="pending">—</strong><small>Respecto al total asignado</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span>Días promedio de resolución</span><strong data-performance-metric="average">No disponible</strong><small>Solo reportes finalizados</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span>Tasa de resolución</span><strong data-performance-metric="resolution">No disponible</strong><small>Finalizados / asignados</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span>En proceso</span><strong data-performance-metric="progress">No disponible</strong><small>Respecto al total asignado</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span>Pendientes</span><strong data-performance-metric="pending">No disponible</strong><small>Respecto al total asignado</small></article>
         </section>
-        <section class="panel performance-panel" aria-labelledby="performance-title">
-          <div class="statistics-list__heading"><h2 id="performance-title">Rendimiento por autoridad</h2><p>Una autoridad por municipio · Datos ficticios</p></div>
+        <section class="panel performance-panel" aria-labelledby="performance-title" data-load-block inert aria-busy="true">
+          <div class="statistics-list__heading"><h2 id="performance-title">Rendimiento por autoridad</h2><p>Una autoridad por municipio · Datos consultados</p></div>
           <div class="performance-scroll" tabindex="0" role="region" aria-label="Tabla de rendimiento, desplazable horizontalmente">
             <table class="performance-table" aria-describedby="performance-methodology">
               <thead><tr><th scope="col">Autoridad</th><th scope="col">Municipio</th><th scope="col">Total asignados</th><th scope="col">Pendientes</th><th scope="col">En proceso</th><th scope="col">Finalizados</th><th scope="col">Tiempo promedio</th><th scope="col">Eficiencia</th></tr></thead>
@@ -99,15 +102,15 @@
             </table>
           </div>
         </section>
-        <p class="demo-caption" id="performance-methodology">Eficiencia provisional = finalizados ÷ asignados × 100. Tiempo promedio: días de resolución de los casos finalizados. El resumen se calcula sobre las autoridades visibles; “—” indica que no hay base para calcular el indicador.</p>
-        <p class="demo-caption">Muestra independiente para diseñar Rendimiento. No modifica las autoridades ni las asignaciones de los reportes del prototipo. Catálogo y criterios pendientes de aprobación.</p>
+        <p class="demo-caption" id="performance-methodology">Indicadores no disponibles: faltan asignaciones a autoridades y fechas de resolución.</p>
+        <p class="demo-caption">Indicadores no disponibles: faltan asignaciones a autoridades y fechas de resolución.</p>
         <noscript><p>Activa JavaScript para ver los datos y utilizar la búsqueda automática.</p></noscript>
       </main>
     </div>
     <!-- Avisos temporales: no se consulta la base de datos ni se generan archivos todavía. -->
     <aside class="route-notice" id="actualizar-pendiente" role="dialog" aria-labelledby="refresh-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↻</span><h2 id="refresh-notice-title">Actualización pendiente</h2><p>La actualización del rendimiento se conectará con la base de datos en una etapa posterior.</p><a href="#">Volver a rendimiento</a></div></aside>
     <aside class="route-notice" id="descarga-pendiente" role="dialog" aria-labelledby="download-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↓</span><h2 id="download-notice-title">Exportación pendiente</h2><p>La exportación de estos indicadores se habilitará en una etapa posterior.</p><a href="#">Volver a rendimiento</a></div></aside>
-    <script src="../js/performance-data.js" defer></script>
+    <script src="../js/report-data.js" defer></script>
     <script src="../js/performance.js" defer></script>
     <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
     <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">

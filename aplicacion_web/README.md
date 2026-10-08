@@ -41,16 +41,16 @@ Los datos serán ficticios hasta que se conecten la base de datos, la API y la a
 - `pages/reportes.html`: filtros, métricas y listado general de reportes.
 - `pages/reporte.html`: seguimiento del folio seleccionado y ruta de origen.
 - `pages/estadisticas.html`: primera pestaña de estadísticas, listado ampliado de reportes.
-- `pages/graficos.html`: gráficas por estatus, concentración GPS provisional, municipio y tendencia mensual.
-- `pages/rendimiento.html`: rendimiento por autoridad municipal y filtro con autocompletado.
+- `pages/graficos.html`: gráficas por estatus, mapa pendiente, municipio y tendencia mensual.
+- `pages/rendimiento.html`: indicadores no disponibles por ausencia de asignaciones y fechas de resolución.
 - `pages/perfil.html`: perfil experimental del administrador, accesible desde el bloque del usuario.
 - `css/profile.css`: estilos aislados de la propuesta de perfil.
-- `js/performance-data.js`: muestra independiente de nueve autoridades ficticias, una por municipio.
-- `js/performance.js`: búsqueda instantánea, sugerencias y cálculo de indicadores.
+- `js/performance-data.js`: colección vacía; se retiró la muestra ficticia.
+- `js/performance.js`: estado no disponible para indicadores sin base de cálculo.
 - `css/performance.css`: presentación de Rendimiento, aislada de los estilos de las gráficas.
-- `js/charts.js`: cálculos, filtros y resúmenes escritos sobre los datos ficticios compartidos.
+- `js/charts.js`: cálculos, filtros y resúmenes escritos sobre los reportes consultados de la API.
 - `css/charts.css`: presentación adaptable de las gráficas y su diálogo de resumen.
-- `js/report-data.js`: datos ficticios y catálogo provisional de tipos de trabajo.
+- `js/report-data.js`: consultas GET de reportes, catálogo real de filtros y renderizado seguro.
 - `js/report-detail.js`: carga del detalle, ruta, avisos y opción de impresión.
 - `pages/`: aquí se agregarán las siguientes pantallas HTML.
 - `assets/`: imágenes, iconos y otros recursos visuales aprobados.
@@ -64,3 +64,17 @@ Los cambios de perfil son experimentales. El respaldo anterior a estas pruebas s
 - Las colecciones repetibles tendrán atributos `data-list`.
 - Las acciones futuras tendrán atributos `data-action`.
 - Los comentarios `INTEGRACIÓN FUTURA` indicarán los puntos destinados a JavaScript, API o base de datos.
+
+## Integración de lectura
+
+Iniciar la API con `npm start` desde `backend` y servir esta carpeta en
+`http://127.0.0.1:4173`. Las vistas consultan `http://127.0.0.1:3000/api/reportes`;
+el seguimiento consulta `/api/reportes/:id` usando `id_reporte`. No hay escrituras
+a MySQL. Las acciones de modificación siguen simuladas y el mapa queda pendiente.
+
+Prueba vigente: `work/test-api-integration.cjs` usa Playwright instalado, un servidor
+local y respuestas controladas para verificar todas las vistas, filtros, navegación,
+diálogos, errores, vacíos y solicitudes exclusivamente GET. Ejecutar con
+`node work/test-api-integration.cjs` (configurar `NODE_PATH` si la dependencia es externa).
+Los archivos de pruebas anteriores reflejan las muestras del prototipo y ya no validan
+el contrato de datos de esta integración.

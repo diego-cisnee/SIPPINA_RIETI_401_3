@@ -3,12 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Estadísticas de reportes ficticios: tipos de trabajo, observaciones y autoridades." />
+    <meta name="description" content="Estadísticas de reportes registrados: tipos de trabajo, observaciones y autoridades." />
     <title>Estadísticas · Gráficos | RIETI</title>
     <link rel="stylesheet" href="../css/styles.css" />
     <link rel="stylesheet" href="../css/charts.css" />
+      <noscript><style>
+      [data-load-block], [data-loading-only] { display: none !important; }
+    </style></noscript>
   </head>
-  <body class="dashboard-page statistics-page charts-page">
+  <body data-report-loading class="dashboard-page statistics-page charts-page">
     <div class="dashboard-shell">
       <!-- La barra lateral conserva la navegación y la sesión simulada del dashboard. -->
       <aside class="sidebar" aria-label="Navegación principal">
@@ -47,7 +50,7 @@
         </button>
       </aside>
 
-      <main class="dashboard-main reports-main">
+      <main aria-busy="true" class="dashboard-main reports-main">
         <header class="management-header">
           <div>
             <p class="eyebrow">Análisis</p>
@@ -55,7 +58,7 @@
             <p>Análisis detallado de reportes y métricas de gestión.</p>
           </div>
 
-          <!-- Estas acciones muestran avisos; se conectarán con API y archivos después. -->
+          <!-- Actualizar vuelve a consultar la API; exportar conserva su aviso provisional. -->
           <div class="management-actions">
             <a class="action-button action-button--secondary" href="#actualizar-pendiente" data-action="refresh-reports">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6.1 8.5A7 7 0 0 1 18.7 7L20 12M4 12l1.3 5a7 7 0 0 0 12.6-1.5" /></svg>
@@ -72,8 +75,8 @@
         <nav class="statistics-tabs" aria-label="Apartados de estadísticas">
           <a href="estadisticas.html">Reportes</a><span aria-current="page">Gráficos</span><a href="rendimiento.html">Rendimiento</a>
         </nav>
-        <!-- Filtros locales sobre RIETI_REPORTS; sustituir la fuente por la API en el futuro. -->
-        <form class="report-filters statistics-filters" id="chart-filters">
+        <!-- Filtros locales sobre los reportes consultados de la API. -->
+        <form class="report-filters statistics-filters" id="chart-filters" data-load-block inert aria-busy="true">
           <label class="filter-field"><span>Municipio</span><select name="municipality" data-filter="municipality"><option value="">Todos los municipios</option><option value="Naucalpan de Juárez">Naucalpan de Juárez</option><option value="Tlalnepantla de Baz">Tlalnepantla de Baz</option><option value="Coacalco">Coacalco</option><option value="Villa del Carbón">Villa del Carbón</option><option value="Huixquilucan">Huixquilucan</option><option value="Tultitlán">Tultitlán</option><option value="Atizapán de Zaragoza">Atizapán de Zaragoza</option><option value="Cuautitlán Izcalli">Cuautitlán Izcalli</option></select></label>
           <label class="filter-field"><span>Tipo de trabajo</span><select name="work-type" data-filter="work-type"><option value="">Todos los tipos</option><option value="venta">Venta ambulante en calles o semáforos</option><option value="limpieza">Limpieza de parabrisas</option><option value="comercio">Comercio en mercados o locales</option><option value="agricola">Trabajo agrícola</option><option value="construccion">Construcción</option><option value="domestico">Trabajo doméstico</option></select></label>
           <label class="filter-field"><span>Fecha inicio</span><input name="start-date" type="date" data-filter="start-date" /></label>
@@ -84,7 +87,7 @@
         <p class="chart-filter-note" id="municipality-hidden-note" hidden>La gráfica de reportes por municipio se oculta mientras hay filtros activos. Limpia los filtros para volver a verla.</p>
         <noscript><p>Activa JavaScript para consultar las gráficas interactivas del prototipo.</p></noscript>
         <section class="analytics-grid" aria-label="Gráficas de reportes">
-          <article class="panel analytics-card " id="card-status">
+          <article class="panel analytics-card " id="card-status" data-load-block inert aria-busy="true">
             <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
             <button type="button" class="chart-open" data-chart="status" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Distribución por estatus: ver resumen">
               <span class="chart-heading">Distribución por estatus</span>
@@ -93,16 +96,16 @@
               
             </button>
           </article>
-          <article class="panel analytics-card " id="card-heat">
+          <article class="panel analytics-card " id="card-heat" data-load-block inert aria-busy="true">
             <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
             <button type="button" class="chart-open" data-chart="heat" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Mapa de calor: ver resumen">
               <span class="chart-heading">Mapa de calor</span>
               <span class="chart-hint">ⓘ Presiona para ver más información</span>
               <span class="chart-visual" id="chart-heat" aria-hidden="true"></span>
-              <span class="chart-footnote">Concentración por coordenadas de muestra. Sin límites municipales reales.</span>
+              <span class="chart-footnote">Integración del mapa pendiente.</span>
             </button>
           </article>
-          <article class="panel analytics-card analytics-card--wide" id="card-municipality">
+          <article class="panel analytics-card analytics-card--wide" id="card-municipality" data-load-block inert aria-busy="true">
             <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
             <button type="button" class="chart-open" data-chart="municipality" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Reportes por municipio: ver resumen">
               <span class="chart-heading">Reportes por municipio</span>
@@ -111,7 +114,7 @@
               
             </button>
           </article>
-          <article class="panel analytics-card analytics-card--wide" id="card-trend">
+          <article class="panel analytics-card analytics-card--wide" id="card-trend" data-load-block inert aria-busy="true">
             <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
             <button type="button" class="chart-open" data-chart="trend" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Tendencia mensual de reportes: ver resumen">
               <span class="chart-heading">Tendencia mensual de reportes</span>
@@ -121,7 +124,7 @@
             </button>
           </article>
         </section>
-        <p class="demo-caption">Datos ficticios del prototipo. Los filtros recalculan las gráficas y sus resúmenes, sin modificar reportes.</p>
+        <p class="demo-caption">Datos consultados de la API. Los filtros recalculan las gráficas; el mapa queda pendiente.</p>
       </main>
     </div>
     <!-- Resumen accesible y dinámico de la gráfica seleccionada. No guarda datos. -->

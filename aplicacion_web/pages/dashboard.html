@@ -8,8 +8,11 @@
     <link rel="stylesheet" href="../css/styles.css" />
     <script src="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.js"></script>
     <link href="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.css" rel="stylesheet" />
+      <noscript><style>
+      [data-load-block], [data-loading-only] { display: none !important; }
+    </style></noscript>
   </head>
-  <body class="dashboard-page">
+  <body data-report-loading class="dashboard-page">
     <div class="dashboard-shell">
       <!--
         NAVEGACIÓN LATERAL
@@ -52,22 +55,22 @@
         </button>
       </aside>
 
-      <main class="dashboard-main">
+      <main aria-busy="true" class="dashboard-main">
         <header class="dashboard-header">
           <div><p class="eyebrow">Resumen general</p><h1>Dashboard</h1></div>
-          <p class="dashboard-header__date">Actualizado hoy, 11:56 a. m.</p>
+          <p class="dashboard-header__date" data-last-report-query aria-live="polite">Consultando reportes…</p>
         </header>
 
         <!-- Cada data-field se reemplazará con el total recibido desde la API. -->
         <section class="metric-grid" aria-label="Resumen de reportes">
-          <article class="metric-card"><span>Total de reportes</span><strong data-field="reports-total">39</strong><small>Todos los registros</small></article>
-          <article class="metric-card metric-card--warning"><span>Pendientes</span><strong data-field="reports-pending">33</strong><small>Requieren atención</small></article>
-          <article class="metric-card metric-card--progress"><span>En proceso</span><strong data-field="reports-progress">4</strong><small>Con seguimiento</small></article>
-          <article class="metric-card metric-card--success"><span>Resueltos</span><strong data-field="reports-resolved">2</strong><small>Casos concluidos</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span>Total de reportes</span><strong data-field="reports-total">—</strong><small>Todos los registros</small></article>
+          <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span>Pendientes</span><strong data-field="reports-pending">—</strong><small>Requieren atención</small></article>
+          <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span>En proceso</span><strong data-field="reports-progress">—</strong><small>Con seguimiento</small></article>
+          <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span>Resueltos</span><strong data-field="reports-resolved">—</strong><small>Casos concluidos</small></article>
         </section>
 
         <section class="analytics-grid" aria-label="Visualizaciones de reportes">
-          <article class="panel status-panel">
+          <article class="panel status-panel" data-load-block inert aria-busy="true">
             <header class="panel__header">
               <div><p class="panel__kicker">Distribución</p><h2>Reportes por estado</h2></div>
               <span class="panel__period">Últimos 30 días</span>
@@ -79,8 +82,8 @@
               <li><span class="legend-dot legend-dot--cancelled"></span>Cancelados</li>
             </ul>
             <!-- INTEGRACIÓN FUTURA: JavaScript sustituirá estos porcentajes ficticios con datos reales. -->
-            <div class="donut-chart" role="img" aria-label="33 recibidos, 4 en proceso y 2 resueltos">
-              <div class="donut-chart__center"><strong data-field="reports-total">39</strong><span>reportes</span></div>
+            <div class="donut-chart" role="img" aria-label="Cargando reportes">
+              <div class="donut-chart__center"><strong data-field="reports-total">—</strong><span>reportes</span></div>
             </div>
           </article>
 
@@ -95,20 +98,20 @@
             </ul>
             <!-- Esta cuadrícula temporal se sustituirá por el mapa conectado a datos municipales. -->
              <div class="hoverMap" id="hoverMap" style="position: relative ; width: 100%; height: 400px;">
-              <div class="heatmap" id="map" aria-label="Representación temporal de densidad de reportes por zona"></div>
+              <div class="heatmap" id="map" aria-label="Mapa de reportes por zona"></div>
               <button class="ExpandMap" id="BotonExpandir" type="button">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
               </button>
-            
+
             </div>
-              
-          
+
+
           </article>
         </section>
 
         <section class="dashboard-lower-grid">
           <!-- data-list identifica la colección que después renderizará JavaScript. -->
-          <article class="panel reports-panel" id="reportes-recientes">
+          <article class="panel reports-panel" id="reportes-recientes" data-load-block inert aria-busy="true">
             <header class="panel__header reports-panel__header">
               <div><p class="panel__kicker">Actividad</p><h2>Reportes recientes</h2></div>
               <a class="outline-button" href="reportes.html" data-action="view-all-reports">Ver todos<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg></a>
@@ -116,36 +119,16 @@
             <div class="table-scroll">
               <table class="reports-table">
                 <thead><tr><th>Folio</th><th>Municipio</th><th>Estado</th><th>Fecha</th><th><span class="sr-only">Acciones</span></th></tr></thead>
-                <tbody data-list="recent-reports">
-                  <!--
-                    Cada fila usa el mismo componente interactivo de Gestión de reportes:
-                    clic en el renglón abre el detalle y los tres puntos abren su menú.
-                  -->
-                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-NAU-2026-0001" data-report-row data-priority="Alta" data-report-id="RIETI-NAU-2026-0001">
-                    <td data-label="Folio"><strong>RIETI-NAU-2026-0001</strong></td><td data-label="Municipio" data-field="municipality">Naucalpan de Juárez</td><td data-label="Estado"><span class="status status--received">Recibido</span></td><td data-label="Fecha">22/10/2026 · 03:32 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-NAU-2026-0001">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                  </tr>
-                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-TLA-2026-0002" data-report-row data-priority="Baja" data-report-id="RIETI-TLA-2026-0002">
-                    <td data-label="Folio"><strong>RIETI-TLA-2026-0002</strong></td><td data-label="Municipio" data-field="municipality">Tlalnepantla de Baz</td><td data-label="Estado"><span class="status status--received">Recibido</span></td><td data-label="Fecha">13/10/2026 · 06:22 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-TLA-2026-0002">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                  </tr>
-                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-CIZ-2026-0003" data-report-row data-priority="Media" data-report-id="RIETI-CIZ-2026-0003">
-                    <td data-label="Folio"><strong>RIETI-CIZ-2026-0003</strong></td><td data-label="Municipio" data-field="municipality">Cuautitlán Izcalli</td><td data-label="Estado"><span class="status status--progress">En proceso</span></td><td data-label="Fecha">06/10/2026 · 01:45 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-CIZ-2026-0003">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                  </tr>
-                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-COA-2026-0004" data-report-row data-priority="Media" data-report-id="RIETI-COA-2026-0004">
-                    <td data-label="Folio"><strong>RIETI-COA-2026-0004</strong></td><td data-label="Municipio" data-field="municipality">Coacalco</td><td data-label="Estado"><span class="status status--progress">En proceso</span></td><td data-label="Fecha">28/09/2026 · 06:45 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-COA-2026-0004">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                  </tr>
-                  <tr tabindex="0" role="link" aria-label="Abrir reporte RIETI-VDC-2026-0005" data-report-row data-priority="Urgente" data-report-id="RIETI-VDC-2026-0005">
-                    <td data-label="Folio"><strong>RIETI-VDC-2026-0005</strong></td><td data-label="Municipio" data-field="municipality">Villa del Carbón</td><td data-label="Estado"><span class="status status--progress">En proceso</span></td><td data-label="Fecha">22/09/2026 · 12:45 p. m.</td><td class="menu-cell"><details class="row-menu"><summary aria-label="Opciones del reporte RIETI-VDC-2026-0005">•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button class="is-danger" type="button" data-delete-report aria-haspopup="dialog" aria-controls="delete-report-dialog">Eliminar</button></div></details></td>
-                  </tr>
-                </tbody>
+                <tbody data-list="recent-reports"><tr><td colspan="5">Cargando reportes…</td></tr></tbody>
               </table>
             </div>
           </article>
 
           <aside class="kpi-stack" aria-label="Indicadores de desempeño">
-            <article class="kpi-card"><span>Días promedio de resolución</span><div><strong data-field="average-resolution-days">5</strong><small class="trend trend--neutral">+2.5%</small></div></article>
-            <article class="kpi-card"><span>Tasa de resolución</span><div><strong data-field="resolution-rate">5.1%</strong><small class="trend trend--positive">−1.2%</small></div></article>
-            <article class="kpi-card"><span>En proceso</span><div><strong data-field="progress-rate">10.3%</strong><small class="trend trend--neutral">+3.1%</small></div></article>
-            <article class="kpi-card"><span>Pendientes</span><div><strong data-field="pending-rate">84.6%</strong><small class="trend trend--negative">+5.2%</small></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Días promedio de resolución</span><div><strong data-field="average-resolution-days">No disponible</strong><small class="trend trend--neutral">No disponible</small></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Tasa de resolución</span><div><strong data-field="resolution-rate">No disponible</strong><small class="trend trend--positive">No disponible</small></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span>En proceso</span><div><strong data-field="progress-rate">No disponible</strong><small class="trend trend--neutral">No disponible</small></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Pendientes</span><div><strong data-field="pending-rate">No disponible</strong><small class="trend trend--negative">No disponible</small></div></article>
           </aside>
         </section>
       </main>
@@ -204,6 +187,7 @@
       <div class="dialog-actions"><button type="button" class="dialog-primary" data-close-dialog>Entendido</button></div>
     </dialog>
 
+    <script src="../js/report-data.js" defer></script>
     <script src="../js/app.js" defer></script>
     <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
     <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
@@ -236,6 +220,6 @@
       <div class="dialog-actions" data-delete-result hidden><button type="button" class="dialog-primary" data-finish-delete>Entendido</button></div>
     </dialog>
     <script src="../js/delete-report.js" defer></script>
-    <script src= '../js/mapa.js'defer></script>
+    <script src="../js/mapa.js" defer></script>
   </body>
 </html>

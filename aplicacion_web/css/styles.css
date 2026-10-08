@@ -1030,7 +1030,7 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
 .statistics-tabs a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
 .statistics-tabs [aria-current] { color: var(--color-primary-dark); border-bottom: 2px solid var(--color-primary-dark); }
 .statistics-tabs [aria-disabled] { color: var(--color-muted); cursor: default; }
-.report-filters.statistics-filters { grid-template-columns: 1.3fr 1.4fr 1fr 1fr 46px; }
+.report-filters.statistics-filters { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) 46px; }
 .statistics-list { min-width: 0; }
 .statistics-list__heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; align-items: center; padding: 17px; background: var(--color-surface-soft); border-radius: 14px 14px 0 0; }
 .statistics-list__heading h2 { margin: 0; font-size: .9rem; }
@@ -1255,3 +1255,53 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
   height: 100vh !important;
   background-color: #f8f9fa; /* Fondo claro por si hay carga lenta */
 }
+
+/* Esqueleto desde el primer render: mantiene los contenedores y oculta valores
+   provisionales hasta terminar la consulta, sin afectar navegación ni el mapa. */
+[data-report-loading] [data-load-block] {
+  position: relative;
+  pointer-events: none;
+}
+[data-report-loading] [data-load-block] > * { visibility: hidden; }
+[data-report-loading] [data-load-block]::after,
+[data-report-loading] .detail-loading-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border-radius: 6px;
+  background:
+    linear-gradient(#e4e8ee, #e4e8ee) left top / 55% 12px no-repeat,
+    linear-gradient(#e4e8ee, #e4e8ee) left 28px / 35% 24px no-repeat,
+    linear-gradient(#edf0f4, #edf0f4) left 66px / 75% 10px no-repeat;
+}
+[data-report-loading] :is(.reports-panel, .management-table-panel, .statistics-list, .performance-panel) {
+  min-height: 320px;
+}
+[data-report-loading] :is(.reports-panel, .management-table-panel, .statistics-list, .performance-panel)::after,
+[data-report-loading] .detail-loading-skeleton::after {
+  background: repeating-linear-gradient(to bottom, #e9edf2 0 14px, transparent 14px 48px);
+  inset: 28px 22px;
+}
+[data-report-loading] :is(.status-panel, .analytics-card)::after {
+  background:
+    linear-gradient(#e4e8ee, #e4e8ee) left top / 55% 14px no-repeat,
+    linear-gradient(#edf0f4, #edf0f4) center 60px / 100% calc(100% - 60px) no-repeat;
+}
+[data-report-loading] :is([data-last-report-query], [data-list-count], #filter-feedback) {
+  visibility: hidden;
+}
+.detail-loading-skeleton { position: relative; min-height: 480px; }
+[data-loading-only][hidden] { display: none; }
+
+/* Estadísticas / Reportes: el ancho de la tabla queda dentro de su región. */
+.statistics-reports-page { overflow-x: clip; }
+.statistics-reports-page .dashboard-main,
+.statistics-reports-page .statistics-list,
+.statistics-reports-page .statistics-scroll {
+  min-width: 0;
+  max-width: 100%;
+}
+.statistics-reports-page .statistics-scroll { width: 100%; overflow-x: auto; }
+.statistics-reports-page .management-header { flex-wrap: wrap; }
+.statistics-reports-page .management-header > div:first-child { min-width: 0; }
+.statistics-reports-page .filter-field :is(input, select) { min-width: 0; max-width: 100%; }

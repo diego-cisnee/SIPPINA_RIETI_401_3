@@ -1,3 +1,5 @@
+(async () => {
+  if (window.RIETI_READY) await window.RIETI_READY;
 /* ELIMINACIÓN SIMULADA: aviso común para las acciones rápidas y los menús de reportes.
    No borra registros, archivos ni almacenamiento. La casilla solo habilita la confirmación.
    INTEGRACIÓN FUTURA: enviar el ID a una API que valide permisos, registrar la operación
@@ -63,4 +65,6 @@
     description.textContent = `Confirmaste la eliminación del folio ${selectedId}. No se ha eliminado ningún dato del prototipo.`;
     done.focus();
   });
+})();
+
 })();

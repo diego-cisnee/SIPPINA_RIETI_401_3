@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./db');
+const path = require('node:path');
+const { corsOptions } = require('./cors-options');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -12,9 +14,7 @@ const requiredDatabaseVariables = [
 ];
 
 // Permite que el dashboard local envíe solicitudes a esta API.
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://127.0.0.1:4173'
-}));
+app.use(cors(corsOptions(process.env.CORS_ORIGIN)));
 
 // Convierte automáticamente los cuerpos JSON de las futuras peticiones.
 app.use(express.json());
@@ -60,7 +60,22 @@ app.get('/test-db', async (request, response) => {
   }
 });
 
-// Aquí se conectarán después las rutas de usuarios, reportes y estadísticas.
+const { readReports } = require('./reports');
+app.get(['/api/reportes', '/api/reportes/:id'], async (request, response) => {
+  const id = request.params.id;
+  if (id && !/^[1-9]\d*$/.test(id)) return response.status(400).json({ message: 'Identificador inválido' });
+  try {
+    const reports = await readReports(pool, id);
+    if (id && !reports.length) return response.status(404).json({ message: 'Reporte no encontrado' });
+    response.json({ data: id ? reports[0] : reports });
+  } catch (error) {
+    console.error('Error al consultar reportes:', error.code);
+    response.status(500).json({ message: 'No fue posible consultar los reportes' });
+  }
+});
+
+// Alternativa de mismo origen: abrir http://127.0.0.1:3000/pages/dashboard.html.
+app.use(express.static(path.join(__dirname, '../aplicacion_web')));
 
 const server = app.listen(port, '127.0.0.1', () => {
   console.log(`API RIETI disponible en http://127.0.0.1:${port}`);

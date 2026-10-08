@@ -188,3 +188,32 @@
 - Verificación: cuatro pantallas, folio correcto, bloqueo inicial, alternancia, cancelación, Escape, reapertura, foco y pruebas de regresión.
 - Se mantiene como cambio de prueba guardado en la carpeta de VS Code. Al finalizar se abre el HTML en el navegador de la app, conforme a la preferencia del usuario.
 - Estado: implementado, pendiente de aprobación.
+
+## Integración RIETI — API MySQL de solo lectura
+
+- Autorizada la conexión de dashboard, gestión, seguimiento y estadísticas con la API, manteniendo el diseño y sin modificar datos ni estructura de MySQL.
+- Esquema verificado con SELECT sobre INFORMATION_SCHEMA: Reporte, Ciudadano, Municipio, Administrador, Demografico_Reporte y Ubicacion_Reporte. No se consultan contraseñas.
+- Rutas GET `/api/reportes` y `/api/reportes/:id`; identificador real `id_reporte`, sin generar folios artificiales. Listado ordenado por fecha e identificador descendentes; dashboard muestra los cinco más recientes.
+- Las relaciones múltiples se consultan aparte para no multiplicar reportes. Los valores demográficos y ubicaciones múltiples se muestran separados con ` · `, sin sumar ni inferir información.
+- Estados literales de la base conservados en tablas y gráficas. Resumen: Registrado/Recibido/Pendiente → pendientes; En revision/En revisión/Canalizado/En proceso → en proceso; Concluido/Resuelto → resueltos. Cancelados y estados adicionales cuentan en el total y la distribución, sin asignarles una categoría inventada.
+- Municipios, prioridades, estados y tipos de trabajo de los filtros provienen de los reportes consultados. Filtros locales sobre la respuesta completa; fechas inclusivas y validación de rango.
+- Última actualización, horario, referencias, autoridad y comentarios no existen en el esquema y se muestran como “No disponible”. Administrador procede de la relación real; imagen_url se muestra como evidencia registrada sin inventar nombres ni tamaños ni habilitar descargas.
+- Rendimiento queda sin indicadores: no existen asignaciones a autoridades ni fechas de resolución. No se infieren autoridades desde administradores ni duración desde la fecha del reporte.
+- Gráficas de estados, municipios y tendencia usan los reportes reales. Mapa del dashboard y concentración de estadísticas quedan pendientes; se retira la ejecución del mapa de demostración.
+- Carga, error y vacío explícitos, sin recurrir a datos ficticios. Actualizar vuelve a consultar mediante recarga. Cambiar estado, asignar autoridad y eliminar siguen simulados; exportación y sesión conservan su comportamiento provisional.
+- Validación en AWS: siete reportes y siete identificadores únicos; detalle consistente con listado. Únicamente SELECT. Pruebas de backend y navegación con respuestas controladas, sin escribir en la base.
+
+### Ajuste — Hora de última consulta del dashboard
+
+- El encabezado muestra la hora real al completar correctamente la consulta y el renderizado de reportes, con segundos y horario de Ciudad de México.
+- Durante la carga muestra “Consultando reportes…”; ante un error, “Última consulta: no disponible”. La hora cambia únicamente al volver a consultar correctamente.
+
+### Ajuste — Esqueleto de carga
+
+- Dashboard, gestión, seguimiento y las tres pestañas de estadísticas conservan los contenedores y muestran un esqueleto neutro mientras se consulta la API. Valores provisionales, tablas y controles dependientes de datos permanecen ocultos y sin interacción.
+- La carga se activa desde el HTML para evitar destellos iniciales de guiones. Al terminar se muestran los datos reales, los campos no disponibles o el error correspondiente. Navegación y mapa existente se conservan.
+
+### Ajuste — Desplazamiento horizontal de Estadísticas / Reportes
+
+- El desplazamiento horizontal queda dentro de la tabla. Se limita el ancho de sus contenedores y se permite ajustar el encabezado y los filtros al ancho disponible.
+- Se restauran las elipsis de las celdas para los textos recibidos de la API; el texto completo permanece en el título de la celda y el seguimiento.
