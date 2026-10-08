@@ -217,3 +217,8 @@
 
 - El desplazamiento horizontal queda dentro de la tabla. Se limita el ancho de sus contenedores y se permite ajustar el encabezado y los filtros al ancho disponible.
 - Se restauran las elipsis de las celdas para los textos recibidos de la API; el texto completo permanece en el título de la celda y el seguimiento.
+
+### Ajuste — PNG de identidad en la barra lateral
+
+- Se sustituye el bloque R / RIETI / Panel de Control por `assets/logo-rieti.png` en las siete pantallas internas. El usuario añadirá su archivo con ese nombre.
+- Se conserva la proporción del PNG dentro de un espacio de 190 × 60 px; el tamaño se controla con `.brand-lockup__logo`.

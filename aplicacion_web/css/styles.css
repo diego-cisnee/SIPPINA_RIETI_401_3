@@ -325,21 +325,15 @@ svg {
   padding: 0 10px 30px;
 }
 
-.brand-lockup__mark {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  border-radius: 9px;
-  color: #fff;
-  background: var(--color-primary);
-  font-size: 1.2rem;
-  font-weight: 800;
+.brand-lockup__logo {
+  display: block;
+  width: 190px;
+  max-width: 100%;
+  height: 60px;
+  object-fit: contain;
+  object-position: middle center;
+  flex-shrink: 0;
 }
-
-.brand-lockup div { display: grid; }
-.brand-lockup strong { font-size: 1.15rem; letter-spacing: -0.02em; }
-.brand-lockup span:last-child { color: var(--color-muted); font-size: 0.72rem; }
 
 .user-summary {
   display: grid;
