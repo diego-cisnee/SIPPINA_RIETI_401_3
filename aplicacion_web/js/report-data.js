@@ -101,14 +101,8 @@ window.RIETI_READY = (async () => {
     const donut = document.querySelector('.donut-chart');
     if (donut) {
       const statuses = [...new Set(reports.map(r => r.status))];
-      const palette = ['#dce0e5', '#bfc6ce', '#9ea6b0', '#68717d', '#454d57'];
-      let angle = 0;
-      const segments = statuses.map((status, index) => {
-        const start = angle;
-        angle += reports.filter(r => r.status === status).length / reports.length * 360;
-        return `${palette[index % palette.length]} ${start}deg ${angle}deg`;
-      });
-      donut.style.background = reports.length ? `conic-gradient(${segments.join(',')})` : '#eef0f4';
+      const palette = window.RIETI_DONUT_COLORS;
+      donut.insertAdjacentHTML('beforeend', window.RIETI_DRAW_DONUT(statuses, statuses.map(status => reports.filter(r => r.status === status).length)));
       donut.setAttribute('aria-label', statuses.map(status => `${status}: ${reports.filter(r => r.status === status).length}`).join(', ') || 'Sin reportes');
       const legend = donut.closest('article').querySelector('.chart-legend');
       legend.replaceChildren();

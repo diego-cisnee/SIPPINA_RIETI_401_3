@@ -71,7 +71,7 @@
           </div>
         </header>
 
-        <!-- Navegación entre las tres vistas de Estadísticas; las gráficas no cambian. -->
+        <!-- Navegación entre las tres vistas de Estadísticas. -->
         <nav class="statistics-tabs" aria-label="Apartados de estadísticas">
           <a href="estadisticas.html">Reportes</a><span aria-current="page">Gráficos</span><a href="rendimiento.html">Rendimiento</a>
         </nav>
@@ -84,16 +84,62 @@
           <button class="filter-submit" type="submit" aria-label="Aplicar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></svg></button>
         </form>
         <div class="chart-filter-footer"><button type="button" class="chart-reset" id="clear-chart-filters">Limpiar filtros</button><p class="filter-feedback" id="chart-feedback" role="status"></p></div>
-        <p class="chart-filter-note" id="municipality-hidden-note" hidden>La gráfica de reportes por municipio se oculta mientras hay filtros activos. Limpia los filtros para volver a verla.</p>
         <noscript><p>Activa JavaScript para consultar las gráficas interactivas del prototipo.</p></noscript>
         <section class="analytics-grid" aria-label="Gráficas de reportes">
+          <article class="panel analytics-card" id="card-category" data-load-block inert aria-busy="true">
+            <button type="button" class="chart-open" data-chart="category" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Reportes por categoría: ver resumen">
+              <span class="chart-heading">Reportes por categoría</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-category" aria-hidden="true"></span>
+              <span class="chart-footnote">Categorías: tipos de trabajo registrados en el sistema.</span>
+            </button>
+          </article>
+          <article class="panel analytics-card" id="card-priority" data-load-block inert aria-busy="true">
+            <button type="button" class="chart-open" data-chart="priority" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Reportes por prioridad: ver resumen">
+              <span class="chart-heading">Reportes por prioridad</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-priority" aria-hidden="true"></span>
+              <span class="chart-footnote"></span>
+            </button>
+          </article>
+          <article class="panel analytics-card analytics-card--wide" id="card-trend" data-load-block inert aria-busy="true">
+            <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
+            <div class="chart-period-controls">
+              <label class="chart-grouping">Agrupar por <select id="trend-grouping"><option value="day">Día</option><option value="week">Semana</option><option value="month" selected>Mes</option></select></label>
+              <label class="chart-grouping">Año <select id="trend-year"></select></label>
+              <label class="chart-grouping" id="trend-month-field" hidden>Mes <select id="trend-month"></select></label>
+              <label class="chart-grouping" id="trend-week-field" hidden>Semana <select id="trend-week"></select></label>
+            </div>
+            <button type="button" class="chart-open" data-chart="trend" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Tendencia de reportes: ver resumen">
+              <span class="chart-heading">Tendencia de reportes</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-trend" aria-hidden="true"></span>
+
+            </button>
+          </article>
+          <article class="panel analytics-card" id="card-municipality" data-load-block inert aria-busy="true">
+            <button type="button" class="chart-open" data-chart="municipality" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Reportes por municipio: ver resumen">
+              <span class="chart-heading">Reportes por municipio</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-municipality" aria-hidden="true"></span>
+              <span class="chart-footnote">Los 10 municipios con más reportes registrados.</span>
+            </button>
+          </article>
+          <article class="panel analytics-card" id="card-resolution" data-load-block inert aria-busy="true">
+            <button type="button" class="chart-open" data-chart="resolution" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Tiempo promedio de resolución por prioridad: ver resumen">
+              <span class="chart-heading">Tiempo promedio de resolución por prioridad</span>
+              <span class="chart-hint">ⓘ Presiona para ver más información</span>
+              <span class="chart-visual" id="chart-resolution" aria-hidden="true"></span>
+              <span class="chart-footnote">Solo reportes resueltos con fechas válidas de registro y resolución.</span>
+            </button>
+          </article>
           <article class="panel analytics-card " id="card-status" data-load-block inert aria-busy="true">
             <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
             <button type="button" class="chart-open" data-chart="status" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Distribución por estatus: ver resumen">
               <span class="chart-heading">Distribución por estatus</span>
               <span class="chart-hint">ⓘ Presiona para ver más información</span>
               <span class="chart-visual" id="chart-status" aria-hidden="true"></span>
-              
+
             </button>
           </article>
           <article class="panel analytics-card " id="card-heat" data-load-block inert aria-busy="true">
@@ -103,24 +149,6 @@
               <span class="chart-hint">ⓘ Presiona para ver más información</span>
               <span class="chart-visual" id="chart-heat" aria-hidden="true"></span>
               <span class="chart-footnote">Integración del mapa pendiente.</span>
-            </button>
-          </article>
-          <article class="panel analytics-card analytics-card--wide" id="card-municipality" data-load-block inert aria-busy="true">
-            <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
-            <button type="button" class="chart-open" data-chart="municipality" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Reportes por municipio: ver resumen">
-              <span class="chart-heading">Reportes por municipio</span>
-              <span class="chart-hint">ⓘ Presiona para ver más información</span>
-              <span class="chart-visual" id="chart-municipality" aria-hidden="true"></span>
-              
-            </button>
-          </article>
-          <article class="panel analytics-card analytics-card--wide" id="card-trend" data-load-block inert aria-busy="true">
-            <!-- El botón cubre toda la gráfica y admite clic, Enter y barra espaciadora. -->
-            <button type="button" class="chart-open" data-chart="trend" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Tendencia mensual de reportes: ver resumen">
-              <span class="chart-heading">Tendencia mensual de reportes</span>
-              <span class="chart-hint">ⓘ Presiona para ver más información</span>
-              <span class="chart-visual" id="chart-trend" aria-hidden="true"></span>
-              
             </button>
           </article>
         </section>
@@ -135,7 +163,9 @@
     </dialog>
     <aside class="route-notice" id="actualizar-pendiente" role="dialog" aria-labelledby="refresh-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↻</span><h2 id="refresh-notice-title">Actualización pendiente</h2><p>La actualización se conectará con la base de datos en una etapa posterior.</p><a href="#">Volver a gráficos</a></div></aside>
     <aside class="route-notice" id="descarga-pendiente" role="dialog" aria-labelledby="download-notice-title"><div><span class="route-notice__icon" aria-hidden="true">↓</span><h2 id="download-notice-title">Exportación pendiente</h2><p>La exportación de gráficas se habilitará en una etapa posterior.</p><a href="#">Volver a gráficos</a></div></aside>
+    <script src="../js/donut-visual.js" defer></script>
     <script src="../js/report-data.js" defer></script>
+    <script src="../js/chart-statistics.js" defer></script>
     <script src="../js/charts.js" defer></script>
     <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
     <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">

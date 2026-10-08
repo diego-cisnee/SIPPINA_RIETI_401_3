@@ -26,3 +26,46 @@
 .chart-summary-dialog .confirmation-summary { margin: 24px 0; }
 @media (max-width: 1000px) { .analytics-grid { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .chart-open { padding: 16px; } .chart-filter-footer { align-items: flex-start; } .chart-visual { min-height: 230px; } .analytics-card--wide .chart-visual { overflow-x: auto; } .analytics-card--wide svg { min-width: 640px; } }
+/* Nuevas distribuciones: etiquetas completas y barras proporcionales. */
+.horizontal-bars { display: flex; flex-direction: column; gap: 18px; width: 100%; max-height: 420px; overflow-y: auto; }
+.horizontal-bar { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(60px, 1.2fr) minmax(75px, auto); align-items: center; gap: 12px; font-size: .78rem; }
+.horizontal-bar__label { overflow-wrap: anywhere; }
+.horizontal-bar__track { display: block; height: 18px; background: #eef0f4; border-radius: 4px; overflow: hidden; }
+.horizontal-bar__track > span { display: block; height: 100%; border-radius: inherit; }
+.horizontal-bar__value { text-align: right; font-variant-numeric: tabular-nums; }
+.chart-grouping { display: flex; align-items: center; gap: 12px; padding: 16px 22px 0; color: var(--color-muted); font-size: .82rem; }
+.chart-grouping select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 8px 38px 8px 12px;
+  border: 1px solid #dce1e7;
+  border-radius: 6px;
+  font: inherit;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%2312344d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 8px;
+}
+#card-category { order: 1; } #card-priority { order: 2; } #card-trend { order: 3; }
+#card-municipality { order: 4; } #card-resolution { order: 5; }
+#card-status { order: 6; } #card-heat { order: 7; }
+#card-trend .chart-open { height: auto; }
+.chart-visual svg { stroke: none; }
+@media (max-width: 600px) {
+  .horizontal-bar { grid-template-columns: minmax(75px, 1fr) minmax(45px, 1fr) minmax(65px, auto); gap: 8px; font-size: .72rem; }
+  .chart-grouping { padding-inline: 16px; }
+}
+
+#chart-priority svg text { font-size: 16px; }
+
+#chart-trend svg text { font-size: 16px; }
+
+.chart-period-controls { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 16px 22px 0; }
+.chart-period-controls .chart-grouping { padding: 0; }
+.chart-period-controls select { max-width: 100%; }
+@media (max-width: 600px) {
+  .chart-period-controls { padding-inline: 16px; }
+  .chart-period-controls .chart-grouping { flex-wrap: wrap; }
+}

@@ -4,14 +4,14 @@
    en todas las pantallas sin modificar cada componente por separado.
    ================================================================ */
 :root {
-  --color-background: #eef1f5;
+  --color-background: #f3f6f8;
   --color-surface: #ffffff;
   --color-surface-soft: #f6f8fb;
   --color-text: #202830;
   --color-muted: #69737e;
   --color-border: #dce2e8;
-  --color-primary: #1769ff;
-  --color-primary-dark: #0f52cc;
+  --color-primary: #12344d;
+  --color-primary-dark: #0b263b;
   --color-slate-1: #dfe4e8;
   --color-slate-2: #aab3bb;
   --color-slate-3: #727d86;
@@ -20,9 +20,9 @@
   --color-success: #218a64;
   --font-interface: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
-  --radius-small: 8px;
-  --radius-medium: 14px;
-  --shadow-soft: 0 16px 44px rgb(24 35 48 / 8%);
+  --radius-small: 12px;
+  --radius-medium: 18px;
+  --shadow-soft: 0 4px 12px rgb(18 52 77 / 8%), 0 2px 3px rgb(18 52 77 / 5%);
 }
 
 /* NORMALIZACIÓN BÁSICA */
@@ -1299,3 +1299,46 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
 .statistics-reports-page .management-header { flex-wrap: wrap; }
 .statistics-reports-page .management-header > div:first-child { min-width: 0; }
 .statistics-reports-page .filter-field :is(input, select) { min-width: 0; max-width: 100%; }
+
+/* Acabado visual compartido inspirado en el panel de referencia. */
+.sidebar { color: #f4f8fc; background: #123047; border-right-color: #203f56; }
+.sidebar .user-summary, .sidebar .sidebar-nav__logout { border-color: rgb(255 255 255 / 14%); }
+.sidebar .user-summary > span:last-child, .sidebar .sidebar-nav__item.is-disabled { color: #b7ccdc; }
+.sidebar .user-summary__avatar { color: #e3eff7; background: #254c67; }
+.sidebar .user-summary--profile:hover, .sidebar .user-summary--profile[aria-current="page"] { background: #1b3d55; border-radius: 12px; }
+.sidebar .sidebar-nav__item.is-active { color: #fff; background: #285b7b; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 6%); }
+.sidebar .sidebar-nav__item[href]:hover, .sidebar button.sidebar-nav__logout:hover { color: #fff; background: #20465f; }
+.sidebar button.sidebar-nav__logout { color: #e3eff7; }
+.sidebar :focus-visible { outline-color: #9dc9e6; }
+.brand-lockup__logo { padding: 6px; border-radius: 10px; background: #fff; }
+.panel, .metric-card, .kpi-card, .profile-trial { box-shadow: var(--shadow-soft); border-color: #e5ebef; }
+.primary-button, .outline-button, .action-button, .filter-submit,
+.dialog-actions button, .route-notice a, .ExpandMap, .pagination button { border-radius: 999px; }
+.outline-button { color: #fff; background: var(--color-primary); }
+.outline-button:hover { background: var(--color-primary-dark); }
+.report-dialog { border-radius: 20px; }
+.donut-chart { width: 100%; height: auto; margin: 20px auto 0; border-radius: 0; background: transparent; }
+.donut-chart::after { display: none; }
+.donut-chart__center { display: none; }
+.donut-chart svg { width: 100%; height: auto; fill: none; stroke: none; }
+.status-donut text { fill: var(--color-text); stroke: none; font-family: var(--font-interface); font-size: 13px; }
+.status-donut .donut-total { font-size: 28px; font-weight: 750; }
+.status-donut .donut-unit { font-size: 12px; fill: var(--color-muted); }
+.status-donut .donut-percentage { font-weight: 650; }
+@media (max-width: 600px) { .donut-chart { width: 100%; height: auto; margin-top: 18px; } }
+
+/* Dashboard: ambas visualizaciones comparten proporción y margen superior. */
+.dashboard-page:not(.statistics-page) .status-panel,
+.dashboard-page:not(.statistics-page) .heatmap-panel { min-height: 0; }
+.dashboard-page:not(.statistics-page) .hoverMap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 520 / 330;
+  margin-top: 20px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.dashboard-page:not(.statistics-page) .hoverMap #map { margin: 0; }
+@media (max-width: 600px) {
+  .dashboard-page:not(.statistics-page) .hoverMap { margin-top: 18px; }
+}
