@@ -162,6 +162,7 @@ if (statusDialog && authorityDialog && confirmationDialog) {
         const priority = row.dataset.priority || "No disponible";
         dialog.querySelector("[data-current-status]").textContent = status;
         dialog.querySelector("[data-current-priority]").textContent = priority;
+        dialog.querySelector("[data-current-priority]").dataset.priority = priority;
         const statusSelect = form.elements.namedItem("status");
         if (![...statusSelect.options].some(option => option.value === status)) statusSelect.add(new Option(status, status));
         statusSelect.value = status;

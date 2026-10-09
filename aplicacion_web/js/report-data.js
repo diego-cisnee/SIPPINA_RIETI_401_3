@@ -64,7 +64,7 @@ window.RIETI_READY = (async () => {
             span.className = 'cell-preview' + (key === 'workType' ? ' cell-preview--work' : key === 'observations' ? ' cell-preview--observations' : '');
           }
           if (key === 'status') span.className = 'status' + (statusClasses[report.status] ? ' status--' + statusClasses[report.status] : '');
-          if (key === 'priority') span.className = 'priority' + (report.priority === 'Urgente' ? ' priority--urgent' : '');
+          if (key === 'priority') { span.className = 'priority'; span.dataset.priority = report.priority; }
           cell.title = span.textContent;
           cell.append(span);
           row.append(cell);

@@ -68,7 +68,7 @@ const fixture = [
   assert.equal(await page.locator('[data-report-error]').isVisible(), true);
   await ready('graficos.html');
   assert.match(await page.locator('#chart-feedback').textContent(), /2 de 2/);
-  assert.match(await page.locator('#chart-heat').textContent(), /pendiente/);
+  assert.equal(await page.locator('#card-heat').count(), 0);
   await page.locator('[data-chart="status"]').click();
   assert.match(await page.locator('#chart-summary-values').textContent(), /Concluido/);
   await ready('rendimiento.html');

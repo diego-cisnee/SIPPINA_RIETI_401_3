@@ -864,7 +864,10 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
   font-size: 0.68rem;
 }
 
-.priority--urgent { color: #9b6517; background: rgb(216 138 22 / 13%); }
+.priority[data-priority="Baja"] { color: #27834d; background: rgb(39 131 77 / 12%); }
+.priority[data-priority="Media"] { color: #856a0f; background: rgb(214 172 25 / 18%); }
+.priority[data-priority="Alta"] { color: #a45112; background: rgb(229 128 39 / 15%); }
+.priority[data-priority="Urgente"], .priority--urgent { color: #ce4545; background: rgb(206 69 69 / 12%); }
 .menu-cell { width: 50px; }
 
 .row-menu {

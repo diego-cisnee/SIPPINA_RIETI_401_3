@@ -42,3 +42,7 @@ El frontend usa `http://127.0.0.1:3000` por defecto. Para otra dirección, defin
 `window.RIETI_API_BASE` antes de cargar `report-data.js`. Servir `aplicacion_web`
 en `http://127.0.0.1:4173` o ajustar `CORS_ORIGIN` al origen de la interfaz.
 Ejecutar `npm test` para verificar las consultas sin acceder a AWS.
+
+## Mapa de calor
+
+GET `/api/mapa-calor`: `{data:{municipios:[{id,clave,nombre}],puntos:[{id,id_ubicacion,latitud,longitud,prioridad,fecha_registro,intensidad}]}}`. Catálogo completo de Municipio y ubicación por reporte; el cliente restringe el selector por pertenencia geográfica de las coordenadas, exclusivamente SELECT. Coordenadas numéricas; ausentes permanecen null. Sin datos personales ni contraseñas. Reiniciar el servidor para habilitar la ruta.

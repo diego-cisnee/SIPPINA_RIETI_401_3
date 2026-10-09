@@ -78,3 +78,22 @@ diálogos, errores, vacíos y solicitudes exclusivamente GET. Ejecutar con
 `node work/test-api-integration.cjs` (configurar `NODE_PATH` si la dependencia es externa).
 Los archivos de pruebas anteriores reflejan las muestras del prototipo y ya no validan
 el contrato de datos de esta integración.
+
+## Estadísticas / Mapa de calor
+
+Abrir `/pages/mapa-calor.html` con el backend iniciado (`npm start` en backend). La página consulta exclusivamente GET `/api/mapa-calor`, con el mismo criterio de `window.RIETI_API_BASE` de las demás vistas. No contiene muestras ni credenciales. Reiniciar el backend después de incorporar la ruta nueva.
+
+- `js/heatmap/page.js`: carga, error y ciclo de vida.
+- `js/heatmap/data.js`: carga API y asignación espacial por polígonos, respetando huecos y partes separadas. Sin asignaciones nuevas al cambiar filtros.
+- `js/heatmap/config.js`: radio fijo 20 px, escala verde-rojo del calor, azul municipal y colores de prioridad.
+- `js/heatmap/controls.js`, `information.js`, `statistics.js`: filtros y conteos sobre la selección.
+- `assets/heatmap/data/municipios.geojson`: 125 geometrías originales INEGI. Fuente y metadatos en `fuente.json`. EPSG:6365 ITRF2008, sin transformación de datum; cartografía diciembre de 2025, descargada el 9 de octubre de 2026. Límites geoestadísticos, sin certificación legal ni precisión topográfica.
+- Leaflet 1.9.4 y Leaflet.heat 0.2.0 fijados, con licencias en vendor. El recorte utiliza `_redraw`; verificarlo antes de actualizar.
+
+La API entrega el catálogo de Municipio (`clave` = clave INEGI). El selector lo restringe a municipios con reportes ubicados dentro de sus polígonos mediante coordenadas. No usa id_municipio de Reporte para excluir puntos: ese vínculo puede diferir de su ubicación geográfica. La fila estatal 15000 no es un municipio. Solo las claves del catálogo que corresponden a polígonos aparecen en el selector; el resto de polígonos permanece gris y no es seleccionable. Los puntos fuera del estado o con coordenadas inválidas se excluyen; los de municipios no registrados se omiten y se informa su cantidad.
+
+Cada punto conserva su pareja de coordenadas de Ubicacion_Reporte, folio y prioridad de Reporte. Hover muestra folio y prioridad; clic abre una ventana con enlace al seguimiento, cuyo Volver regresa al mapa. Cuando un reporte tiene varias ubicaciones, se dibujan todas, pero el total, prioridades y recientes cuentan folios únicos por selección; cada municipio cuenta el folio una vez. El calor depende de las ubicaciones, radio y zoom, y no es un conteo absoluto.
+
+Los últimos 30 días incluyen hoy en America/Mexico_City; fechas inválidas o futuras no cuentan como recientes. Prioridades desconocidas aparecen como Sin especificar. Ver todo el estado conserva el filtro de prioridad. Las coordenadas exactamente sobre límites compartidos conservan el criterio de ray casting y primer polígono coincidente; acordar política antes de usos de precisión.
+
+Prueba del navegador: `node work/test-heatmap.cjs` con Playwright disponible mediante NODE_PATH. Usa datos controlados solo en pruebas y verifica API, duplicados, prioridades, enlaces, catálogo parcial/grises, filtros, vacío, error y móvil. El backend tiene pruebas SELECT en `npm test`.

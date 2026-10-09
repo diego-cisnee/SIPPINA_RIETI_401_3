@@ -1,0 +1,309 @@
+.heatmap-layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 20px;
+    margin-top: 24px
+}
+
+.heatmap-controls {
+    padding: 20px
+}
+
+.heatmap-controls fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0
+}
+
+.heatmap-controls legend {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 16px
+}
+
+.heatmap-controls label {
+    display: block;
+    margin: 16px 0 8px;
+    font-size: 14px
+}
+
+.heatmap-controls select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d8e2db;
+    border-radius: 7px;
+    background: white;
+    font: inherit
+}
+
+.heatmap-controls input[type=range] {
+    width: 100%;
+    accent-color: #21684e
+}
+
+.heatmap-controls .check {
+    display: flex;
+    gap: 8px;
+    align-items: center
+}
+
+.heatmap-controls button {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d6e5da;
+    border-radius: 7px;
+    background: #edf4ef;
+    color: #24523e;
+    cursor: pointer;
+    margin: 12px 0
+}
+
+.heatmap-controls .stats {
+    display: flex;
+    gap: 24px;
+    margin: 20px 0
+}
+
+.heatmap-controls .stats strong {
+    display: block;
+    font-size: 26px
+}
+
+.heatmap-controls .stats span,
+.heatmap-controls .hint,
+.heatmap-controls footer {
+    font-size: 12px;
+    color: #627469
+}
+
+.heatmap-controls footer {
+    line-height: 1.7;
+    margin-top: 20px
+}
+
+.heatmap-controls output {
+    float: right
+}
+
+.heatmap-controls .demo {
+    background: #fdf3df;
+    color: #92672a;
+    padding: 10px;
+    border-radius: 7px;
+    font-size: 13px
+}
+
+.heatmap-controls .detail {
+    border-top: 1px solid #dce4de;
+    padding-top: 14px
+}
+
+.heatmap-controls h2 {
+    font-size: 18px
+}
+
+.heatmap-controls .detail p {
+    font-size: 13px;
+    line-height: 1.6
+}
+
+.heatmap-view {
+    position: relative;
+    min-width: 0;
+    height: auto;
+    min-height: 740px;
+    border: 1px solid #dce4de;
+    border-radius: 12px;
+    overflow: hidden;
+    isolation: isolate
+}
+
+#map {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    background: #eaf0e9
+}
+
+.map-title,
+.legend,
+#status {
+    position: absolute;
+    z-index: 700;
+    background: #fffffff2;
+    border: 1px solid #dce6db;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px
+}
+
+.map-title {
+    left: 14px;
+    top: 14px
+}
+
+.legend {
+    left: 14px;
+    bottom: 24px;
+    width: 220px;
+    max-width: calc(100% - 28px)
+}
+
+.legend p {
+    font-size: 11px;
+    margin-bottom: 0
+}
+
+#legend-gradient {
+    height: 7px;
+    border-radius: 4px;
+    margin: 12px 0 7px;
+    background: linear-gradient(90deg, #3b82f6, #22d3ee, #4ade80, #facc15, #fb923c, #ef4444)
+}
+
+.legend-labels {
+    display: flex;
+    justify-content: space-between
+}
+
+#status {
+    left: 14px;
+    bottom: 8px;
+    max-width: calc(100% - 28px)
+}
+
+.heatmap-page .statistics-tabs {
+    flex-wrap: wrap
+}
+
+.heatmap-page :focus-visible {
+    outline: 2px solid #398c6a;
+    outline-offset: 3px
+}
+
+@media(max-width:1100px) {
+    .heatmap-layout {
+        grid-template-columns: 1fr
+    }
+
+    .heatmap-view {
+        height: 65dvh;
+        min-height: 460px
+    }
+
+    .heatmap-controls fieldset {
+        max-width: 600px
+    }
+}
+
+@media(max-width:480px) {
+    .legend {
+        width: 190px
+    }
+
+    .map-title {
+        max-width: 65%
+    }
+
+    .heatmap-controls {
+        padding: 16px
+    }
+}
+
+.heatmap-controls .case-priorities h2 {
+    font-size: 14px;
+    margin: 0 0 12px
+}
+
+.case-priorities ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px
+}
+
+.case-priorities li,
+.case-priorities li span {
+    display: flex;
+    align-items: center;
+    gap: 8px
+}
+
+.case-priorities li {
+    justify-content: space-between;
+    font-size: 13px
+}
+
+.priority-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0
+}
+
+.heatmap-controls .recent-cases {
+    padding: 12px;
+    border-radius: 8px;
+    background: #edf4f8;
+    color: var(--color-primary);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 18px 0
+}
+
+.heatmap-controls .stats {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 16px
+}
+
+.heatmap-controls input[type=range] {
+    accent-color: var(--color-primary)
+}
+
+.heatmap-controls button {
+    color: var(--color-primary);
+    background: #edf4f8;
+    border-color: #c8dce9
+}
+
+.heatmap-controls .detail {
+    border-color: var(--color-border)
+}
+
+.heatmap-page :focus-visible {
+    outline-color: var(--color-primary)
+}
+
+#map {
+    background: #edf2f6
+}
+
+.heatmap-view,
+.map-title,
+.legend,
+#status {
+    border-color: var(--color-border)
+}
+
+#legend-gradient {
+    background: linear-gradient(90deg, #edf4f8, #c8dce9, #92b7ce, #5b8aa7, #285b7b, #12344d)
+}
+.heatmap-controls .detail{border-top:0;padding-top:0;margin-bottom:16px}
+.heatmap-controls .detail h2{margin:0;color:var(--color-primary);font-size:18px}
+#status:empty{display:none}
+
+.heatmap-controls select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23202830' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px 16px;
+}
+
+
+.heatmap-view:has(#status:not(:empty)) .legend { bottom: 72px; }

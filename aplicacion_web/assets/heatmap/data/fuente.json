@@ -1,0 +1,11 @@
+{
+  "fuente": "INEGI, servicio vectorial del Marco Geoestadístico",
+  "url": "https://gaia.inegi.org.mx/wscatgeo/v2/geo/mgem/15",
+  "fecha_descarga": "2026-10-09",
+  "municipios": 125,
+  "metadatos": {
+    "Fuente_informacion_vectorial": "INEGI. Marco Geoestadístico, diciembre de 2025",
+    "Fuente_informacion_estadistica": "INEGI. Censo de Población y Vivienda, 2020"
+  },
+  "nota": "Geometrías originales sin simplificación. CRS original declarado por INEGI: EPSG:6365. Visualización web en Leaflet; no es delimitación legal ni medición topográfica."
+}

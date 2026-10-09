@@ -74,6 +74,15 @@ app.get(['/api/reportes', '/api/reportes/:id'], async (request, response) => {
   }
 });
 
+const { readHeatmap } = require('./heatmap');
+app.get('/api/mapa-calor', async (request, response) => {
+  try { response.json({data: await readHeatmap(pool)}); }
+  catch(error) {
+    console.error('Error al consultar mapa:', error.code);
+    response.status(500).json({message:'No fue posible consultar los datos del mapa.'});
+  }
+});
+
 // Alternativa de mismo origen: abrir http://127.0.0.1:3000/pages/dashboard.html.
 app.use(express.static(path.join(__dirname, '../aplicacion_web')));
 

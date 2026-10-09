@@ -1,7 +1,10 @@
 /* ESTADÍSTICAS / GRÁFICOS
    Reportes consultados por report-data.js. No se escribe información.
-   SVG y barras CSS reutilizan el diseño existente. El mapa queda pendiente. */
+   SVG y barras CSS reutilizan el diseño existente. */
 (async () => {
+  // Cambiar a true para volver a mostrar esta gráfica; no hay control en la interfaz.
+  const SHOW_RESOLUTION_CHART = false;
+  document.querySelector('#card-resolution').hidden = !SHOW_RESOLUTION_CHART;
   await window.RIETI_READY;
   const records = Object.values(window.RIETI_REPORTS || {});
   const form = document.querySelector('#chart-filters');
@@ -33,13 +36,6 @@
     const max = Math.max(...counts);
     const leaders = statuses.filter((_, i) => counts[i] === max).join(', ');
     summaries.status = { title: 'Distribución por estatus', description: total ? `Se muestran ${total} reportes. La mayor concentración corresponde a ${leaders}, con ${max} reporte(s) por estado. Cada segmento representa su proporción del total.` : 'No hay reportes que coincidan con los filtros.', values: statuses.map((status, i) => [status, `${counts[i]} (${percentage(counts[i], total)})`]) };
-  }
-
-  // Esquema de concentración sobre coordenadas ficticias, con escala fija al filtrar.
-  // INTEGRACIÓN FUTURA: usar polígonos municipales y un proveedor cartográfico aprobado.
-  function renderHeat(selected) {
-    setChart('heat', '<span class="chart-empty">Integración del mapa pendiente.</span>');
-    summaries.heat = { title: 'Mapa de calor', description: 'Integración del mapa pendiente.', values: [] };
   }
 
   // Ejes compartidos: escala entera, líneas guía y etiqueta de unidades.
@@ -117,9 +113,11 @@
     const municipalities = stats.counts(selected, 'municipality');
     setChart('municipality', selected.length ? horizontal(municipalities.slice(0, 10), () => '#285b7b') + `<span class="chart-footnote">Se muestran ${Math.min(10, municipalities.length)} de ${municipalities.length} municipios.</span>` : empty);
     summaries.municipality = { title: 'Reportes por municipio', description: 'Cada barra muestra el total de reportes registrados en un municipio. La gráfica muestra los diez municipios principales, ordenados de mayor a menor; este resumen incluye todos.', values: municipalities.map(([label, count]) => [label, `${count} reporte(s)`]) };
+    if (SHOW_RESOLUTION_CHART) {
     const averages = stats.averages(selected);
     setChart('resolution', horizontal(averages.map(r => [r.priority, r.hours]), label => stats.colors[label], duration) + '<span class="chart-footnote">Sin datos significa que no hay resoluciones con fechas válidas para calcular el promedio. La API actual no entrega fecha de resolución.</span>');
     summaries.resolution = { title: 'Tiempo promedio de resolución por prioridad', description: 'Promedio de fecha de resolución menos fecha de registro. Solo incluye resueltos con fechas válidas y duración no negativa; la longitud de las barras se compara en horas; no se sustituye la resolución por la fecha de registro o actualización.', values: averages.map(r => [r.priority, `${duration(r.hours)} · ${r.count} reporte(s) válidos`]) };
+    }
   }
 
   function renderTrend(selected) {
@@ -174,7 +172,6 @@
     const active = Object.values(filters).some(Boolean);
     document.querySelector('#chart-feedback').textContent = `${selected.length} de ${records.length} reportes consultados · ${active ? 'Filtros aplicados' : 'Sin filtros'}`;
     renderStatus(selected);
-    renderHeat(selected);
     renderTrend(selected);
     renderAdditional(selected);
     // El contexto queda guardado con el resumen aplicado, no con cambios de formulario inválidos.
@@ -211,7 +208,7 @@
   dialog.addEventListener('close', () => returnFocusTo?.focus());
   // Escape y confinamiento del foco provienen del elemento dialog nativo.
   if (window.RIETI_API_ERROR) {
-    ['status', 'heat', 'municipality', 'trend', 'category', 'priority', 'resolution'].forEach(id => setChart(id, '<span class="chart-empty">Datos no disponibles.</span>'));
+    ['status', 'municipality', 'trend', 'category', 'priority', 'resolution'].forEach(id => setChart(id, '<span class="chart-empty">Datos no disponibles.</span>'));
     buttons.forEach(button => { button.disabled = true; });
     document.querySelector('#chart-feedback').textContent = 'Datos no disponibles.';
     return;

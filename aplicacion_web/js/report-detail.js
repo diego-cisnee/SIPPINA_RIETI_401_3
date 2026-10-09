@@ -12,6 +12,7 @@
   const origins = {
     dashboard: ["dashboard.html", "Dashboard"],
     reportes: ["reportes.html", "Gestión de reportes"],
+    "mapa-calor": ["mapa-calor.html", "Estadísticas · Mapa de calor"],
     estadisticas: ["estadisticas.html", "Estadísticas · Reportes"],
   };
   const origin = params.get("from");
@@ -39,6 +40,7 @@
   // No se inserta HTML a partir de la URL o de los datos del reporte.
   document.querySelectorAll("[data-detail]").forEach((node) => {
     node.textContent = report[node.dataset.detail] ?? "No disponible";
+    if (node.dataset.detail === "priority") node.dataset.priority = report.priority;
   });
   const attachments = document.querySelector('[data-list="attachments"]');
   attachments.replaceChildren();

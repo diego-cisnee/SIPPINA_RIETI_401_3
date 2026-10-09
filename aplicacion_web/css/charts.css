@@ -48,9 +48,8 @@
   background-position: right 12px center;
   background-size: 12px 8px;
 }
-#card-category { order: 1; } #card-priority { order: 2; } #card-trend { order: 3; }
-#card-municipality { order: 4; } #card-resolution { order: 5; }
-#card-status { order: 6; } #card-heat { order: 7; }
+#card-status { order: 1; } #card-category { order: 2; } #card-priority { order: 3; }
+#card-municipality { order: 4; } #card-resolution { order: 5; } #card-trend { order: 6; }
 #card-trend .chart-open { height: auto; }
 .chart-visual svg { stroke: none; }
 @media (max-width: 600px) {
@@ -69,3 +68,5 @@
   .chart-period-controls { padding-inline: 16px; }
   .chart-period-controls .chart-grouping { flex-wrap: wrap; }
 }
+
+#card-resolution[hidden] { display: none; }
