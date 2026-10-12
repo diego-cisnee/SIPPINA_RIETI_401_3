@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="RIETI">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/AndroidStudio/RIETI.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
