@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro | RIETI</title>
+    <style>
+        :root {
+            --primary-color: #1a3646; /* Azul oscuro del botón y títulos */
+            --bg-left: #f0f2f5; /* Fondo gris claro izquierdo */
+            --bg-right: #ffffff; /* Fondo blanco derecho */
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --border-color: #e5e7eb;
+            --input-bg: #f9fafb;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            background-color: #d1d5db; /* Fondo gris exterior simulado */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .auth-container {
+            display: flex;
+            width: 100%;
+            max-width: 1000px;
+            min-height: 600px;
+            background: var(--bg-right);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 8px; /* Borde sutil si no está a pantalla completa */
+            overflow: hidden;
+        }
+
+        /* PANEL IZQUIERDO (Logo y branding) */
+        .auth-brand {
+            flex: 1;
+            background-color: var(--bg-left);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .brand-card {
+            background: #ffffff;
+            padding: 4rem 3rem;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .brand-icon {
+            width: 72px;
+            height: 72px;
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 2rem;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary-color);
+        }
+
+        .brand-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--primary-color);
+            margin: 0 0 1rem;
+            letter-spacing: -1px;
+        }
+
+        .brand-subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* PANEL DERECHO (Formulario) */
+        .auth-form-wrapper {
+            flex: 1;
+            padding: 3rem 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin: 0 0 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+            margin: 0 0 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-row .form-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-dark);
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none; /* Para limpiar estilos nativos del select */
+        }
+
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+            padding-right: 2.5rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 54, 70, 0.1);
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .password-toggle:hover {
+            color: var(--text-dark);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #122632;
+        }
+
+        .auth-footer {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+                min-height: auto;
+                margin: 1rem;
+            }
+            .auth-brand {
+                padding: 3rem 1.5rem;
+            }
+            .brand-card {
+                padding: 2rem 1.5rem;
+            }
+            .auth-form-wrapper {
+                padding: 2rem 1.5rem;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .form-row .form-group {
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <!-- Panel Izquierdo: Branding -->
+        <aside class="auth-brand">
+            <div class="brand-card">
+                <div class="brand-icon">R</div>
+                <h1 class="brand-title">RIETI</h1>
+                <p class="brand-subtitle">Sistema de gestión de reportes</p>
+            </div>
+        </aside>
+
+        <!-- Panel Derecho: Formulario de Registro -->
+        <main class="auth-form-wrapper">
+            <header>
+                <div class="eyebrow">Panel de control</div>
+                <h1>Crear cuenta</h1>
+                <p class="subtitle">Registra un nuevo administrador en el sistema.</p>
+            </header>
+
+            <form action="#" method="POST" id="register-form">
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Nombre de administrador" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" name="email" placeholder="admin@gmail.gob.mx" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_municipio">Municipio asignado</label>
+                        <select id="id_municipio" name="id_municipio" required>
+                            <option value="" disabled selected>Selecciona un municipio</option>
+                            <option value="1">Naucalpan de Juárez</option>
+                            <option value="2">Tlalnepantla de Baz</option>
+                            <option value="3">Coacalco</option>
+                            <option value="4">Villa del Carbón</option>
+                            <option value="5">Huixquilucan</option>
+                            <option value="6">Tultitlán</option>
+                            <option value="7">Atizapán de Zaragoza</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="contrasena" name="contrasena" placeholder="Crea una contraseña segura" required>
+                        <!-- Icono de ojo simulado (SVG básico) -->
+                        <button type="button" class="password-toggle" aria-label="Mostrar contraseña">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Crear administrador</button>
+            </form>
+
+            <footer class="auth-footer">
+                ¿Ya tienes una cuenta? <a href="login.html">Iniciar sesión</a>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // mostrar/ocultar contraseña
+        document.querySelector('.password-toggle').addEventListener('click', function() {
+            const input = document.getElementById('contrasena');
+            if (input.type === 'password') {
+                input.type = 'text';
+                // Cambiar icono opcionalmente aquí
+            } else {
+                input.type = 'password';
+            }
+        });
+    </script>
+    <script src="../js/getmunicipio.js" defer></script>
+    <script src="../js/registro.js" defer></script>
+</body>
+</html>

@@ -95,6 +95,22 @@ server.on('error', (error) => {
   process.exitCode = 1;
 });
 
+app.get('/api/municipios', async (req, res) => {
+    try {
+        // Query SQL exacto basado en tu diseño de base de datos
+        const query = 'SELECT id_municipio, nombre, clave_corta FROM Municipio ORDER BY nombre ASC';
+        
+        const [municipios] = await pool.query(query);
+
+        
+        res.status(200).json(municipios);
+
+    } catch (error) {
+        console.error("Error al obtener municipios de la BD:", error);
+        res.status(500).json({ error: "Error al consultar la base de datos" });
+    }
+});
+
 // Cierra correctamente el servidor y el pool al detener el proceso.
 async function closeServer(signal) {
   console.log(`\n${signal}: cerrando API RIETI...`);
