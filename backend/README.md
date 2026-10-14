@@ -46,3 +46,29 @@ Ejecutar `npm test` para verificar las consultas sin acceder a AWS.
 ## Mapa de calor
 
 GET `/api/mapa-calor`: `{data:{municipios:[{id,clave,nombre}],puntos:[{id,id_ubicacion,latitud,longitud,prioridad,fecha_registro,intensidad}]}}`. Catálogo completo de Municipio y ubicación por reporte; el cliente restringe el selector por pertenencia geográfica de las coordenadas, exclusivamente SELECT. Coordenadas numéricas; ausentes permanecen null. Sin datos personales ni contraseñas. Reiniciar el servidor para habilitar la ruta.
+
+## Folio visible
+
+Las consultas de reportes y mapa de calor incluyen `Reporte.folio`. El frontend
+muestra ese texto en tablas, detalle, diálogos, exportación CSV y puntos del mapa.
+`id_reporte` permanece como identificador interno para consultas, enlaces y
+conteos. Si falta el folio, se muestra “No disponible”, sin generar uno artificial.
+
+## Posibles duplicados
+
+`GET /api/reportes/:id/coincidencias` devuelve `{data: [...]}` con hasta cinco
+candidatos únicos, folio y motivos. Devuelve 400 para un ID inválido y 404 si el
+reporte no existe. Son consultas SELECT parametrizadas; no requiere tablas nuevas.
+
+Criterios iniciales: mismo municipio, registros dentro de ±7 días y ubicación a
+100 metros o menos, más coincidencia de tipo de trabajo o similitud de descripción
+(Jaccard ≥0.6, al menos tres términos relevantes por descripción). Cuando faltan
+coordenadas comparables se admite una dirección normalizada idéntica de al menos
+10 caracteres. Se comparan las ubicaciones individualmente. Los límites están en
+`duplicates.js` y son orientativos: el aviso no confirma un duplicado. Los casos
+sin ubicación suficiente o fuera de estos criterios pueden quedar sin detectar.
+
+El detalle muestra los motivos y permite abrir el candidato por su ID interno,
+conservando el folio visible. El aviso solo aparece al encontrar coincidencias; permanece oculto durante la
+consulta, si no hay candidatos o si ocurre un error, sin bloquear el detalle. No guarda
+revisiones, no fusiona y no elimina datos.

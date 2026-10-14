@@ -8,7 +8,7 @@ function exportarReportesCSV() {
   }
 
     const columnas = [
-    { label: 'Folio', key: 'id' },
+    { label: 'Folio', key: 'folio' },
     { label: 'Denunciante', key: 'reporter' },
     { label: 'Municipio', key: 'municipality' },
     { label: 'Estatus', key: 'status' },

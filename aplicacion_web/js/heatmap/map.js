@@ -79,7 +79,7 @@ export function createMap(geoData,points,catalog=[]) {
       if($('points').checked){
         visible.forEach(p=>{
           const priority=priorities.includes(p.prioridad)?p.prioridad:'Sin especificar';
-          const tooltip=document.createElement('span');tooltip.textContent=`Folio ${p.id} · ${priority}`;
+          const tooltip=document.createElement('span');tooltip.textContent=`Folio ${p.folio === null || p.folio === undefined || p.folio === '' ? 'No disponible' : p.folio} · ${priority}`;
           const popup=document.createElement('div');
           const heading=document.createElement('p');heading.textContent=tooltip.textContent;
           const link=document.createElement('a');link.textContent='Abrir reporte';link.href=`reporte.html?id=${encodeURIComponent(p.id)}&from=mapa-calor`;
@@ -114,7 +114,7 @@ export function createMap(geoData,points,catalog=[]) {
         const marker = dots.getLayers().find(layer => layer.options.reportId === requestedReport);
         marker?.openPopup();
       } else {
-        const notice = `El folio ${requestedReport} no tiene una ubicación disponible en el mapa de calor.`;
+        const notice = 'El reporte seleccionado no tiene una ubicación disponible en el mapa de calor.';
         $('status').textContent = [$('status').textContent, notice].filter(Boolean).join(' · ');
       }
     }

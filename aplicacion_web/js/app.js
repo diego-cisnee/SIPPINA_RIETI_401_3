@@ -138,7 +138,7 @@ const authorityDialog = document.querySelector("#authority-dialog");
 const confirmationDialog = document.querySelector("#update-confirmation");
 
 if (statusDialog && authorityDialog && confirmationDialog) {
-  let selectedReportId = "";
+  let selectedReportFolio = "";
   let returnFocusTo = null;
   const dialogs = [statusDialog, authorityDialog, confirmationDialog];
 
@@ -147,7 +147,7 @@ if (statusDialog && authorityDialog && confirmationDialog) {
       const row = button.closest("[data-report-row], [data-report-context]");
       if (!row) return;
 
-      selectedReportId = row.dataset.reportId;
+      selectedReportFolio = row.dataset.reportFolio || "No disponible";
       // El menú se cierra, así que el foco vuelve a su activador y no al botón oculto.
       returnFocusTo = row.querySelector("summary") || button;
       reportMenus.forEach((menu) => { menu.open = false; });
@@ -155,7 +155,7 @@ if (statusDialog && authorityDialog && confirmationDialog) {
       const dialog = button.dataset.reportAction === "status" ? statusDialog : authorityDialog;
       const form = dialog.querySelector("form");
       form.reset();
-      dialog.querySelector("[data-dialog-report-id]").textContent = selectedReportId;
+      dialog.querySelector("[data-dialog-report-id]").textContent = selectedReportFolio;
 
       if (dialog === statusDialog) {
         const status = row.dataset.status || row.querySelector(".status")?.textContent.trim() || "No disponible";
@@ -194,7 +194,7 @@ if (statusDialog && authorityDialog && confirmationDialog) {
 
       const values = new FormData(form);
       const summary = confirmationDialog.querySelector("[data-confirmation-summary]");
-      const fields = [["Reporte", selectedReportId]];
+      const fields = [["Folio", selectedReportFolio]];
       if (dialog === statusDialog) {
         fields.push(["Nuevo estado", values.get("status")], ["Nueva prioridad", values.get("priority")]);
         fields.push(["Comentarios", String(values.get("comments") || "").trim() || "Sin comentarios"]);

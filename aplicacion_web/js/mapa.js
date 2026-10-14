@@ -34,9 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (reporte.estatus === "En proceso") colorPin = "#f97316";
                     if (reporte.estatus === "Resuelto") colorPin = "#22c55e";
 
+                    const folio = document.createElement('span');
+                    folio.textContent = reporte.folio ?? 'No disponible';
                     const popup = new maplibregl.Popup({ offset:25 }).setHTML(`
                         <div style="font-family: sans-serif;">
-                            <h4 style="margin: 0 0 5px 0;">Reporte #${reporte.id_reporte}</h4>
+                            <h4 style="margin: 0 0 5px 0;">Folio ${folio.innerHTML}</h4>
                             <p style="margin: 0; font-size: 13px;"><strong>Estatus:</strong> ${reporte.estatus}</p>
                             <p style="margin: 0; font-size: 13px;"><strong>Prioridad:</strong> ${reporte.prioridad}</p>
                             <hr style="border: 0.5px solid #ccc; margin: 8px 0;">

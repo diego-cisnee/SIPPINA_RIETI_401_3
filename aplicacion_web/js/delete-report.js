@@ -18,6 +18,7 @@
   const description = dialog.querySelector('#delete-report-description');
   const folio = dialog.querySelector('[data-delete-folio]');
   let selectedId = '';
+  let selectedFolio = '';
   let returnFocusTo = null;
 
   function reset() {
@@ -36,8 +37,9 @@
       if (!context || context.hidden || !context.dataset.reportId) return;
       reset();
       selectedId = context.dataset.reportId;
+      selectedFolio = context.dataset.reportFolio || 'No disponible';
       // El folio se trata como texto, nunca como HTML proveniente de la URL o API.
-      folio.textContent = selectedId;
+      folio.textContent = selectedFolio;
       returnFocusTo = context.querySelector('summary') || button;
       document.querySelectorAll('.row-menu').forEach(menu => { menu.open = false; });
       dialog.showModal();
@@ -51,6 +53,7 @@
   dialog.addEventListener('close', () => {
     reset();
     selectedId = '';
+    selectedFolio = '';
     folio.textContent = '';
     returnFocusTo?.focus();
   });
@@ -62,7 +65,7 @@
     form.hidden = true;
     result.hidden = false;
     title.textContent = 'Eliminación simulada';
-    description.textContent = `Confirmaste la eliminación del folio ${selectedId}. No se ha eliminado ningún dato del prototipo.`;
+    description.textContent = `Confirmaste la eliminación del folio ${selectedFolio}. No se ha eliminado ningún dato del prototipo.`;
     done.focus();
   });
 })();

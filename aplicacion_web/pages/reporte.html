@@ -57,7 +57,7 @@
             <nav class="breadcrumbs" aria-label="Ruta de navegación">
               <a data-origin-link href="reportes.html">Gestión de reportes</a>
               <span aria-hidden="true">/</span><span>Seguimiento de reporte</span>
-              <span aria-hidden="true">/</span><span aria-current="page" data-detail="id"></span>
+              <span aria-hidden="true">/</span><span aria-current="page" data-detail="folio"></span>
             </nav>
             <div class="detail-toolbar__actions">
               <a class="action-button action-button--secondary" data-back-link href="reportes.html">← Volver</a>
@@ -75,7 +75,12 @@
         -->
         <div class="panel detail-loading-skeleton" data-loading-only aria-hidden="true"></div>
         <div id="report-content" data-report-context hidden>
-          <h2 class="detail-folio">Folio <span data-detail="id"></span></h2>
+          <h2 class="detail-folio">Folio <span data-detail="folio"></span></h2>
+          <section class="panel duplicate-notice" data-duplicate-notice hidden aria-labelledby="duplicate-title" aria-busy="true">
+            <h2 id="duplicate-title">Posibles reportes duplicados</h2>
+            <p data-duplicate-status role="status">Comprobando coincidencias…</p>
+            <ul data-duplicate-list hidden></ul>
+          </section>
           <section class="detail-summary" aria-label="Resumen del reporte">
             <article class="panel"><span>Estado actual</span><strong class="status status--received" data-detail="status"></strong></article>
             <article class="panel"><span>Prioridad</span><strong class="priority" data-detail="priority"></strong></article>
@@ -159,7 +164,7 @@
         </label>
         <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>
         <label class="dialog-field">Nueva prioridad
-          <select name="priority" required><option>Baja</option><option>Media</option><option>Alta</option><option>Urgente</option></select>
+          <select name="priority" required><option>Baja</option><option>Media</option><option>Alta</option></select>
         </label>
         <label class="dialog-field">Comentarios
           <textarea name="comments" rows="3" maxlength="2000" placeholder="Escribe los comentarios…"></textarea>

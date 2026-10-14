@@ -1,8 +1,8 @@
 /* Cálculos puros sobre RIETI_REPORTS. Contrato futuro: registeredAt y resolvedAt
    en ISO 8601 (con zona horaria si incluyen hora); nunca usar updatedAt como resolución. */
 (() => {
-  const priorities = ['Baja', 'Media', 'Alta', 'Urgente'];
-  const colors = { Baja: '#27834d', Media: '#d6ac19', Alta: '#e58027', Urgente: '#ce4545' };
+  const priorities = ['Baja', 'Media', 'Alta'];
+  const colors = { Baja: '#27834d', Media: '#d6ac19', Alta: '#e58027' };
   const clean = value => typeof value === 'string' && value.trim() && value !== 'No disponible' ? value.trim() : '';
   function date(value) {
     if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2}))?$/.test(value)) return null;

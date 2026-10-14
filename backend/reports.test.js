@@ -5,13 +5,15 @@ test('Consultas de solo lectura, detalle parametrizado y relaciones múltiples s
  const calls = [];
  const pool = { execute: async (sql, args) => {
   calls.push([sql, args]);
-  if (sql.includes('FROM Reporte')) return [[{ id_reporte: 7 }]];
+  if (sql.includes('FROM Reporte')) return [[{ id_reporte: 7, folio: 'RIETI-2026-0007' }]];
   if (sql.includes('Demografico_Reporte')) return [[{ id_reporte: 7, tipo_trabajo: 'Comercio', edad: '8', numero_ninos: '1' }, { id_reporte: 7, tipo_trabajo: 'Agrícola', edad: '10', numero_ninos: '2' }]];
   return [[{ id_reporte: 7, direccion: 'Lugar', latitud: 0, longitud: 0 }]];
  }};
  const rows = await readReports(pool, '7');
  assert.equal(rows.length, 1);
  assert.equal(rows[0].id, '7');
+ assert.equal(rows[0].folio, 'RIETI-2026-0007');
+ assert.match(calls[0][0], /r\.folio/);
  assert.equal(rows[0].workType, 'Comercio · Agrícola');
  assert.equal(rows[0].latitude, '0');
  assert.ok(calls.every(([sql]) => /^SELECT\b/.test(sql)));

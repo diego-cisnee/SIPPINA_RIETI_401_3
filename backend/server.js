@@ -60,6 +60,20 @@ app.get('/test-db', async (request, response) => {
   }
 });
 
+const { readDuplicates } = require('./duplicates');
+app.get('/api/reportes/:id/coincidencias', async (request, response) => {
+  const id = request.params.id;
+  if (!/^[1-9]\d*$/.test(id)) return response.status(400).json({ message: 'Identificador inválido' });
+  try {
+    const matches = await readDuplicates(pool, id);
+    if (matches === null) return response.status(404).json({ message: 'Reporte no encontrado' });
+    response.json({ data: matches });
+  } catch (error) {
+    console.error('Error al consultar coincidencias:', error.code);
+    response.status(500).json({ message: 'No fue posible comprobar posibles duplicados' });
+  }
+});
+
 const { readReports } = require('./reports');
 app.get(['/api/reportes', '/api/reportes/:id'], async (request, response) => {
   const id = request.params.id;

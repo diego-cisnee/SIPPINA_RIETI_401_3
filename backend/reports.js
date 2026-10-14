@@ -1,5 +1,5 @@
 // Solo SELECT. Las relaciones 1:N se consultan aparte para no duplicar reportes.
-const listSQL = `SELECT r.id_reporte, r.estatus AS status, r.prioridad AS priority,
+const listSQL = `SELECT r.id_reporte, r.folio, r.estatus AS status, r.prioridad AS priority,
  DATE_FORMAT(r.fecha, '%d/%m/%Y %H:%i') AS reportedAt,
  DATE_FORMAT(r.fecha, '%Y-%m-%d') AS date,
  r.descripcion AS observations, r.imagen_url AS evidence,

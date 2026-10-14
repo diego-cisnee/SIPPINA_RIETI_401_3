@@ -1,6 +1,6 @@
 /*
   VISTA DE SEGUIMIENTO
-  Lee únicamente el folio y un origen permitido de la URL.
+  Lee únicamente el ID interno y un origen permitido de la URL.
   Espera la consulta GET por id_reporte; carga y errores se manejan sin datos de muestra.
 */
 (async () => {
@@ -44,13 +44,58 @@
   });
   document.querySelector("[data-heatmap-link]").href = "mapa-calor.html?reporte=" + encodeURIComponent(report.id);
   content.dataset.reportId = report.id;
+  content.dataset.reportFolio = report.folio;
   content.dataset.status = report.status;
   content.dataset.priority = report.priority;
   content.hidden = false;
-  document.title = report.id + " | Seguimiento RIETI";
+  document.title = report.folio + " | Seguimiento RIETI";
   document.querySelector('meta[name="description"]').content =
-    "Seguimiento del reporte " + report.id + " en " + report.municipality + ".";
+    "Seguimiento del reporte " + report.folio + " en " + report.municipality + ".";
   printButton.addEventListener("click", () => { window.print(); });
+
+  const duplicateNotice = document.querySelector('[data-duplicate-notice]');
+  const duplicateStatus = document.querySelector('[data-duplicate-status]');
+  const duplicateList = document.querySelector('[data-duplicate-list]');
+  async function checkDuplicates() {
+    duplicateNotice.hidden = true;
+    duplicateNotice.setAttribute('aria-busy', 'true');
+    duplicateNotice.classList.remove('duplicate-notice--warning');
+    duplicateStatus.textContent = 'Comprobando coincidencias…';
+    duplicateList.hidden = true;
+    duplicateList.replaceChildren();
+    const apiBase = (window.RIETI_API_BASE || (location.port === '3000' && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) ? location.origin : 'http://127.0.0.1:3000')).replace(/\/$/, '');
+    try {
+      const response = await fetch(`${apiBase}/api/reportes/${encodeURIComponent(report.id)}/coincidencias`, { method: 'GET', cache: 'no-store', signal: AbortSignal.timeout(15000) });
+      if (!response.ok) throw new Error('No fue posible comprobar coincidencias.');
+      const payload = await response.json();
+      if (!Array.isArray(payload.data) || !payload.data.every(match => match && /^[1-9]\d*$/.test(String(match.id)) && String(match.id) !== report.id && Array.isArray(match.reasons) && match.reasons.every(reason => typeof reason === 'string'))) throw new Error('Respuesta de coincidencias inválida.');
+      duplicateStatus.textContent = payload.data.length
+        ? 'Revisa estos reportes: podrían corresponder al mismo caso.'
+        : 'No se encontraron coincidencias con los criterios actuales. Esto no descarta que exista un duplicado.';
+      duplicateNotice.classList.toggle('duplicate-notice--warning', payload.data.length > 0);
+      for (const match of payload.data) {
+        const item = document.createElement('li');
+        const heading = document.createElement('strong');
+        heading.textContent = `Folio ${match.folio == null || match.folio === '' ? 'No disponible' : match.folio}`;
+        const reasons = document.createElement('p');
+        reasons.textContent = match.reasons.join(' · ');
+        const link = document.createElement('a');
+        link.className = 'detail-text-link duplicate-notice__link';
+        link.textContent = 'Abrir posible duplicado ↗';
+        link.setAttribute('aria-label', `Abrir posible duplicado: ${heading.textContent}`);
+        link.href = `reporte.html?id=${encodeURIComponent(match.id)}&from=${Object.hasOwn(origins, origin) ? origin : 'reportes'}`;
+        item.append(heading, reasons, link);
+        duplicateList.append(item);
+      }
+      duplicateList.hidden = payload.data.length === 0;
+      duplicateNotice.hidden = payload.data.length === 0;
+    } catch {
+      duplicateNotice.hidden = true;
+    } finally {
+      duplicateNotice.setAttribute('aria-busy', 'false');
+    }
+  }
+  checkDuplicates();
 
   // Solo visualización: utiliza las coordenadas que ya entrega la consulta del reporte.
   const mapNode = document.querySelector('[data-case-map]');

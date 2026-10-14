@@ -28,6 +28,7 @@ window.RIETI_READY = (async () => {
     for (const raw of records) {
       const report = Object.fromEntries(Object.entries(raw).map(([key, v]) => [key, value(v)]));
       report.id = String(raw.id_reporte);
+      report.folio = value(raw.folio);
       report.date = raw.date || '';
       window.RIETI_REPORTS[report.id] = report;
     }
@@ -46,19 +47,19 @@ window.RIETI_READY = (async () => {
     if (tbody && !document.querySelector('#performance-rows')) {
       const statistics = document.body.classList.contains('statistics-page');
       const management = document.body.classList.contains('reports-management-page');
-      const fields = statistics ? ['id', 'workType', 'observations', 'municipality', 'authority', 'status', 'priority', 'reportedAt', 'reporter'] : management ? ['id', 'reporter', 'municipality', 'status', 'priority', 'reportedAt'] : ['id', 'municipality', 'status', 'reportedAt'];
+      const fields = statistics ? ['folio', 'workType', 'observations', 'municipality', 'authority', 'status', 'priority', 'reportedAt', 'reporter'] : management ? ['folio', 'reporter', 'municipality', 'status', 'priority', 'reportedAt'] : ['folio', 'municipality', 'status', 'reportedAt'];
       const labels = statistics ? ['Folio', 'Tipo de trabajo', 'Observaciones', 'Municipio', 'Autoridad', 'Estatus', 'Prioridad', 'Fecha', 'Denunciante'] : management ? ['Folio', 'Denunciante', 'Municipio', 'Estatus', 'Prioridad', 'Fecha'] : ['Folio', 'Municipio', 'Estado', 'Fecha'];
       tbody.replaceChildren();
       (management || statistics ? reports : reports.slice(0, 5)).forEach(report => {
         const row = document.createElement('tr');
         row.tabIndex = 0;
         row.setAttribute('role', 'link');
-        row.setAttribute('aria-label', 'Abrir reporte ' + report.id);
-        Object.assign(row.dataset, { reportRow: '', reportId: report.id, municipality: report.municipality, status: report.status, priority: report.priority, workType: report.workTypeId, date: report.date });
+        row.setAttribute('aria-label', 'Abrir reporte ' + report.folio);
+        Object.assign(row.dataset, { reportRow: '', reportId: report.id, reportFolio: report.folio, municipality: report.municipality, status: report.status, priority: report.priority, workType: report.workTypeId, date: report.date });
         fields.forEach((key, index) => {
           const cell = document.createElement('td');
           cell.dataset.label = labels[index];
-          const span = document.createElement(key === 'id' ? 'strong' : 'span');
+          const span = document.createElement(key === 'folio' ? 'strong' : 'span');
           span.textContent = value(report[key]);
           if (statistics && ['workType', 'observations', 'municipality', 'authority', 'reporter'].includes(key)) {
             span.className = 'cell-preview' + (key === 'workType' ? ' cell-preview--work' : key === 'observations' ? ' cell-preview--observations' : '');
@@ -73,7 +74,7 @@ window.RIETI_READY = (async () => {
         menuCell.className = 'menu-cell';
         // Solo marcado fijo; los valores de la API siempre usan textContent.
         menuCell.innerHTML = '<details class="row-menu"><summary>•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report>Eliminar</button></div></details>';
-        menuCell.querySelector('summary').setAttribute('aria-label', 'Opciones del reporte ' + report.id);
+        menuCell.querySelector('summary').setAttribute('aria-label', 'Opciones del reporte ' + report.folio);
         row.append(menuCell);
         tbody.append(row);
       });

@@ -1,4 +1,20 @@
 /* Estilos exclusivos del seguimiento de reportes. */
+/* Padding explícito: .panel solo aporta fondo y sombra. */
+.duplicate-notice { margin-bottom: 20px; padding: 16px 20px; border-left: 3px solid var(--color-border); font-size: .875rem; }
+.duplicate-notice h2 { font-size: .95rem; line-height: 1.4; margin: 0 0 6px; }
+.duplicate-notice p { margin: 0; line-height: 1.5; overflow-wrap: anywhere; }
+.duplicate-notice--warning { border-left-color: #b7791f; background: #fffbeb; }
+.duplicate-notice ul { list-style: none; padding: 0; margin: 12px 0 0; }
+.duplicate-notice li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 20px; padding: 12px 0 0; border-top: 1px solid var(--color-border); overflow-wrap: anywhere; }
+.duplicate-notice li + li { margin-top: 12px; }
+.duplicate-notice li strong { font-size: .875rem; line-height: 1.5; }
+.duplicate-notice li p { grid-column: 1; font-size: .8125rem; color: var(--color-muted); }
+.duplicate-notice .duplicate-notice__link { grid-column: 2; grid-row: 1 / 3; margin: 0; align-self: center; font-size: .8125rem; }
+@media (max-width: 600px) {
+  .duplicate-notice { padding: 14px 16px; }
+  .duplicate-notice li { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .duplicate-notice .duplicate-notice__link { grid-column: 1; grid-row: auto; justify-self: start; }
+}
 .report-detail-page .detail-columns { align-items: start; gap: 24px; }
 .report-detail-page .detail-panel h2 { line-height: 1.5; }
 .case-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }

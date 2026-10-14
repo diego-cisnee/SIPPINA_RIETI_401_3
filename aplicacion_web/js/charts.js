@@ -103,13 +103,15 @@
       const y = 235 - value / top * 190;
       markup += `<path d="M40 ${y}H465" stroke="#dce1e7"/>` + text(30, y + 4, value, 'end');
     }
+    const slotWidth = (465 - 40) / groups.length;
+    const barWidth = Math.min(64, slotWidth * 0.5);
     const bars = groups.map(([priority, count], i) => {
-      const x = 95 + i * 105, height = count / top * 190;
-      return `<g><title>${escape(priority)}: ${count} reporte(s)</title><rect x="${x - 22}" y="${235 - height}" width="44" height="${height}" fill="${stats.colors[priority]}"/>${text(x, 223 - height, count)}${text(x, 265, priority)}</g>`;
+      const x = 40 + slotWidth * (i + 0.5), height = count / top * 190;
+      return `<g><title>${escape(priority)}: ${count} reporte(s)</title><rect x="${x - barWidth / 2}" y="${235 - height}" width="${barWidth}" height="${height}" fill="${stats.colors[priority]}"/>${text(x, 223 - height, count)}${text(x, 265, priority)}</g>`;
     }).join('');
     const unclassified = selected.length - groups.reduce((total, [, count]) => total + count, 0);
     setChart('priority', (selected.length ? svg(480, 285, markup + bars) : empty) + (unclassified ? `<span class="chart-footnote">${unclassified} reporte(s) sin prioridad reconocida.</span>` : ''));
-    summaries.priority = { title: 'Reportes por prioridad', description: `Orden de menor a mayor: Baja, Media, Alta y Urgente. ${unclassified} reporte(s) sin prioridad reconocida.`, values: groups.map(([label, count]) => [label, `${count} reporte(s)`]) };
+    summaries.priority = { title: 'Reportes por prioridad', description: `Orden de menor a mayor: Baja, Media y Alta. ${unclassified} reporte(s) sin prioridad reconocida.`, values: groups.map(([label, count]) => [label, `${count} reporte(s)`]) };
     const municipalities = stats.counts(selected, 'municipality');
     setChart('municipality', selected.length ? horizontal(municipalities.slice(0, 10), () => '#285b7b') + `<span class="chart-footnote">Se muestran ${Math.min(10, municipalities.length)} de ${municipalities.length} municipios.</span>` : empty);
     summaries.municipality = { title: 'Reportes por municipio', description: 'Cada barra muestra el total de reportes registrados en un municipio. La gráfica muestra los diez municipios principales, ordenados de mayor a menor; este resumen incluye todos.', values: municipalities.map(([label, count]) => [label, `${count} reporte(s)`]) };
