@@ -42,11 +42,7 @@
     node.textContent = report[node.dataset.detail] ?? "No disponible";
     if (node.dataset.detail === "priority") node.dataset.priority = report.priority;
   });
-  const attachments = document.querySelector('[data-list="attachments"]');
-  attachments.replaceChildren();
-  const evidence = document.createElement('li');
-  evidence.textContent = report.evidence === 'No disponible' ? 'No disponible' : 'Evidencia registrada: ' + report.evidence + ' · Descarga pendiente';
-  attachments.append(evidence);
+  document.querySelector("[data-heatmap-link]").href = "mapa-calor.html?reporte=" + encodeURIComponent(report.id);
   content.dataset.reportId = report.id;
   content.dataset.status = report.status;
   content.dataset.priority = report.priority;
@@ -56,21 +52,34 @@
     "Seguimiento del reporte " + report.id + " en " + report.municipality + ".";
   printButton.addEventListener("click", () => { window.print(); });
 
-  // Mapa y adjuntos solo presentan avisos. No se descargan ni envían datos.
-  const notice = document.querySelector("#detail-notice");
-  let noticeTrigger = null;
-  document.querySelectorAll("[data-detail-notice]").forEach((link) => {
-    link.addEventListener("click", (event) => {
-      event.preventDefault();
-      noticeTrigger = link;
-      const isMap = link.dataset.detailNotice === "map";
-      notice.querySelector("h2").textContent = isMap ? "Ubicación del caso" : "Descarga de archivo";
-      notice.querySelector("[data-detail-notice-message]").textContent = isMap
-        ? "Aquí se abrirá la ubicación del reporte en el mapa. La integración del mapa está pendiente."
-        : "La descarga de " + link.dataset.filename + " se habilitará después. Este adjunto es ficticio y no se descargará ningún archivo.";
-      notice.showModal();
+  // Solo visualización: utiliza las coordenadas que ya entrega la consulta del reporte.
+  const mapNode = document.querySelector('[data-case-map]');
+  const mapMessage = document.querySelector('[data-map-message]');
+  const coordinate = (value, limit) => {
+    if (value == null || String(value).trim() === '') return null;
+    const number = Number(value);
+    return Number.isFinite(number) && Math.abs(number) <= limit ? number : null;
+  };
+  const latitude = coordinate(report.latitude, 90);
+  const longitude = coordinate(report.longitude, 180);
+  if (latitude !== null && longitude !== null && window.L) {
+    mapNode.hidden = false;
+    mapMessage.hidden = true;
+    const map = L.map(mapNode, { scrollWheelZoom: false }).setView([latitude, longitude], 16);
+    const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
+    streets.on('tileerror', () => {
+      mapMessage.hidden = false;
+      mapMessage.textContent = 'No se pudo cargar el mapa base. La ubicación marcada sigue disponible.';
     });
-  });
-  notice.querySelector("[data-dismiss-detail-notice]").addEventListener("click", () => { notice.close(); });
-  notice.addEventListener("close", () => { noticeTrigger?.focus(); });
+    L.marker([latitude, longitude], {
+      icon: L.divIcon({ className: 'case-map-pin', iconSize: [20, 20], iconAnchor: [10, 10] }),
+    }).addTo(map).bindTooltip('Ubicación del caso', { permanent: true, direction: 'top' });
+    const resize = new ResizeObserver(() => map.invalidateSize());
+    resize.observe(mapNode);
+    window.addEventListener('beforeprint', () => map.invalidateSize());
+    window.addEventListener('afterprint', () => map.invalidateSize());
+  }
 })();

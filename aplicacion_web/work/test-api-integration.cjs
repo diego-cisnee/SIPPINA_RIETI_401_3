@@ -63,6 +63,7 @@ const fixture = [
   assert.equal(await page.locator('[data-detail="updatedAt"]').textContent(), 'No disponible');
   assert.equal(await page.locator('[data-detail="authority"]').textContent(), 'No disponible');
   assert.equal(await page.locator('[data-back-link]').getAttribute('href'), 'estadisticas.html');
+  assert.equal(await page.locator('[data-heatmap-link]').getAttribute('href'), 'mapa-calor.html?reporte=12');
   await ready('reporte.html?id=99');
   assert.equal(await page.locator('[data-report-context]').isVisible(), false);
   assert.equal(await page.locator('[data-report-error]').isVisible(), true);

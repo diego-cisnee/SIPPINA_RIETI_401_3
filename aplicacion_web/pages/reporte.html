@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Seguimiento de un reporte registrado en RIETI." />
     <title>Seguimiento de reporte | RIETI</title>
+    <link rel="stylesheet" href="../assets/heatmap/vendor/leaflet.css" />
     <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/report-detail.css" />
       <noscript><style>
       [data-load-block], [data-loading-only] { display: none !important; }
     </style></noscript>
@@ -95,12 +97,12 @@
 
               <section class="panel detail-panel" aria-labelledby="case-title">
                 <h2 id="case-title">Detalles del caso de trabajo infantil</h2>
-                <dl class="detail-fields detail-fields--split">
+                <dl class="detail-fields case-fields">
                   <div><dt>Número de niños involucrados</dt><dd data-detail="children"></dd></div>
                   <div><dt>Rango de edades</dt><dd data-detail="ages"></dd></div>
                   <div><dt>Tipo de trabajo</dt><dd data-detail="workType"></dd></div>
                   <div><dt>Horario de trabajo</dt><dd data-detail="workHours"></dd></div>
-                  <div class="detail-fields__full"><dt>Observaciones detalladas</dt><dd data-detail="observations"></dd></div>
+                  <div ><dt>Observaciones detalladas</dt><dd data-detail="observations"></dd></div>
                 </dl>
               </section>
 
@@ -108,8 +110,6 @@
                 <h2 id="assigned-title">Autoridad asignada</h2>
                 <dl class="detail-fields">
                   <div><dt>Autoridad</dt><dd data-detail="authority"></dd></div>
-                  <div><dt>Administrador</dt><dd><span data-detail="adminName"></span><br /><span data-detail="adminEmail"></span></dd></div>
-                  <div><dt>Comentarios</dt><dd>No disponible</dd></div>
                 </dl>
               </section>
             </div>
@@ -120,17 +120,20 @@
                 <dl class="detail-fields">
                   <div><dt>Dirección</dt><dd data-detail="address"></dd></div>
                   <div><dt>Municipio</dt><dd data-detail="municipality"></dd></div>
-                  <div><dt>Puntos de referencia</dt><dd data-detail="reference"></dd></div>
-                  <div><dt>Coordenadas GPS</dt><dd>Lat: <span data-detail="latitude"></span><br />Lng: <span data-detail="longitude"></span></dd></div>
                 </dl>
-                <!-- INTEGRACIÓN FUTURA: reemplazar el aviso por el enlace validado al mapa. -->
-                <a class="detail-text-link" href="#ubicacion-pendiente" data-detail-notice="map">Ver en mapa ↗</a>
+                <div class="case-map" data-case-map hidden role="region" aria-label="Mapa de la ubicación del caso"></div>
+                <p class="case-map-message" data-map-message role="status">Ubicación no disponible para mostrar en el mapa.</p>
+                <a class="detail-text-link" data-heatmap-link href="mapa-calor.html">Ver reporte en el mapa de calor ↗</a>
               </section>
 
               <section class="panel detail-panel" aria-labelledby="attachments-title">
                 <h2 id="attachments-title">Evidencias fotográficas</h2>
                 <!-- INTEGRACIÓN FUTURA: renderizar archivos autorizados con URLs de descarga seguras. -->
-                <ul class="attachment-list" data-list="attachments"><li>No disponible</li></ul>
+                <ul class="evidence-spaces" aria-label="Espacios reservados para evidencias fotográficas">
+                  <li><span aria-hidden="true">▧</span><span>Fotografía 1</span></li>
+                  <li><span aria-hidden="true">▧</span><span>Fotografía 2</span></li>
+                  <li><span aria-hidden="true">▧</span><span>Fotografía 3</span></li>
+                </ul>
               </section>
 
               <section class="panel detail-panel quick-actions" aria-labelledby="quick-actions-title">
@@ -195,14 +198,9 @@
     </dialog>
 
 
-    <!-- Aviso compartido para mapa y archivos: no abre servicios externos ni descarga archivos. -->
-    <dialog class="report-dialog" id="detail-notice" aria-labelledby="detail-notice-heading">
-      <h2 id="detail-notice-heading"></h2>
-      <p data-detail-notice-message></p>
-      <div class="dialog-actions"><button type="button" class="dialog-primary" data-dismiss-detail-notice>Entendido</button></div>
-    </dialog>
     <!-- El catálogo y la vista se cargan antes de inicializar las acciones compartidas. -->
     <script src="../js/report-data.js" defer></script>
+    <script src="../assets/heatmap/vendor/leaflet.js" defer></script>
     <script src="../js/report-detail.js" defer></script>
     <script src="../js/app.js" defer></script>
     <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->

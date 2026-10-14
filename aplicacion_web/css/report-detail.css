@@ -1,0 +1,24 @@
+/* Estilos exclusivos del seguimiento de reportes. */
+.report-detail-page .detail-columns { align-items: start; gap: 24px; }
+.report-detail-page .detail-panel h2 { line-height: 1.5; }
+.case-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.case-fields > div { padding: 18px 0; }
+.case-fields > div:first-child { padding-top: 0; }
+.case-fields > div:last-child { padding-bottom: 0; }
+.case-fields > div + div { border-top: 1px solid var(--color-border); }
+.case-fields dt { margin-bottom: 8px; }
+.case-fields dd { padding-left: 0; white-space: pre-line; }
+.case-map { height: 300px; margin-top: 24px; border: 1px solid var(--color-border); border-radius: 8px; z-index: 0; }
+.case-map-message { margin: 24px 0 0; padding: 16px; background: var(--color-surface-soft); border-radius: 8px; color: var(--color-muted); line-height: 1.6; }
+.evidence-spaces { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.evidence-spaces li { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 120px; border: 1px dashed var(--color-border); border-radius: 8px; background: var(--color-surface-soft); color: var(--color-muted); font-size: .75rem; }
+.evidence-spaces li > span:first-child { font-size: 2rem; }
+@media (max-width: 480px) {
+  .case-map { height: 260px; }
+  .evidence-spaces { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media print {
+  .case-map { break-inside: avoid; }
+}
+
+.case-map-pin { background: #2563eb; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 0 0 5px #2563eb33, 0 2px 6px #0004; }

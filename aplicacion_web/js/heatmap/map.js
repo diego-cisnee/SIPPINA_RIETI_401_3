@@ -84,7 +84,7 @@ export function createMap(geoData,points,catalog=[]) {
           const heading=document.createElement('p');heading.textContent=tooltip.textContent;
           const link=document.createElement('a');link.textContent='Abrir reporte';link.href=`reporte.html?id=${encodeURIComponent(p.id)}&from=mapa-calor`;
           popup.append(heading,link);
-          L.circleMarker([p.latitud,p.longitud],{...dotOptions,fillColor:priorityColors[priority]}).bindTooltip(tooltip).bindPopup(popup).addTo(dots);
+          L.circleMarker([p.latitud,p.longitud],{...dotOptions,reportId:String(p.id),fillColor:priorityColors[priority]}).bindTooltip(tooltip).bindPopup(popup).addTo(dots);
         });dots.addTo(map);
       }else map.removeLayer(dots);
       const visibleReports=[...new Map(visible.map(p=>[p.id,p])).values()];
@@ -101,5 +101,22 @@ export function createMap(geoData,points,catalog=[]) {
     }
     const unbind=bindControls($, {update,map,streets});
     update();
+    // Desde el detalle: ubicar el folio sin cambiar los datos ni los conteos del mapa.
+    const requestedReport = new URLSearchParams(location.search).get('reporte');
+    if (requestedReport && /^[1-9]\d*$/.test(requestedReport)) {
+      const locations = assignment.records.filter(p => String(p.id) === requestedReport && registered.has(p.municipio));
+      if (locations.length) {
+        const municipality = locations[0].municipio;
+        if (locations.every(p => p.municipio === municipality)) $('municipio').value = municipality;
+        $('points').checked = true;
+        update();
+        map.fitBounds(L.latLngBounds(locations.map(p => [p.latitud, p.longitud])), {padding: [50, 50], maxZoom: 15});
+        const marker = dots.getLayers().find(layer => layer.options.reportId === requestedReport);
+        marker?.openPopup();
+      } else {
+        const notice = `El folio ${requestedReport} no tiene una ubicación disponible en el mapa de calor.`;
+        $('status').textContent = [$('status').textContent, notice].filter(Boolean).join(' · ');
+      }
+    }
     return {map, cargarPuntos(points){assignment.ingest(points);update();}, destroy(){unbind();if(heat._frame){L.Util.cancelAnimFrame(heat._frame);heat._frame=null;}streets.off();municipalities.eachLayer(layer=>layer.off());map.remove();}};
 }
