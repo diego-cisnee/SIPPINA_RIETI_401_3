@@ -105,9 +105,10 @@
             Este enlace simula el acceso sin enviar los datos escritos. Cuando se
             conecte la autenticación se convertirá en el envío seguro del formulario.
           -->
-          <a class="primary-button" href="pages/dashboard.html" data-action="login">
-            Iniciar sesión
-          </a>
+            <button class="primary-button" type="submit" id="btn-login">
+              Iniciar sesión
+            </button>
+            <p id="mensaje-error" style="color: #d32f2f; text-align: center; display: none; margin-top: 10px; font-size: 0.9rem;"></p>
 
           <p class="login-form__support">
             ¿Problemas para ingresar? Contacta al administrador del sistema.
@@ -137,5 +138,6 @@
 
     <!-- JavaScript de interacciones locales; no realiza conexiones externas. -->
     <script src="js/app.js" defer></script>
+    <script src="js/login.js" defer></script>
   </body>
 </html>
