@@ -10,7 +10,7 @@ window.RIETI_READY = (async () => {
   const statusClasses = { Recibido: 'received', Pendiente: 'pending', 'En proceso': 'progress', Resuelto: 'resolved', Cancelado: 'cancelled', Registrado: 'received', 'En revision': 'progress', 'En revisión': 'progress', Canalizado: 'progress', Concluido: 'resolved' };
   const context = document.querySelector('[data-report-context]');
   const id = new URLSearchParams(location.search).get('id');
-  const apiBase = (window.RIETI_API_BASE || (location.port === '3000' && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) ? location.origin : 'http://127.0.0.1:3000')).replace(/\/$/, '');
+  const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
   const apiURL = apiBase + '/api/reportes' + (context ? '/' + encodeURIComponent(id) : '');
   const feedback = document.createElement('p');
   feedback.className = 'demo-caption';

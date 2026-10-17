@@ -9,7 +9,7 @@ window.RIETI_MUNICIPIOS_READY = (async () => {
   selectMunicipio.innerHTML = '<option value="" disabled selected>Cargando municipios...</option>';
 
 
-  const apiBase = (window.RIETI_API_BASE || (location.port === '3000' && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) ? location.origin : 'http://127.0.0.1:3000')).replace(/\/$/, '');
+  const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
   const apiURL = apiBase + '/api/municipios';
 
   try {

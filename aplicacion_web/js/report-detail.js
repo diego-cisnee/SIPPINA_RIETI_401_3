@@ -63,7 +63,7 @@
     duplicateStatus.textContent = 'Comprobando coincidencias…';
     duplicateList.hidden = true;
     duplicateList.replaceChildren();
-    const apiBase = (window.RIETI_API_BASE || (location.port === '3000' && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) ? location.origin : 'http://127.0.0.1:3000')).replace(/\/$/, '');
+    const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
     try {
       const response = await fetch(`${apiBase}/api/reportes/${encodeURIComponent(report.id)}/coincidencias`, { method: 'GET', cache: 'no-store', signal: AbortSignal.timeout(15000) });
       if (!response.ok) throw new Error('No fue posible comprobar coincidencias.');

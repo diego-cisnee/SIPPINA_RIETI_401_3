@@ -1,10 +1,12 @@
 const mysql = require('mysql2/promise');
+const fs = require('node:fs');
 
-/*
- * CONEXIÓN FUTURA CON AWS RDS
- * Los valores reales se leen desde `backend/.env`, archivo que Git ignora.
- * No se deben escribir contraseñas directamente dentro de este archivo.
- */
+const sslCaFile = process.env.DB_SSL_CA_FILE;
+
+if (process.env.NODE_ENV === 'production' && !sslCaFile) {
+  throw new Error('Falta configurar DB_SSL_CA_FILE en producción.');
+}
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT || 3306),
@@ -12,14 +14,18 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
 
-  // El pool reutiliza conexiones cuando el dashboard o la app hagan peticiones.
+  ssl: sslCaFile
+    ? {
+        ca: fs.readFileSync(sslCaFile),
+        rejectUnauthorized: true,
+        verifyIdentity: true
+      }
+    : undefined,
+
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-
-  // Evita que una prueba permanezca esperando indefinidamente.
   connectTimeout: 10000
 });
 
 module.exports = pool;
-
