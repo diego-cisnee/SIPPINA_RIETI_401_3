@@ -23,7 +23,7 @@ function distance(a, b) {
 async function readDuplicates(pool, id) {
   const [target] = await pool.execute(`SELECT r.id_reporte, r.id_municipio, r.fecha, r.descripcion,
     u.latitud, u.longitud, u.direccion FROM Reporte r
-    LEFT JOIN Ubicacion_Reporte u ON u.id_reporte = r.id_reporte WHERE r.id_reporte = ?`, [id]);
+    LEFT JOIN Ubicacion_Reporte u ON u.id_reporte = r.id_reporte WHERE r.active = 1 AND r.id_reporte = ?`, [id]);
   if (!target.length) return null;
   const [candidates] = await pool.execute(`SELECT r.id_reporte, r.folio, r.descripcion,
     DATE_FORMAT(r.fecha, '%d/%m/%Y %H:%i') AS reportedAt,
@@ -36,6 +36,7 @@ async function readDuplicates(pool, id) {
     FROM Reporte original JOIN Reporte r ON r.id_municipio = original.id_municipio
     LEFT JOIN Ubicacion_Reporte u ON u.id_reporte = r.id_reporte
     WHERE original.id_reporte = ? AND r.id_reporte <> original.id_reporte
+    AND original.active = 1 AND r.active = 1
     AND r.fecha BETWEEN DATE_SUB(original.fecha, INTERVAL ${WINDOW_DAYS} DAY)
       AND DATE_ADD(original.fecha, INTERVAL ${WINDOW_DAYS} DAY)`, [id]);
   const matches = new Map();

@@ -11,5 +11,10 @@ export function bindControls($,{update,map,streets}) {
     on('points','change',()=>update());
     on('basemap','change',()=>{if($('basemap').checked)streets.addTo(map);else map.removeLayer(streets);});
     on('reset','click',()=>{$('municipio').value='';update(true);});
+    on('clear-map-filters','click',()=>{
+      $('municipio').value='';
+      $('priority-filter').value='';
+      update(true);
+    });
  return ()=>removers.forEach(remove=>remove());
 }

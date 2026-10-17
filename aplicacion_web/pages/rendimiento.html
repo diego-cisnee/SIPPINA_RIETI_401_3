@@ -42,6 +42,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
           </span>
+          <a class="sidebar-nav__item" href="acerca.html?origen=panel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
+            Acerca de RIETI
+          </a>
         </nav>
 
 <button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
@@ -91,15 +95,15 @@
         <!-- INTEGRACIÓN FUTURA: indicadores agregados por la API, según el municipio consultado. -->
         <section class="metric-grid management-metrics" aria-label="Resumen de rendimiento">
           <article class="metric-card" data-load-block inert aria-busy="true"><span>Días promedio de resolución</span><strong data-performance-metric="average">No disponible</strong><small>Solo reportes finalizados</small></article>
-          <article class="metric-card" data-load-block inert aria-busy="true"><span>Tasa de resolución</span><strong data-performance-metric="resolution">No disponible</strong><small>Finalizados / asignados</small></article>
-          <article class="metric-card" data-load-block inert aria-busy="true"><span>En proceso</span><strong data-performance-metric="progress">No disponible</strong><small>Respecto al total asignado</small></article>
-          <article class="metric-card" data-load-block inert aria-busy="true"><span>Pendientes</span><strong data-performance-metric="pending">No disponible</strong><small>Respecto al total asignado</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span>Tasa de resolución</span><strong data-performance-metric="resolution">No disponible</strong><small>Concluidos / asignados</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span title="En revisión, En seguimiento y Canalizado">En atención</span><strong data-performance-metric="progress">No disponible</strong><small>Respecto al total asignado</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span title="Reportes con estado Registrado">Registrados</span><strong data-performance-metric="pending">No disponible</strong><small>Respecto al total asignado</small></article>
         </section>
         <section class="panel performance-panel" aria-labelledby="performance-title" data-load-block inert aria-busy="true">
           <div class="statistics-list__heading"><h2 id="performance-title">Rendimiento por autoridad</h2><p>Una autoridad por municipio · Datos consultados</p></div>
           <div class="performance-scroll" tabindex="0" role="region" aria-label="Tabla de rendimiento, desplazable horizontalmente">
             <table class="performance-table" aria-describedby="performance-methodology">
-              <thead><tr><th scope="col">Autoridad</th><th scope="col">Municipio</th><th scope="col">Total asignados</th><th scope="col">Pendientes</th><th scope="col">En proceso</th><th scope="col">Finalizados</th><th scope="col">Tiempo promedio</th><th scope="col">Eficiencia</th></tr></thead>
+              <thead><tr><th scope="col">Autoridad</th><th scope="col">Municipio</th><th scope="col">Total asignados</th><th scope="col">Registrados</th><th scope="col">En atención</th><th scope="col">Concluidos</th><th scope="col">Tiempo promedio</th><th scope="col">Eficiencia</th></tr></thead>
               <!-- El script crea filas seguras con textContent a partir de performance-data.js. -->
               <tbody id="performance-rows" data-list="authority-performance"></tbody>
             </table>

@@ -18,6 +18,8 @@ test('Coincidencia cercana, parametrizada, solo lectura y sin duplicar por múlt
   assert.match(calls[1].sql, /r.id_reporte <> original.id_reporte/);
   assert.match(calls[1].sql, /INTERVAL 7 DAY/);
   assert.match(calls[1].sql, /r.id_municipio = original.id_municipio/);
+  assert.match(calls[0].sql, /WHERE r\.active = 1 AND r\.id_reporte = \?/);
+  assert.match(calls[1].sql, /original\.active = 1 AND r\.active = 1/);
 });
 test('Proximidad sola, ubicaciones lejanas y coordenadas ausentes no generan coincidencia', async () => {
   assert.deepEqual((await run([target], [{ ...candidate, sameWorkType: 0 }])).result, []);

@@ -6,14 +6,18 @@ const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/chart-statistics.js'), 'utf8'), context);
 const stats = context.window.RIETI_STATISTICS;
 const plain = value => JSON.parse(JSON.stringify(value));
+assert.equal(stats.resolved({ status: 'Concluido' }), true);
+for (const status of ['Registrado', 'En_revision', 'En_seguimiento', 'Canalizado', 'Archivado', 'Cancelado', 'Reincidente', 'Resuelto', 'Pendiente']) {
+ assert.equal(stats.resolved({ status }), false, `${status} no es un estado concluido`);
+}
 const reports = [
- { workType: 'Construcción', address: 'Zona A', priority: 'Alta', status: 'Resuelto', date: '2026-10-01', registeredAt: '2026-10-01T12:00:00Z', resolvedAt: '2026-10-03T00:00:00Z' },
+ { workType: 'Construcción', address: 'Zona A', priority: 'Alta', status: 'Concluido', date: '2026-10-01', registeredAt: '2026-10-01T12:00:00Z', resolvedAt: '2026-10-03T00:00:00Z' },
  { workType: 'Construcción', address: 'Zona B', priority: 'Alta', status: 'Concluido', date: '2026-10-02', registeredAt: '2026-10-02T12:00:00Z', resolvedAt: '2026-10-03T00:00:00Z' },
- { workType: 'Comercio', municipality: 'Municipio', priority: 'Baja', status: 'Pendiente', date: '2026-10-01', resolvedAt: '2026-10-04' },
- { priority: 'Alta', status: 'Resuelto', date: '2026-02-30', resolvedAt: '2026-10-04' },
- { priority: 'Alta', status: 'Resuelto', date: '2026-10-04', resolvedAt: '2026-10-03' },
+ { workType: 'Comercio', municipality: 'Municipio', priority: 'Baja', status: 'Registrado', date: '2026-10-01', resolvedAt: '2026-10-04' },
+ { priority: 'Alta', status: 'Concluido', date: '2026-02-30', resolvedAt: '2026-10-04' },
+ { priority: 'Alta', status: 'Concluido', date: '2026-10-04', resolvedAt: '2026-10-03' },
  { priority: 'Alta', status: 'Cancelado', date: '2026-10-01', resolvedAt: '2026-10-03' },
- { priority: 'Alta', status: 'Resuelto', date: '2026-10-01' },
+ { priority: 'Alta', status: 'Concluido', date: '2026-10-01' },
 ];
 assert.deepEqual(plain(stats.counts(reports.slice(0, 3), 'workType')), [['Construcción', 2], ['Comercio', 1]]);
 assert.deepEqual(plain(stats.counts([{}], 'address', 'municipality')), [['Sin especificar', 1]]);
@@ -56,5 +60,5 @@ assert.equal(crossingYear.length, 7);
 assert.equal(crossingYear[6].date, '2027-01-03');
 assert.equal(crossingYear[4].registered, 1);
 const localStart = new Date(2026, 9, 1, 12);
-assert.equal(stats.averages([{ priority: 'Baja', status: 'Resuelto', date: '2026-10-01', reportedAt: '01/10/2026 12:00', resolvedAt: new Date(+localStart + 3600000).toISOString() }])[0].hours, 1);
+assert.equal(stats.averages([{ priority: 'Baja', status: 'Concluido', date: '2026-10-01', reportedAt: '01/10/2026 12:00', resolvedAt: new Date(+localStart + 3600000).toISOString() }])[0].hours, 1);
 console.log('OK: conteos, prioridades, promedios, fechas reales de resolución, pendientes/cancelados, nulos, fechas inválidas, duración negativa y agrupación día/semana/mes.');

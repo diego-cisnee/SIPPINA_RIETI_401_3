@@ -1,5 +1,8 @@
 # Backend RIETI
 
+El cambio de estado con historial, la asignación a procuradores y la baja lógica
+están pendientes. Los acuerdos y requisitos para retomarlos están en [PENDIENTES.md](PENDIENTES.md).
+
 Esqueleto básico de Node.js y Express para conectar el dashboard y, más adelante,
 la aplicación móvil con una base MySQL alojada en AWS RDS.
 
@@ -29,8 +32,8 @@ de comprobar la conexión y revisar las tablas existentes.
 
 ## Consulta de reportes
 
-- `GET /api/reportes`: listado completo, ordenado por fecha e `id_reporte` descendentes.
-- `GET /api/reportes/:id`: seguimiento por `id_reporte` numérico; 400 si es inválido y 404 si no existe.
+- `GET /api/reportes`: listado de reportes con `Reporte.active = 1`, ordenado por fecha e `id_reporte` descendentes.
+- `GET /api/reportes/:id`: seguimiento por `id_reporte` numérico; 400 si es inválido y 404 si no existe o está inactivo.
 - Respuesta: `{ "data": [...] }` en listado y `{ "data": {...} }` en detalle.
 
 Todas las consultas nuevas son SELECT parametrizados. Las relaciones demográficas
@@ -45,7 +48,7 @@ Ejecutar `npm test` para verificar las consultas sin acceder a AWS.
 
 ## Mapa de calor
 
-GET `/api/mapa-calor`: `{data:{municipios:[{id,clave,nombre}],puntos:[{id,id_ubicacion,latitud,longitud,prioridad,fecha_registro,intensidad}]}}`. Catálogo completo de Municipio y ubicación por reporte; el cliente restringe el selector por pertenencia geográfica de las coordenadas, exclusivamente SELECT. Coordenadas numéricas; ausentes permanecen null. Sin datos personales ni contraseñas. Reiniciar el servidor para habilitar la ruta.
+GET `/api/mapa-calor`: `{data:{municipios:[{id,clave,nombre}],puntos:[{id,folio,id_ubicacion,latitud,longitud,direccion,estatus,prioridad,fecha_registro,intensidad}]}}`. Catálogo completo de Municipio y ubicaciones de reportes con `active = 1`; el cliente restringe el selector por pertenencia geográfica de las coordenadas, exclusivamente SELECT. Coordenadas numéricas; ausentes permanecen null. La dirección y el estado se usan en el mapa del dashboard, que consulta esta misma ruta. No incluye datos de ciudadanos, correos ni contraseñas. Reiniciar el backend al incorporar estos cambios.
 
 ## Folio visible
 
@@ -58,7 +61,10 @@ conteos. Si falta el folio, se muestra “No disponible”, sin generar uno arti
 
 `GET /api/reportes/:id/coincidencias` devuelve `{data: [...]}` con hasta cinco
 candidatos únicos, folio y motivos. Devuelve 400 para un ID inválido y 404 si el
-reporte no existe. Son consultas SELECT parametrizadas; no requiere tablas nuevas.
+reporte no existe o está inactivo. Tanto el reporte original como los candidatos deben tener `active = 1`. Son consultas SELECT parametrizadas; no requiere tablas nuevas.
+
+El filtrado por `active` es obligatorio en el backend y no tiene parámetros para
+incluir inactivos. No se agrega una vista de bajas ni se modifican valores en RDS.
 
 Criterios iniciales: mismo municipio, registros dentro de ±7 días y ubicación a
 100 metros o menos, más coincidencia de tipo de trabajo o similitud de descripción

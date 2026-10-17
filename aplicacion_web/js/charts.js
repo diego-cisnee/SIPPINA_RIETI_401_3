@@ -32,10 +32,10 @@
   function renderStatus(selected) {
     const counts = statuses.map(status => selected.filter(report => statusLabel(report) === status).length);
     const total = selected.length;
-    setChart('status', legend(statuses.map((label, i) => [label, colors[i]])) + (total ? window.RIETI_DRAW_DONUT(statuses, counts) : empty));
+    setChart('status', legend(statuses.map((status, i) => [window.RIETI_STATUS_LABEL(status), colors[i]])) + (total ? window.RIETI_DRAW_DONUT(statuses.map(window.RIETI_STATUS_LABEL), counts) : empty));
     const max = Math.max(...counts);
-    const leaders = statuses.filter((_, i) => counts[i] === max).join(', ');
-    summaries.status = { title: 'Distribución por estatus', description: total ? `Se muestran ${total} reportes. La mayor concentración corresponde a ${leaders}, con ${max} reporte(s) por estado. Cada segmento representa su proporción del total.` : 'No hay reportes que coincidan con los filtros.', values: statuses.map((status, i) => [status, `${counts[i]} (${percentage(counts[i], total)})`]) };
+    const leaders = statuses.filter((_, i) => counts[i] === max).map(window.RIETI_STATUS_LABEL).join(', ');
+    summaries.status = { title: 'Distribución por estatus', description: total ? `Se muestran ${total} reportes. La mayor concentración corresponde a ${leaders}, con ${max} reporte(s) por estado. Cada segmento representa su proporción del total.` : 'No hay reportes que coincidan con los filtros.', values: statuses.map((status, i) => [window.RIETI_STATUS_LABEL(status), `${counts[i]} (${percentage(counts[i], total)})`]) };
   }
 
   // Ejes compartidos: escala entera, líneas guía y etiqueta de unidades.
@@ -118,7 +118,7 @@
     if (SHOW_RESOLUTION_CHART) {
     const averages = stats.averages(selected);
     setChart('resolution', horizontal(averages.map(r => [r.priority, r.hours]), label => stats.colors[label], duration) + '<span class="chart-footnote">Sin datos significa que no hay resoluciones con fechas válidas para calcular el promedio. La API actual no entrega fecha de resolución.</span>');
-    summaries.resolution = { title: 'Tiempo promedio de resolución por prioridad', description: 'Promedio de fecha de resolución menos fecha de registro. Solo incluye resueltos con fechas válidas y duración no negativa; la longitud de las barras se compara en horas; no se sustituye la resolución por la fecha de registro o actualización.', values: averages.map(r => [r.priority, `${duration(r.hours)} · ${r.count} reporte(s) válidos`]) };
+    summaries.resolution = { title: 'Tiempo promedio de resolución por prioridad', description: 'Promedio de fecha de resolución menos fecha de registro. Solo incluye concluidos con fechas válidas y duración no negativa; la longitud de las barras se compara en horas; no se sustituye la resolución por la fecha de registro o actualización.', values: averages.map(r => [r.priority, `${duration(r.hours)} · ${r.count} reporte(s) válidos`]) };
     }
   }
 
@@ -138,7 +138,7 @@
     const note = (noEvents ? 'No hay reportes para el período y los filtros seleccionados. ' : '')
       + 'Los períodos sin reportes se muestran sin puntos; la línea une únicamente períodos con reportes. '
       + (unit === 'week' ? 'El cuarto tramo incluye del día 22 al último día del mes. ' : '')
-      + (!withDates ? 'Resoluciones: sin datos de fecha de resolución.' : `${missing} reporte(s) resueltos sin fecha válida, excluidos de la línea de resoluciones.`);
+      + (!withDates ? 'Resoluciones: sin datos de fecha de resolución.' : `${missing} reporte(s) concluidos sin fecha válida, excluidos de la línea de resoluciones.`);
     const { top, markup } = axes(Math.max(1, ...groups.flatMap(r => [r.registered, r.resolved])));
     const x = i => 65 + i * 770 / Math.max(1, groups.length - 1);
     const axisLabel = (row, i) => unit === 'month' ? monthDate.format(stats.date(row.date)) : unit === 'week' ? `Semana ${i + 1}` : shortDate.format(stats.date(row.date));
@@ -146,7 +146,7 @@
     let drawing = markup;
     const displayedYears = [...new Set(groups.map(row => row.date.slice(0, 4)))];
     drawing += text(850, 16, displayedYears.join(' – '), 'end');
-    [['registered', '#287cbb', 'Registrados'], ...(withDates ? [['resolved', '#27834d', 'Resueltos']] : [])].forEach(([key, color, label]) => {
+    [['registered', '#287cbb', 'Registrados'], ...(withDates ? [['resolved', '#27834d', 'Concluidos']] : [])].forEach(([key, color, label]) => {
       const points = groups.flatMap((row, i) => row[key] > 0 ? [{ row, x: x(i), y: 270 - row[key] / top * 230 }] : []);
       if (points.length > 1) drawing += `<polyline data-series="${key}" points="${points.map(p => `${p.x},${p.y}`).join(' ')}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
       drawing += points.map(p => `<circle data-series="${key}" cx="${p.x}" cy="${p.y}" r="5" fill="${color}"><title>${escape(periodLabel(p.row))} · ${label}: ${p.row[key]} reporte(s)</title></circle>`).join('');
@@ -157,8 +157,8 @@
       if (unit === 'week') label += text(x(i), 323, `${Number(row.date.slice(8))}–${Number(row.endDate.slice(8))} ${monthDate.format(stats.date(row.date))}`, anchor);
       return label;
     }).join('');
-    setChart('trend', legend([['Registrados', '#287cbb'], ['Resueltos' + (!withDates ? ' (sin datos)' : ''), '#27834d']]) + svg(900, 345, drawing) + `<span class="chart-footnote">${escape(note)}</span>`);
-    summaries.trend = { title: 'Tendencia de reportes', description: `Agrupación por ${labels[unit]}. Registros por fecha de registro y resoluciones por fecha de resolución. ${note}`, values: groups.map(row => [row.endDate ? `${row.date} al ${row.endDate}` : row.date, `${row.registered ? row.registered + ' registrados' : 'sin registros'} · ${withDates ? (row.resolved ? row.resolved + ' resueltos' : 'sin resoluciones') : 'resueltos: Sin datos'}`]) };
+    setChart('trend', legend([['Registrados', '#287cbb'], ['Concluidos' + (!withDates ? ' (sin datos)' : ''), '#27834d']]) + svg(900, 345, drawing) + `<span class="chart-footnote">${escape(note)}</span>`);
+    summaries.trend = { title: 'Tendencia de reportes', description: `Agrupación por ${labels[unit]}. Registros por fecha de registro y resoluciones por fecha de resolución. ${note}`, values: groups.map(row => [row.endDate ? `${row.date} al ${row.endDate}` : row.date, `${row.registered ? row.registered + ' registrados' : 'sin registros'} · ${withDates ? (row.resolved ? row.resolved + ' concluidos' : 'sin resoluciones') : 'concluidos: Sin datos'}`]) };
   }
 
   function render() {
@@ -166,7 +166,11 @@
     const filters = Object.fromEntries(Object.entries(controls).map(([key, input]) => [key, input.value]));
     const invalidRange = filters['start-date'] && filters['end-date'] && filters['start-date'] > filters['end-date'];
     controls['end-date'].setCustomValidity(invalidRange ? 'La fecha fin debe ser igual o posterior a la fecha inicio.' : '');
-    if (!form.reportValidity()) return;
+    controls['end-date'].setAttribute('aria-invalid', String(!controls['end-date'].validity.valid));
+    if (!form.checkValidity()) {
+      document.querySelector('#chart-feedback').textContent = `${invalidRange ? controls['end-date'].validationMessage : 'Ingresa una fecha válida.'} Se conservan los últimos resultados.`;
+      return;
+    }
     const selected = records.filter(report => (!filters.municipality || report.municipality === filters.municipality)
       && (!filters['work-type'] || report.workTypeId === filters['work-type'])
       && (!filters['start-date'] || isoDate(report) >= filters['start-date'])
@@ -188,8 +192,21 @@
   [yearControl, monthControl].forEach(control => control.addEventListener('change', () => { updateWeeks(); render(); }));
   weekControl.addEventListener('change', render);
   form.addEventListener('submit', event => { event.preventDefault(); render(); });
+  form.addEventListener('input', render);
   form.addEventListener('change', render);
-  document.querySelector('#clear-chart-filters').addEventListener('click', () => { form.reset(); render(); });
+  const resetTrend = () => {
+    grouping.value = 'month';
+    yearControl.value = latestDate.slice(0, 4);
+    monthControl.value = String(Number(latestDate.slice(5, 7)));
+    updateWeeks(latestDate);
+  };
+  document.querySelector('#clear-chart-filters').addEventListener('click', () => {
+    form.reset();
+    controls['end-date'].setCustomValidity('');
+    resetTrend();
+    render();
+  });
+  document.querySelector('#clear-trend-filters').addEventListener('click', () => { resetTrend(); render(); });
   buttons.forEach(button => button.addEventListener('click', () => {
     const summary = summaries[button.dataset.chart];
     document.querySelector('#chart-summary-title').textContent = summary.title;

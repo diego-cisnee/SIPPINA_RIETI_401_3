@@ -23,7 +23,7 @@
     }
     return date(report.date);
   }
-  const resolved = report => (window.RIETI_STATUS_GROUPS?.resolved || ['Resuelto', 'Concluido']).includes(report.status);
+  const resolved = report => report.status === 'Concluido';
   function counts(records, key, fallback) {
     const groups = new Map();
     records.forEach(report => {

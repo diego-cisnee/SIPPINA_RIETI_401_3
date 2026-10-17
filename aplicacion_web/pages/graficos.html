@@ -42,6 +42,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
           </span>
+          <a class="sidebar-nav__item" href="acerca.html?origen=panel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
+            Acerca de RIETI
+          </a>
         </nav>
 
 <button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
@@ -84,9 +88,9 @@
           <label class="filter-field"><span>Tipo de trabajo</span><select name="work-type" data-filter="work-type"><option value="">Todos los tipos</option><option value="venta">Venta ambulante en calles o semáforos</option><option value="limpieza">Limpieza de parabrisas</option><option value="comercio">Comercio en mercados o locales</option><option value="agricola">Trabajo agrícola</option><option value="construccion">Construcción</option><option value="domestico">Trabajo doméstico</option></select></label>
           <label class="filter-field"><span>Fecha inicio</span><input name="start-date" type="date" data-filter="start-date" /></label>
           <label class="filter-field"><span>Fecha fin</span><input name="end-date" type="date" data-filter="end-date" /></label>
-          <button class="filter-submit" type="submit" aria-label="Aplicar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></svg></button>
+          <button type="button" class="filter-clear" id="clear-chart-filters">Limpiar filtros</button>
         </form>
-        <div class="chart-filter-footer"><button type="button" class="chart-reset" id="clear-chart-filters">Limpiar filtros</button><p class="filter-feedback" id="chart-feedback" role="status"></p></div>
+        <p class="filter-feedback" id="chart-feedback" role="status"></p>
         <noscript><p>Activa JavaScript para consultar las gráficas interactivas del prototipo.</p></noscript>
         <section class="analytics-grid" aria-label="Gráficas de reportes">
           <article class="panel analytics-card " id="card-status" data-load-block inert aria-busy="true">
@@ -127,7 +131,7 @@
               <span class="chart-heading">Tiempo promedio de resolución por prioridad</span>
               <span class="chart-hint">ⓘ Presiona para ver más información</span>
               <span class="chart-visual" id="chart-resolution" aria-hidden="true"></span>
-              <span class="chart-footnote">Solo reportes resueltos con fechas válidas de registro y resolución.</span>
+              <span class="chart-footnote">Solo reportes concluidos con fechas válidas de registro y resolución.</span>
             </button>
           </article>
           <article class="panel analytics-card analytics-card--wide" id="card-trend" data-load-block inert aria-busy="true">
@@ -137,6 +141,7 @@
               <label class="chart-grouping">Año <select id="trend-year"></select></label>
               <label class="chart-grouping" id="trend-month-field" hidden>Mes <select id="trend-month"></select></label>
               <label class="chart-grouping" id="trend-week-field" hidden>Semana <select id="trend-week"></select></label>
+              <button type="button" class="filter-clear" id="clear-trend-filters">Limpiar período</button>
             </div>
             <button type="button" class="chart-open" data-chart="trend" aria-haspopup="dialog" aria-controls="chart-summary" aria-label="Tendencia de reportes: ver resumen">
               <span class="chart-heading">Tendencia de reportes</span>

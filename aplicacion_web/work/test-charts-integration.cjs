@@ -6,10 +6,10 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const reports = [
- { id_reporte: 1, status: 'Resuelto', priority: 'Alta', workType: 'Construcción', workTypeId: 'Construcción', address: 'Zona A', municipality: 'Municipio A', date: '2026-10-01', registeredAt: '2026-10-01T12:00:00Z', resolvedAt: '2026-10-03T00:00:00Z' },
+ { id_reporte: 1, status: 'Concluido', priority: 'Alta', workType: 'Construcción', workTypeId: 'Construcción', address: 'Zona A', municipality: 'Municipio A', date: '2026-10-01', registeredAt: '2026-10-01T12:00:00Z', resolvedAt: '2026-10-03T00:00:00Z' },
  { id_reporte: 2, status: 'Concluido', priority: 'Alta', workType: 'Construcción', workTypeId: 'Construcción', address: 'Zona A', municipality: 'Municipio A', date: '2026-10-02', registeredAt: '2026-10-02T12:00:00Z', resolvedAt: '2026-10-03T00:00:00Z' },
- { id_reporte: 3, status: 'Pendiente', priority: 'Baja', workType: '<img src=x>', workTypeId: '<img src=x>', municipality: 'Municipio B', date: '2026-10-01' },
- { id_reporte: 4, status: 'Cancelado', priority: null, workType: null, address: null, date: '2026-02-30' },
+ { id_reporte: 3, status: 'Registrado', priority: 'Baja', workType: '<img src=x>', workTypeId: '<img src=x>', municipality: 'Municipio B', date: '2026-10-01' },
+ { id_reporte: 4, status: 'Cancelado', priority: null, workType: null, address: null, date: '2026-02-30', registeredAt: '2025-02-01T12:00:00Z' },
 ];
 (async () => {
  const server = http.createServer((req, res) => {
@@ -40,12 +40,10 @@ const reports = [
   assert.match(await summary('municipality'), /Municipio A2 reporte/);
   assert.equal(await page.locator('[data-chart="municipality"]').count(), 1);
   assert.equal(await page.locator('#card-location').count(), 0);
-  assert.match(await summary('resolution'), /Alta1 día · 2 reporte/);
-  assert.match(await summary('resolution'), /BajaSin datos/);
+  assert.equal(await page.locator('#card-resolution').isVisible(), false);
   assert.equal(await page.locator('.chart-visual img').count(), 0);
   assert.match(await page.locator('#chart-category .horizontal-bar').first().getAttribute('title'), /Construcción: 2 reporte/);
   assert.match(await page.locator('#chart-priority title').allTextContents().then(values => values.join(' ')), /Alta: 2 reporte/);
-  assert.match(await page.locator('#chart-resolution .horizontal-bar').nth(2).getAttribute('title'), /Alta: 1 día/);
   assert.equal(await page.locator('#chart-trend svg text[y="298"]').count(), 12);
   assert.equal(await page.locator('#chart-trend circle[data-series="registered"]').count(), 1);
   assert.equal(await page.locator('#chart-trend polyline[data-series="registered"]').count(), 0);
@@ -56,7 +54,7 @@ const reports = [
   const linePoints = await page.locator('#chart-trend polyline[data-series="registered"]').getAttribute('points');
   assert.equal(linePoints.split(' ').length, 2);
   assert.match(await page.locator('#chart-trend svg text[x="850"][y="16"]').textContent(), /2026/);
-  assert.match(await summary('trend'), /2026-10-03sin registros · 2 resueltos/);
+  assert.match(await summary('trend'), /2026-10-03sin registros · 2 concluidos/);
   await page.selectOption('#trend-grouping', 'week');
   assert.match(await summary('trend'), /2026-10-01 al 2026-10-073 registrados/);
   assert.equal(await page.locator('#chart-trend svg text[y="298"]').count(), 4);
@@ -74,29 +72,49 @@ const reports = [
   assert.equal(await page.locator('[data-chart="municipality"]').count(), 1);
   assert.equal(await page.locator('#card-location').count(), 0);
   await page.fill('[data-filter="start-date"]', '2027-01-01');
-  await page.locator('#chart-filters').evaluate(form => form.requestSubmit());
   assert.match(await page.locator('#chart-category').textContent(), /No hay reportes/);
   assert.equal(await page.locator('#chart-trend circle').count(), 0);
-  assert.match(await page.locator('#chart-resolution').textContent(), /Sin datos/);
+  await page.fill('[data-filter="end-date"]', '2026-10-01');
+  assert.match(await page.locator('#chart-feedback').textContent(), /fecha fin.*últimos resultados/);
+  assert.equal(await page.locator('[data-filter="end-date"]').evaluate(input => input.validity.valid), false);
+  await page.locator('#clear-chart-filters').click();
+  assert.match(await page.locator('#chart-feedback').textContent(), /4 de 4.*Sin filtros/);
+  assert.equal(await page.locator('[data-filter="end-date"]').evaluate(input => input.validity.valid), true);
+  assert.equal(await page.locator('#trend-grouping').inputValue(), 'month');
+  assert.equal(await page.locator('#trend-month-field').isVisible(), false);
+  assert.equal(await page.locator('#chart-trend svg text[y="298"]').count(), 12);
+  await page.selectOption('[data-filter="municipality"]', 'Municipio A');
+  await page.fill('[data-filter="start-date"]', '2026-10-02');
+  await page.fill('[data-filter="end-date"]', '2026-10-02');
+  assert.match(await page.locator('#chart-feedback').textContent(), /1 de 4/);
+  await page.selectOption('#trend-grouping', 'day');
+  await page.selectOption('#trend-year', '2025');
+  await page.selectOption('#trend-month', '9');
+  assert.equal(await page.locator('#chart-trend circle').count(), 0);
+  await page.locator('#clear-trend-filters').click();
+  assert.equal(await page.locator('#trend-grouping').inputValue(), 'month');
+  assert.equal(await page.locator('#trend-year').inputValue(), '2026');
+  assert.equal(await page.locator('#trend-month').inputValue(), '10');
+  assert.match(await page.locator('#chart-feedback').textContent(), /1 de 4/, 'Limpiar período conserva los filtros generales');
+  assert.equal(await page.locator('#chart-trend circle[data-series="registered"]').count(), 1);
   await page.locator('#clear-chart-filters').click();
   for (const width of [1440, 768, 375, 320]) {
    await page.setViewportSize({ width, height: 1000 });
    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `overflow en ${width}px`);
-   for (const key of ['category','priority','trend','municipality','resolution']) assert.equal(await page.locator(`#card-${key}`).isVisible(), true);
+   for (const key of ['status','category','priority','trend','municipality']) assert.equal(await page.locator(`#card-${key}`).isVisible(), true);
    if (width === 1440 || width === 375) await page.screenshot({ path: `/tmp/rieti-charts-${width}.png`, fullPage: true });
   }
   data = reports.map(({ resolvedAt, ...r }) => r); await ready();
   assert.match(await page.locator('#chart-trend').textContent(), /sin datos de fecha/);
-  assert.ok(!/resueltos: \d/.test(await summary('trend')));
-  data = Array.from({ length: 12 }, (_, i) => ({ id_reporte: i + 1, status: 'Pendiente', priority: 'Baja', date: '2026-10-01', municipality: 'Municipio ' + i })); await ready();
+  assert.ok(!/concluidos: \d/.test(await summary('trend')));
+  data = Array.from({ length: 12 }, (_, i) => ({ id_reporte: i + 1, status: 'Registrado', priority: 'Baja', date: '2026-10-01', municipality: 'Municipio ' + i })); await ready();
   assert.equal(await page.locator('#chart-municipality .horizontal-bar').count(), 10);
   assert.match(await page.locator('#chart-municipality').textContent(), /10 de 12 municipios/);
   data = []; await ready();
   assert.match(await page.locator('#chart-category').textContent(), /No hay reportes/);
   assert.equal(await page.locator('#chart-trend circle').count(), 0);
-  assert.match(await page.locator('#chart-resolution').textContent(), /Sin datos/);
   failure = true; await ready();
-  for (const key of ['category','priority','trend','municipality','resolution']) assert.match(await page.locator(`#chart-${key}`).textContent(), /Datos no disponibles/);
+  for (const key of ['status','category','priority','trend','municipality']) assert.match(await page.locator(`#chart-${key}`).textContent(), /Datos no disponibles/);
   assert.deepEqual(errors, []);
   console.log('OK: cinco gráficas, tooltips, resúmenes, filtros, día/semana/mes, fechas de resolución, vacío/error, etiquetas seguras y responsive 1440/768/375/320px.');
  } finally { await browser?.close(); server.close(); }

@@ -7,9 +7,10 @@ const listSQL = `SELECT r.id_reporte, r.folio, r.estatus AS status, r.prioridad 
  m.nombre AS municipality, a.nombre AS adminName, a.email AS adminEmail
  FROM Reporte r LEFT JOIN Ciudadano c ON c.id_usuario = r.id_usuario
  LEFT JOIN Municipio m ON m.id_municipio = r.id_municipio
- LEFT JOIN Administrador a ON a.id_admin = r.id_administrador`;
+ LEFT JOIN Administrador a ON a.id_admin = r.id_administrador
+ WHERE r.active = 1`;
 async function readReports(pool, id) {
- const [rows] = await pool.execute(listSQL + (id ? ' WHERE r.id_reporte = ?' : '') + ' ORDER BY r.fecha DESC, r.id_reporte DESC', id ? [id] : []);
+ const [rows] = await pool.execute(listSQL + (id ? ' AND r.id_reporte = ?' : '') + ' ORDER BY r.fecha DESC, r.id_reporte DESC', id ? [id] : []);
  if (!rows.length) return [];
  const ids = rows.map(r => r.id_reporte);
  const placeholders = ids.map(() => '?').join(',');

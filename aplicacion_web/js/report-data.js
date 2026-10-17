@@ -2,12 +2,30 @@
 window.RIETI_REPORTS = Object.create(null);
 window.RIETI_WORK_TYPES = [];
 window.RIETI_API_ERROR = null;
-// Equivalencias de resumen; las tablas conservan literalmente el estatus almacenado.
-window.RIETI_STATUS_GROUPS = { pending: ['Recibido', 'Pendiente', 'Registrado'], progress: ['En proceso', 'En revision', 'En revisión', 'Canalizado'], resolved: ['Resuelto', 'Concluido'] };
+// Valores de chk_reporte_estatus en RDS; las etiquetas no cambian el valor almacenado.
+window.RIETI_STATUS_LABELS = Object.freeze({
+  Registrado: 'Registrado', En_revision: 'En revisión', En_seguimiento: 'En seguimiento',
+  Canalizado: 'Canalizado', Concluido: 'Concluido', Archivado: 'Archivado',
+  Cancelado: 'Cancelado', Reincidente: 'Reincidente',
+});
+window.RIETI_STATUSES = Object.freeze(Object.keys(window.RIETI_STATUS_LABELS));
+window.RIETI_STATUS_LABEL = status => window.RIETI_STATUSES.includes(status) ? window.RIETI_STATUS_LABELS[status] : status;
+window.RIETI_STATUS_GROUPS = { pending: ['Registrado'], progress: ['En_revision', 'En_seguimiento', 'Canalizado'], resolved: ['Concluido'] };
+window.RIETI_STATUS_CLASSES = {
+  Registrado: 'received', En_revision: 'progress', En_seguimiento: 'progress',
+  Canalizado: 'progress', Concluido: 'resolved', Archivado: 'archived',
+  Cancelado: 'cancelled', Reincidente: 'recurrent',
+};
+// Un solo catálogo para el filtro y todos los formularios de cambio de estado.
+document.querySelectorAll('select[name="status"]').forEach(select => {
+  const options = window.RIETI_STATUSES.map(status => new Option(window.RIETI_STATUS_LABEL(status), status));
+  if (select.hasAttribute('data-filter')) options.unshift(new Option('Todos los estados', ''));
+  select.replaceChildren(...options);
+});
 window.RIETI_READY = (async () => {
   const unavailable = 'No disponible';
   const value = v => v === null || v === undefined || v === '' ? unavailable : String(v);
-  const statusClasses = { Recibido: 'received', Pendiente: 'pending', 'En proceso': 'progress', Resuelto: 'resolved', Cancelado: 'cancelled', Registrado: 'received', 'En revision': 'progress', 'En revisión': 'progress', Canalizado: 'progress', Concluido: 'resolved' };
+  const statusClasses = window.RIETI_STATUS_CLASSES;
   const context = document.querySelector('[data-report-context]');
   const id = new URLSearchParams(location.search).get('id');
   const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
@@ -35,7 +53,7 @@ window.RIETI_READY = (async () => {
     window.RIETI_WORK_TYPES = [...new Set(records.map(r => r.workType).filter(Boolean))].map(label => ({ id: label, label }));
     document.querySelectorAll('[data-filter]').forEach(select => {
       if (select.tagName !== 'SELECT') return;
-      const key = { municipality: 'municipality', status: 'status', priority: 'priority', 'work-type': 'workTypeId' }[select.dataset.filter];
+      const key = { municipality: 'municipality', priority: 'priority', 'work-type': 'workTypeId' }[select.dataset.filter];
       if (!key) return;
       const first = select.options[0].cloneNode(true);
       select.replaceChildren(first);
@@ -60,7 +78,7 @@ window.RIETI_READY = (async () => {
           const cell = document.createElement('td');
           cell.dataset.label = labels[index];
           const span = document.createElement(key === 'folio' ? 'strong' : 'span');
-          span.textContent = value(report[key]);
+          span.textContent = key === 'status' ? window.RIETI_STATUS_LABEL(report.status) : value(report[key]);
           if (statistics && ['workType', 'observations', 'municipality', 'authority', 'reporter'].includes(key)) {
             span.className = 'cell-preview' + (key === 'workType' ? ' cell-preview--work' : key === 'observations' ? ' cell-preview--observations' : '');
           }
@@ -103,14 +121,14 @@ window.RIETI_READY = (async () => {
     if (donut) {
       const statuses = [...new Set(reports.map(r => r.status))];
       const palette = window.RIETI_DONUT_COLORS;
-      donut.insertAdjacentHTML('beforeend', window.RIETI_DRAW_DONUT(statuses, statuses.map(status => reports.filter(r => r.status === status).length)));
-      donut.setAttribute('aria-label', statuses.map(status => `${status}: ${reports.filter(r => r.status === status).length}`).join(', ') || 'Sin reportes');
+      donut.insertAdjacentHTML('beforeend', window.RIETI_DRAW_DONUT(statuses.map(window.RIETI_STATUS_LABEL), statuses.map(status => reports.filter(r => r.status === status).length)));
+      donut.setAttribute('aria-label', statuses.map(status => `${window.RIETI_STATUS_LABEL(status)}: ${reports.filter(r => r.status === status).length}`).join(', ') || 'Sin reportes');
       const legend = donut.closest('article').querySelector('.chart-legend');
       legend.replaceChildren();
       statuses.forEach((status, index) => {
         const item = document.createElement('li'), dot = document.createElement('span');
         dot.className = 'legend-dot'; dot.style.background = palette[index % palette.length];
-        item.append(dot, document.createTextNode(status)); legend.append(item);
+        item.append(dot, document.createTextNode(window.RIETI_STATUS_LABEL(status))); legend.append(item);
       });
     }
     const lastQuery = document.querySelector('[data-last-report-query]');

@@ -41,6 +41,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
           </span>
+          <a class="sidebar-nav__item" href="acerca.html?origen=panel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
+            Acerca de RIETI
+          </a>
         </nav>
 
 <button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
@@ -77,13 +81,13 @@
           <a href="mapa-calor.html">Mapa de calor</a>
           <a href="rendimiento.html">Rendimiento</a>
         </nav>
-        <!-- INTEGRACIÓN FUTURA: los filtros consultarán la API; el catálogo es provisional. -->
+        <!-- Filtros automáticos sobre los reportes consultados de la API. -->
         <form class="report-filters statistics-filters" id="report-filters" data-load-block inert aria-busy="true">
           <label class="filter-field"><span>Municipio</span><select name="municipality" data-filter="municipality"><option value="">Todos los municipios</option><option value="Naucalpan de Juárez">Naucalpan de Juárez</option><option value="Tlalnepantla de Baz">Tlalnepantla de Baz</option><option value="Coacalco">Coacalco</option><option value="Villa del Carbón">Villa del Carbón</option><option value="Huixquilucan">Huixquilucan</option><option value="Tultitlán">Tultitlán</option><option value="Atizapán de Zaragoza">Atizapán de Zaragoza</option><option value="Cuautitlán Izcalli">Cuautitlán Izcalli</option></select></label>
           <label class="filter-field"><span>Tipo de trabajo</span><select name="work-type" data-filter="work-type"><option value="">Todos los tipos</option><option value="venta">Venta ambulante en calles o semáforos</option><option value="limpieza">Limpieza de parabrisas</option><option value="comercio">Comercio en mercados o locales</option><option value="agricola">Trabajo agrícola</option><option value="construccion">Construcción</option><option value="domestico">Trabajo doméstico</option></select></label>
           <label class="filter-field"><span>Fecha inicio</span><input name="start-date" type="date" data-filter="start-date" /></label>
           <label class="filter-field"><span>Fecha fin</span><input name="end-date" type="date" data-filter="end-date" /></label>
-          <button class="filter-submit" type="submit" aria-label="Aplicar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></svg></button>
+          <button class="filter-clear" type="button" id="clear-report-filters">Limpiar filtros</button>
         </form>
 
         <p class="filter-feedback" id="filter-feedback" aria-live="polite">Cargando reportes…</p>
@@ -91,9 +95,9 @@
         <!-- Los totales se reemplazarán con valores agregados entregados por la API. -->
         <section class="metric-grid management-metrics" aria-label="Resumen de reportes">
           <article class="metric-card" data-load-block inert aria-busy="true"><span>Total de reportes</span><strong data-field="reports-total" data-filter-count="reports-total">—</strong></article>
-          <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span>Pendientes</span><strong data-field="reports-pending" data-filter-count="reports-pending">—</strong></article>
-          <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span>En proceso</span><strong data-field="reports-progress" data-filter-count="reports-progress">—</strong></article>
-          <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span>Resueltos</span><strong data-field="reports-resolved" data-filter-count="reports-resolved">—</strong></article>
+          <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span title="Reportes con estado Registrado">Registrados</span><strong data-field="reports-pending" data-filter-count="reports-pending">—</strong></article>
+          <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span title="En revisión, En seguimiento y Canalizado">En atención</span><strong data-field="reports-progress" data-filter-count="reports-progress">—</strong></article>
+          <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span title="Reportes con estado Concluido">Concluidos</span><strong data-field="reports-resolved" data-filter-count="reports-resolved">—</strong></article>
         </section>
 
 <section class="panel statistics-list" aria-labelledby="statistics-list-title" data-load-block inert aria-busy="true">
@@ -124,7 +128,14 @@
         <div class="current-value"><p>Estado actual</p><span class="status status--received" data-current-status></span></div>
         <label class="dialog-field">Nuevo estado
           <select name="status" required>
-            <option>Recibido</option><option>Pendiente</option><option>En proceso</option><option>Resuelto</option><option>Cancelado</option>
+            <option value="Registrado">Registrado</option>
+            <option value="En_revision">En revisión</option>
+            <option value="En_seguimiento">En seguimiento</option>
+            <option value="Canalizado">Canalizado</option>
+            <option value="Concluido">Concluido</option>
+            <option value="Archivado">Archivado</option>
+            <option value="Cancelado">Cancelado</option>
+            <option value="Reincidente">Reincidente</option>
           </select>
         </label>
         <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>

@@ -195,7 +195,7 @@
 - Esquema verificado con SELECT sobre INFORMATION_SCHEMA: Reporte, Ciudadano, Municipio, Administrador, Demografico_Reporte y Ubicacion_Reporte. No se consultan contraseñas.
 - Rutas GET `/api/reportes` y `/api/reportes/:id`; identificador real `id_reporte`, sin generar folios artificiales. Listado ordenado por fecha e identificador descendentes; dashboard muestra los cinco más recientes.
 - Las relaciones múltiples se consultan aparte para no multiplicar reportes. Los valores demográficos y ubicaciones múltiples se muestran separados con ` · `, sin sumar ni inferir información.
-- Estados literales de la base conservados en tablas y gráficas. Resumen: Registrado/Recibido/Pendiente → pendientes; En revision/En revisión/Canalizado/En proceso → en proceso; Concluido/Resuelto → resueltos. Cancelados y estados adicionales cuentan en el total y la distribución, sin asignarles una categoría inventada.
+- Criterio inicial de estados sustituido el 17 de octubre de 2026 por el catálogo exacto de RDS descrito abajo.
 - Municipios, prioridades, estados y tipos de trabajo de los filtros provienen de los reportes consultados. Filtros locales sobre la respuesta completa; fechas inclusivas y validación de rango.
 - Última actualización, horario, referencias, autoridad y comentarios no existen en el esquema y se muestran como “No disponible”. Administrador procede de la relación real; imagen_url se muestra como evidencia registrada sin inventar nombres ni tamaños ni habilitar descargas.
 - Rendimiento queda sin indicadores: no existen asignaciones a autoridades ni fechas de resolución. No se infieren autoridades desde administradores ni duración desde la fecha del reporte.
@@ -222,3 +222,11 @@
 
 - Se sustituye el bloque R / RIETI / Panel de Control por `assets/logo-rieti.png` en las siete pantallas internas. El usuario añadirá su archivo con ese nombre.
 - Se conserva la proporción del PNG dentro de un espacio de 190 × 60 px; el tamaño se controla con `.brand-lockup__logo`.
+
+## Alineación de estados con RDS · 17 de octubre de 2026
+
+- Se usan únicamente los ocho valores de `chk_reporte_estatus`: Registrado, En_revision, En_seguimiento, Canalizado, Concluido, Archivado, Cancelado y Reincidente.
+- El catálogo compartido alimenta formularios y filtro; En revisión y En seguimiento son etiquetas legibles, manteniendo el valor original para filtrar y para futuras escrituras.
+- Registrados cuenta Registrado; En atención agrupa En_revision, En_seguimiento y Canalizado; Concluidos cuenta solo Concluido. Archivado, Cancelado y Reincidente aparecen en el total y la distribución.
+- Se alinean tablas, seguimiento, confirmaciones simuladas, gráficas y colores del mapa. El CSV conserva los valores originales.
+- No se implementan todavía escrituras, asignaciones a procuradores ni bajas lógicas. El usuario confirmó que las autoridades corresponden a Procurador, para una etapa posterior.

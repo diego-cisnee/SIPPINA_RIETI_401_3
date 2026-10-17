@@ -18,28 +18,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     map.on('load', async () => {
         try {
-            const Lambda = 'https://odsk3s766p4pshk3z5mbyjtggq0lrdft.lambda-url.us-east-1.on.aws/';
+            // La misma API filtra los reportes activos para ambos mapas.
+            const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
+            const respuesta = await fetch(`${apiBase}/api/mapa-calor`, { cache: 'no-store', signal: AbortSignal.timeout(15000) });
+            if (!respuesta.ok) throw new Error('No fue posible consultar el mapa.');
+            const payload = await respuesta.json();
+            const reportes = payload.data?.puntos;
+            if (!Array.isArray(reportes)) throw new Error('Respuesta del mapa inválida.');
 
-            const respuesta = await fetch(Lambda);
-            const reportes = await respuesta.json();
-
+            const statusColors = {
+                Registrado: '#eab308', En_revision: '#f97316', En_seguimiento: '#f97316',
+                Canalizado: '#f97316', Concluido: '#22c55e', Archivado: '#69737e',
+                Cancelado: '#d32f2f', Reincidente: '#856a0f',
+            };
             reportes.forEach(reporte => {
                 // CORRECCIÓN: 'reporte' (singular) y 'latitud' bien escrito
                 const lat = parseFloat(reporte.latitud);
                 const long = parseFloat(reporte.longitud);
                 
                 if (!isNaN(lat) && !isNaN(long)) {
-                    let colorPin = "#3b82f6";
-                    if (reporte.estatus === "Recibido") colorPin = "#eab308";
-                    if (reporte.estatus === "En proceso") colorPin = "#f97316";
-                    if (reporte.estatus === "Resuelto") colorPin = "#22c55e";
+                    const colorPin = statusColors[reporte.estatus] || '#3b82f6';
+                    const status = document.createElement('span');
+                    status.textContent = window.RIETI_STATUS_LABEL(reporte.estatus);
 
                     const folio = document.createElement('span');
                     folio.textContent = reporte.folio ?? 'No disponible';
                     const popup = new maplibregl.Popup({ offset:25 }).setHTML(`
                         <div style="font-family: sans-serif;">
                             <h4 style="margin: 0 0 5px 0;">Folio ${folio.innerHTML}</h4>
-                            <p style="margin: 0; font-size: 13px;"><strong>Estatus:</strong> ${reporte.estatus}</p>
+                            <p style="margin: 0; font-size: 13px;"><strong>Estatus:</strong> ${status.innerHTML}</p>
                             <p style="margin: 0; font-size: 13px;"><strong>Prioridad:</strong> ${reporte.prioridad}</p>
                             <hr style="border: 0.5px solid #ccc; margin: 8px 0;">
                             <p style="margin: 0; font-size: 12px; color: #666;">${reporte.direccion || 'Sin dirección registrada'}</p>

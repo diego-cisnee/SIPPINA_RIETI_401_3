@@ -47,6 +47,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
           </a>
+          <a class="sidebar-nav__item" href="acerca.html?origen=panel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
+            Acerca de RIETI
+          </a>
         </nav>
 
 <button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
@@ -64,9 +68,9 @@
         <!-- Cada data-field se reemplazará con el total recibido desde la API. -->
         <section class="metric-grid" aria-label="Resumen de reportes">
           <article class="metric-card" data-load-block inert aria-busy="true"><span>Total de reportes</span><strong data-field="reports-total">—</strong><small>Todos los registros</small></article>
-          <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span>Pendientes</span><strong data-field="reports-pending">—</strong><small>Requieren atención</small></article>
-          <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span>En proceso</span><strong data-field="reports-progress">—</strong><small>Con seguimiento</small></article>
-          <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span>Resueltos</span><strong data-field="reports-resolved">—</strong><small>Casos concluidos</small></article>
+          <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span title="Reportes con estado Registrado">Registrados</span><strong data-field="reports-pending">—</strong><small>Requieren atención</small></article>
+          <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span title="En revisión, En seguimiento y Canalizado">En atención</span><strong data-field="reports-progress">—</strong><small>Con seguimiento</small></article>
+          <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span title="Reportes con estado Concluido">Concluidos</span><strong data-field="reports-resolved">—</strong><small>Casos concluidos</small></article>
         </section>
 
         <section class="analytics-grid" aria-label="Visualizaciones de reportes">
@@ -76,10 +80,14 @@
               <span class="panel__period">Últimos 30 días</span>
             </header>
             <ul class="chart-legend" aria-label="Leyenda del gráfico">
-              <li><span class="legend-dot legend-dot--received"></span>Recibidos</li>
-              <li><span class="legend-dot legend-dot--progress"></span>En proceso</li>
-              <li><span class="legend-dot legend-dot--resolved"></span>Resueltos</li>
-              <li><span class="legend-dot legend-dot--cancelled"></span>Cancelados</li>
+              <li>Registrado</li>
+              <li>En revisión</li>
+              <li>En seguimiento</li>
+              <li>Canalizado</li>
+              <li>Concluido</li>
+              <li>Archivado</li>
+              <li>Cancelado</li>
+              <li>Reincidente</li>
             </ul>
             <!-- INTEGRACIÓN FUTURA: JavaScript sustituirá estos porcentajes ficticios con datos reales. -->
             <div class="donut-chart" role="img" aria-label="Cargando reportes">
@@ -127,8 +135,8 @@
           <aside class="kpi-stack" aria-label="Indicadores de desempeño">
             <article class="kpi-card" data-load-block inert aria-busy="true"><span>Días promedio de resolución</span><div><strong data-field="average-resolution-days">No disponible</strong><small class="trend trend--neutral">No disponible</small></div></article>
             <article class="kpi-card" data-load-block inert aria-busy="true"><span>Tasa de resolución</span><div><strong data-field="resolution-rate">No disponible</strong><small class="trend trend--positive">No disponible</small></div></article>
-            <article class="kpi-card" data-load-block inert aria-busy="true"><span>En proceso</span><div><strong data-field="progress-rate">No disponible</strong><small class="trend trend--neutral">No disponible</small></div></article>
-            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Pendientes</span><div><strong data-field="pending-rate">No disponible</strong><small class="trend trend--negative">No disponible</small></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span title="En revisión, En seguimiento y Canalizado">En atención</span><div><strong data-field="progress-rate">No disponible</strong><small class="trend trend--neutral">No disponible</small></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span title="Reportes con estado Registrado">Registrados</span><div><strong data-field="pending-rate">No disponible</strong><small class="trend trend--negative">No disponible</small></div></article>
           </aside>
         </section>
       </main>
@@ -144,7 +152,14 @@
         <div class="current-value"><p>Estado actual</p><span class="status status--received" data-current-status></span></div>
         <label class="dialog-field">Nuevo estado
           <select name="status" required>
-            <option>Recibido</option><option>Pendiente</option><option>En proceso</option><option>Resuelto</option><option>Cancelado</option>
+            <option value="Registrado">Registrado</option>
+            <option value="En_revision">En revisión</option>
+            <option value="En_seguimiento">En seguimiento</option>
+            <option value="Canalizado">Canalizado</option>
+            <option value="Concluido">Concluido</option>
+            <option value="Archivado">Archivado</option>
+            <option value="Cancelado">Cancelado</option>
+            <option value="Reincidente">Reincidente</option>
           </select>
         </label>
         <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>

@@ -42,6 +42,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
           </a>
+          <a class="sidebar-nav__item" href="acerca.html?origen=panel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
+            Acerca de RIETI
+          </a>
         </nav>
 
 <button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
@@ -159,7 +163,14 @@
         <div class="current-value"><p>Estado actual</p><span class="status status--received" data-current-status></span></div>
         <label class="dialog-field">Nuevo estado
           <select name="status" required>
-            <option>Recibido</option><option>Pendiente</option><option>En proceso</option><option>Resuelto</option><option>Cancelado</option>
+            <option value="Registrado">Registrado</option>
+            <option value="En_revision">En revisión</option>
+            <option value="En_seguimiento">En seguimiento</option>
+            <option value="Canalizado">Canalizado</option>
+            <option value="Concluido">Concluido</option>
+            <option value="Archivado">Archivado</option>
+            <option value="Cancelado">Cancelado</option>
+            <option value="Reincidente">Reincidente</option>
           </select>
         </label>
         <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>

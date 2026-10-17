@@ -41,6 +41,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
           </a>
+          <a class="sidebar-nav__item" href="acerca.html?origen=panel">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
+            Acerca de RIETI
+          </a>
         </nav>
 
 <button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
@@ -71,9 +75,7 @@
         </header>
 
         <!--
-          FILTROS DEL PROTOTIPO
-          Las opciones usan los mismos valores que los atributos data-* de cada
-          reporte. app.js filtra los reportes consultados de la API.
+          Filtros automáticos sobre los reportes consultados de la API.
         -->
         <form class="report-filters" id="report-filters" data-load-block inert aria-busy="true">
           <label class="filter-field">
@@ -94,10 +96,14 @@
             <span>Estado</span>
             <select name="status" data-filter="status">
               <option value="">Todos</option>
-              <option value="Recibido">Recibido</option>
-              <option value="Pendiente">Pendiente</option>
-              <option value="En proceso">En proceso</option>
-              <option value="Resuelto">Resuelto</option>
+              <option value="Registrado">Registrado</option>
+              <option value="En_revision">En revisión</option>
+              <option value="En_seguimiento">En seguimiento</option>
+              <option value="Canalizado">Canalizado</option>
+              <option value="Concluido">Concluido</option>
+              <option value="Archivado">Archivado</option>
+              <option value="Cancelado">Cancelado</option>
+              <option value="Reincidente">Reincidente</option>
             </select>
           </label>
 
@@ -121,9 +127,7 @@
             <input name="end-date" type="date" data-filter="end-date" />
           </label>
 
-          <button class="filter-submit" type="submit" aria-label="Aplicar filtros">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></svg>
-          </button>
+          <button class="filter-clear" type="button" id="clear-report-filters">Limpiar filtros</button>
         </form>
 
         <p class="filter-feedback" id="filter-feedback" aria-live="polite">Cargando reportes…</p>
@@ -131,9 +135,9 @@
         <!-- Los totales se reemplazarán con valores agregados entregados por la API. -->
         <section class="metric-grid management-metrics" aria-label="Resumen de reportes">
           <article class="metric-card" data-load-block inert aria-busy="true"><span>Total de reportes</span><strong data-field="reports-total">—</strong></article>
-          <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span>Pendientes</span><strong data-field="reports-pending">—</strong></article>
-          <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span>En proceso</span><strong data-field="reports-progress">—</strong></article>
-          <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span>Resueltos</span><strong data-field="reports-resolved">—</strong></article>
+          <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span title="Reportes con estado Registrado">Registrados</span><strong data-field="reports-pending">—</strong></article>
+          <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span title="En revisión, En seguimiento y Canalizado">En atención</span><strong data-field="reports-progress">—</strong></article>
+          <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span title="Reportes con estado Concluido">Concluidos</span><strong data-field="reports-resolved">—</strong></article>
         </section>
 
         <section class="panel management-table-panel" aria-labelledby="reports-table-title" data-load-block inert aria-busy="true">
@@ -153,10 +157,7 @@
           </div>
         </section>
 
-        <!-- La paginación es visual hasta conectar el listado completo. -->
-        <nav class="pagination" aria-label="Paginación de reportes">
-          <span class="pagination__disabled">‹ Previo</span><span class="is-current" aria-current="page">1</span><span aria-disabled="true">2</span><span aria-hidden="true">…</span><span aria-disabled="true">5</span><span aria-disabled="true">Siguiente ›</span>
-        </nav>
+        <nav class="pagination" id="report-pagination" aria-label="Paginación de reportes" hidden></nav>
       </main>
     </div>
 
@@ -173,7 +174,14 @@
         <div class="current-value"><p>Estado actual</p><span class="status status--received" data-current-status></span></div>
         <label class="dialog-field">Nuevo estado
           <select name="status" required>
-            <option>Recibido</option><option>Pendiente</option><option>En proceso</option><option>Resuelto</option><option>Cancelado</option>
+            <option value="Registrado">Registrado</option>
+            <option value="En_revision">En revisión</option>
+            <option value="En_seguimiento">En seguimiento</option>
+            <option value="Canalizado">Canalizado</option>
+            <option value="Concluido">Concluido</option>
+            <option value="Archivado">Archivado</option>
+            <option value="Cancelado">Cancelado</option>
+            <option value="Reincidente">Reincidente</option>
           </select>
         </label>
         <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>

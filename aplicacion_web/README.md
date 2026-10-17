@@ -44,6 +44,8 @@ Los datos serán ficticios hasta que se conecten la base de datos, la API y la a
 - `pages/graficos.html`: gráficas por estatus, mapa pendiente, municipio y tendencia mensual.
 - `pages/rendimiento.html`: indicadores no disponibles por ausencia de asignaciones y fechas de resolución.
 - `pages/perfil.html`: perfil experimental del administrador, accesible desde el bloque del usuario.
+- `pages/acerca.html`: propósito, contexto académico, equipo creador y contacto pendiente. Desde el menú lateral (`?origen=panel`) conserva la navegación del sistema; desde el inicio de sesión muestra la presentación pública con acceso al login. El parámetro solo controla la presentación.
+- `css/about.css`: presentación adaptable de la página Acerca de RIETI.
 - `css/profile.css`: estilos aislados de la propuesta de perfil.
 - `js/performance-data.js`: colección vacía; se retiró la muestra ficticia.
 - `js/performance.js`: estado no disponible para indicadores sin base de cálculo.
@@ -72,6 +74,38 @@ Iniciar la API con `npm start` desde `backend` y servir esta carpeta en
 el seguimiento consulta `/api/reportes/:id` usando `id_reporte`. No hay escrituras
 a MySQL. Las acciones de modificación siguen simuladas y el mapa queda pendiente.
 
+En Gestión de reportes, Estadísticas / Reportes y Gráficos, los filtros se aplican
+al escribir o seleccionar un valor, sin pulsar buscar. `Limpiar filtros` restaura
+la consulta completa y elimina los avisos de fechas inválidas. Un rango invertido
+muestra un aviso y conserva los últimos resultados hasta corregirlo o limpiarlo.
+En Gráficos también restaura el período inicial de tendencia; `Limpiar período`
+restaura solo ese período (agrupación mensual y fecha más reciente de los datos).
+Rendimiento mantiene su búsqueda deshabilitada mientras no existan los datos de
+asignaciones y resolución que necesita.
+
+Los estados de reportes corresponden a la restricción `chk_reporte_estatus` de
+RDS: `Registrado`, `En_revision`, `En_seguimiento`, `Canalizado`, `Concluido`,
+`Archivado`, `Cancelado` y `Reincidente`. El catálogo compartido en
+`js/report-data.js` alimenta el filtro de estados y los formularios. Las etiquetas
+En revisión y En seguimiento conservan sus valores con guion bajo en los controles,
+los datos y el CSV. Indicadores: Registrados = Registrado; En atención = En_revision,
+En_seguimiento y Canalizado; Concluidos = Concluido. Archivado, Cancelado y Reincidente
+cuentan en el total y la distribución, sin sumarse a esos tres indicadores.
+Las acciones de cambio de estado siguen simuladas; esta alineación no escribe en RDS.
+
+La API devuelve exclusivamente reportes con `active = 1`; las métricas, filtros y
+exportación usan esa misma consulta. No existe una opción para mostrar inactivos.
+El mapa del dashboard usa `/api/mapa-calor`, igual que el mapa de calor, para
+respetar el filtro del backend; dejó de consultar la Lambda independiente.
+`node work/test-dashboard-map.cjs` verifica esa fuente sin navegador ni acceso a RDS.
+
+Gestión de reportes muestra 10 reportes por página, conservando el orden de la API.
+Previo, Siguiente y los números navegan por los resultados filtrados; aplicar o
+limpiar filtros vuelve a la primera página. Los indicadores generales conservan
+su total y el CSV sigue exportando todos los reportes consultados, no solo la página
+visible. La paginación es local sobre la respuesta de reportes activos; no agrega
+consultas, escrituras ni acceso a inactivos.
+
 Prueba vigente: `work/test-api-integration.cjs` usa Playwright instalado, un servidor
 local y respuestas controladas para verificar todas las vistas, filtros, navegación,
 diálogos, errores, vacíos y solicitudes exclusivamente GET. Ejecutar con
@@ -94,6 +128,6 @@ La API entrega el catálogo de Municipio (`clave` = clave INEGI). El selector lo
 
 Cada punto conserva su pareja de coordenadas de Ubicacion_Reporte, folio y prioridad de Reporte. Hover muestra folio y prioridad; clic abre una ventana con enlace al seguimiento, cuyo Volver regresa al mapa. Cuando un reporte tiene varias ubicaciones, se dibujan todas, pero el total, prioridades y recientes cuentan folios únicos por selección; cada municipio cuenta el folio una vez. El calor depende de las ubicaciones, radio y zoom, y no es un conteo absoluto.
 
-Los últimos 30 días incluyen hoy en America/Mexico_City; fechas inválidas o futuras no cuentan como recientes. Prioridades desconocidas aparecen como Sin especificar. Ver todo el estado conserva el filtro de prioridad. Las coordenadas exactamente sobre límites compartidos conservan el criterio de ray casting y primer polígono coincidente; acordar política antes de usos de precisión.
+Los últimos 30 días incluyen hoy en America/Mexico_City; fechas inválidas o futuras no cuentan como recientes. Prioridades desconocidas aparecen como Sin especificar. Ver todo el estado conserva el filtro de prioridad. Limpiar filtros elimina la selección de municipio y prioridad y muestra todo el estado, conservando las opciones de visualización. Las coordenadas exactamente sobre límites compartidos conservan el criterio de ray casting y primer polígono coincidente; acordar política antes de usos de precisión.
 
 Prueba del navegador: `node work/test-heatmap.cjs` con Playwright disponible mediante NODE_PATH. Usa datos controlados solo en pruebas y verifica API, duplicados, prioridades, enlaces, catálogo parcial/grises, filtros, vacío, error y móvil. El backend tiene pruebas SELECT en `npm test`.

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Conoce el propósito de RIETI y al equipo de estudiantes del Tecnológico de Monterrey, Campus Estado de México, que desarrolló el proyecto." />
+    <title>Acerca de RIETI</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="../css/about.css" />
+    <script src="../js/about.js"></script>
+  </head>
+  <body class="dashboard-page about-page">
+    <a class="about-skip" href="#contenido">Saltar al contenido</a>
+    <div class="dashboard-shell about-layout">
+      <aside class="sidebar about-sidebar" aria-label="Navegación principal">
+        <div class="brand-lockup">
+          <!-- Coloca el PNG de la identidad en assets/logo-rieti.png. -->
+          <img class="brand-lockup__logo" src="../assets/logo-rieti.png" alt="RIETI · Panel de Control" width="190" height="60" />
+        </div>
+
+        <a class="user-summary user-summary--profile" href="perfil.html" aria-label="Mi perfil de administrador">
+          <span class="user-summary__avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
+          </span>
+          <!-- INTEGRACIÓN FUTURA: estos datos se obtendrán de la sesión autenticada. -->
+          <strong data-field="user-name">RIETI Admin</strong>
+          <span data-field="user-role">Panel de Control</span>
+        </a>
+
+        <nav class="sidebar-nav">
+          <a class="sidebar-nav__item" href="dashboard.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3Z" /></svg>
+            Dashboard
+          </a>
+          <a class="sidebar-nav__item" href="reportes.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
+            Gestión de reportes
+          </a>
+          <a class="sidebar-nav__item" href="estadisticas.html">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
+            Estadísticas
+          </a>
+          <a class="sidebar-nav__item is-active" href="acerca.html?origen=panel" aria-current="page">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
+            Acerca de RIETI
+          </a>
+        </nav>
+
+<button type="button" class="sidebar-nav__item sidebar-nav__logout" data-action="logout" aria-haspopup="dialog" aria-controls="logout-dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg>
+          Cerrar sesión
+        </button>
+      </aside>
+      <div class="about-content">
+    <header class="about-header">
+      <div class="about-header__inner">
+        <a href="../index.html" aria-label="RIETI · Ir al inicio de sesión"><img class="brand-lockup__logo" src="../assets/logo-rieti.png" alt="RIETI" width="190" height="60" /></a>
+        <a class="about-login" href="../index.html">Iniciar sesión <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+
+    <main id="contenido" class="about-main" tabindex="-1">
+      <section class="about-intro" aria-labelledby="about-title">
+        <p class="eyebrow">Tecnología con propósito</p>
+        <h1 id="about-title">Acerca de RIETI</h1>
+        <p>Un proyecto académico que busca facilitar el reporte de situaciones de explotación infantil y apoyar la protección de niñas, niños y adolescentes en México.</p>
+        <nav class="about-sections" aria-label="Contenido de esta página">
+          <a href="#proposito">Propósito</a>
+          <a href="#proyecto">El proyecto</a>
+          <a href="#equipo">Equipo creador</a>
+          <a href="#contacto">Contacto</a>
+        </nav>
+      </section>
+
+      <section id="proposito" class="panel about-section" aria-labelledby="purpose-title">
+        <p class="eyebrow">Por qué lo desarrollamos</p>
+        <h2 id="purpose-title">Facilitar los reportes y su seguimiento</h2>
+        <p>La explotación infantil en México plantea la necesidad de contar con herramientas que faciliten y agilicen las denuncias. RIETI se desarrolla para atender las necesidades de la SIPINNA, la Secretaría Ejecutiva del Sistema Nacional de Protección de Niñas, Niños y Adolescentes.</p>
+        <p>El objetivo es diseñar y desarrollar una aplicación Android acorde con las especificaciones de la organización, acompañada de un panel web para la gestión de reportes. El trabajo incorpora prácticas de calidad de software y administración de proyectos, con retroalimentación constante de los socios formadores.</p>
+        <ul class="about-goals">
+          <li><span class="about-goals__number" aria-hidden="true">01</span><div><h3>Registrar situaciones</h3><p>Brindar una forma rápida y eficiente de reportar posibles situaciones de explotación infantil, con datos útiles para apoyar la atención de cada caso.</p></div></li>
+          <li><span class="about-goals__number" aria-hidden="true">02</span><div><h3>Dar seguimiento</h3><p>Permitir que las personas usuarias conozcan el estatus de sus reportes durante el proceso de atención.</p></div></li>
+          <li><span class="about-goals__number" aria-hidden="true">03</span><div><h3>Apoyar el análisis</h3><p>Aprovechar los datos recopilados para analizar patrones y zonas con mayor frecuencia de reportes, y apoyar el trabajo de la organización.</p></div></li>
+        </ul>
+      </section>
+
+      <section id="proyecto" class="panel about-section" aria-labelledby="project-title">
+        <p class="eyebrow">Contexto académico</p>
+        <h2 id="project-title">Un proyecto del Tecnológico de Monterrey</h2>
+        <p>Desarrollado por estudiantes del Tecnológico de Monterrey, Campus Estado de México, como parte de la materia <strong>Integración de seguridad informática en redes y sistemas de software</strong>.</p>
+        <dl class="about-project-details">
+          <div><dt>Institución</dt><dd>Tecnológico de Monterrey</dd></div>
+          <div><dt>Campus</dt><dd>Estado de México</dd></div>
+          <div><dt>Alcance del proyecto</dt><dd>Aplicación Android y panel web de gestión de reportes</dd></div>
+          <div><dt>Organización destinataria</dt><dd>SIPINNA</dd></div>
+        </dl>
+      </section>
+
+      <section id="equipo" class="about-team" aria-labelledby="team-title">
+        <p class="eyebrow">Créditos</p>
+        <h2 id="team-title">Equipo creador</h2>
+        <p class="about-team__description">Estudiantes del Tecnológico de Monterrey, Campus Estado de México.</p>
+        <ul class="about-team__grid">
+          <li class="panel about-member"><span class="about-member__initials" aria-hidden="true">DT</span><div><h3>Daniel Tellez Mireles</h3><p>Matrícula <span>A01753417</span></p></div></li>
+          <li class="panel about-member"><span class="about-member__initials" aria-hidden="true">AG</span><div><h3>Alonso García Gonzaléz</h3><p>Matrícula <span>A01753985</span></p></div></li>
+          <li class="panel about-member"><span class="about-member__initials" aria-hidden="true">RT</span><div><h3>Rodrigo Torres Maya</h3><p>Matrícula <span>A01753443</span></p></div></li>
+          <li class="panel about-member"><span class="about-member__initials" aria-hidden="true">RT</span><div><h3>Rodrigo Toledo Santiago</h3><p>Matrícula <span>A01798104</span></p></div></li>
+          <li class="panel about-member"><span class="about-member__initials" aria-hidden="true">DC</span><div><h3>Diego Alexander Cisneros Ramos</h3><p>Matrícula <span>A01754431</span></p></div></li>
+        </ul>
+      </section>
+
+      <section id="contacto" class="panel about-section about-contact" aria-labelledby="contact-title">
+        <div><p class="eyebrow">Contacto del proyecto</p><h2 id="contact-title">Información de contacto</h2><p>Los datos de contacto se agregarán próximamente.</p></div>
+        <span class="about-pending">Pendiente</span>
+      </section>
+    </main>
+    <footer class="about-footer"><p>RIETI · Proyecto académico del Tecnológico de Monterrey, Campus Estado de México.</p><a href="#about-title">Volver arriba ↑</a></footer>
+      </div>
+    </div>
+    <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
+      <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
+      <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
+      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
+      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <div class="dialog-actions">
+        <button type="button" data-cancel-logout autofocus>Cancelar</button>
+        <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>
+      </div>
+    </dialog>
+    <script src="../js/session.js" defer></script>
+  </body>
+</html>

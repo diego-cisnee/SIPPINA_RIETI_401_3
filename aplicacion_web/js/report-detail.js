@@ -39,7 +39,8 @@
 
   // No se inserta HTML a partir de la URL o de los datos del reporte.
   document.querySelectorAll("[data-detail]").forEach((node) => {
-    node.textContent = report[node.dataset.detail] ?? "No disponible";
+    node.textContent = node.dataset.detail === 'status' ? window.RIETI_STATUS_LABEL(report.status) : report[node.dataset.detail] ?? "No disponible";
+    if (node.dataset.detail === 'status') node.className = 'status' + (window.RIETI_STATUS_CLASSES[report.status] ? ' status--' + window.RIETI_STATUS_CLASSES[report.status] : '');
     if (node.dataset.detail === "priority") node.dataset.priority = report.priority;
   });
   document.querySelector("[data-heatmap-link]").href = "mapa-calor.html?reporte=" + encodeURIComponent(report.id);
