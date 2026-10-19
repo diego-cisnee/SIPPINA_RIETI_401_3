@@ -19,5 +19,10 @@
 .performance-table th:first-child, .performance-table th:nth-child(2) { width: 18%; }
 .performance-table tbody th { background: var(--color-surface); font-size: .76rem; font-weight: 500; white-space: normal; }
 .performance-value { display: inline-block; padding: 3px 9px; border-radius: 20px; background: var(--color-surface-soft); white-space: nowrap; font-size: .72rem; }
+.performance-efficiency { display: inline-flex; align-items: center; justify-content: center; min-height: 24px; padding: 0 10px; border-radius: 999px; font-size: .68rem; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.performance-efficiency[data-band="red"] { color: #a52017; background: rgb(217 45 32 / 12%); }
+.performance-efficiency[data-band="orange"] { color: #a45112; background: rgb(229 128 39 / 15%); }
+.performance-efficiency[data-band="yellow"] { color: #856a0f; background: rgb(214 172 25 / 18%); }
+.performance-efficiency[data-band="green"] { color: #27834d; background: rgb(39 131 77 / 12%); }
 .performance-empty td { padding: 40px 16px; text-align: center; color: var(--color-muted); }
 @media (max-width: 600px) { .performance-search { grid-template-columns: minmax(0, 1fr); } .performance-clear { justify-self: start; } }

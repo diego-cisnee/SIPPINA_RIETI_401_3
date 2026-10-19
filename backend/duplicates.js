@@ -20,10 +20,12 @@ function distance(a, b) {
   const h = Math.sin(rad(b[0] - a[0]) / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(rad(b[1] - a[1]) / 2) ** 2;
   return 6371000 * 2 * Math.asin(Math.sqrt(Math.min(1, h)));
 }
-async function readDuplicates(pool, id) {
+async function readDuplicates(pool, id, municipalityId = null) {
+  const scoped = municipalityId !== null;
+  const args = scoped ? [id, municipalityId] : [id];
   const [target] = await pool.execute(`SELECT r.id_reporte, r.id_municipio, r.fecha, r.descripcion,
     u.latitud, u.longitud, u.direccion FROM Reporte r
-    LEFT JOIN Ubicacion_Reporte u ON u.id_reporte = r.id_reporte WHERE r.active = 1 AND r.id_reporte = ?`, [id]);
+    LEFT JOIN Ubicacion_Reporte u ON u.id_reporte = r.id_reporte WHERE r.active = 1 AND r.id_reporte = ?${scoped ? ' AND r.id_municipio = ?' : ''}`, args);
   if (!target.length) return null;
   const [candidates] = await pool.execute(`SELECT r.id_reporte, r.folio, r.descripcion,
     DATE_FORMAT(r.fecha, '%d/%m/%Y %H:%i') AS reportedAt,
@@ -36,9 +38,9 @@ async function readDuplicates(pool, id) {
     FROM Reporte original JOIN Reporte r ON r.id_municipio = original.id_municipio
     LEFT JOIN Ubicacion_Reporte u ON u.id_reporte = r.id_reporte
     WHERE original.id_reporte = ? AND r.id_reporte <> original.id_reporte
-    AND original.active = 1 AND r.active = 1
+    AND original.active = 1 AND r.active = 1${scoped ? ' AND original.id_municipio = ?' : ''}
     AND r.fecha BETWEEN DATE_SUB(original.fecha, INTERVAL ${WINDOW_DAYS} DAY)
-      AND DATE_ADD(original.fecha, INTERVAL ${WINDOW_DAYS} DAY)`, [id]);
+      AND DATE_ADD(original.fecha, INTERVAL ${WINDOW_DAYS} DAY)`, args);
   const matches = new Map();
   for (const candidate of candidates) {
     let meters = Infinity, sameAddress = false;

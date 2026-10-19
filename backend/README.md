@@ -1,7 +1,13 @@
 # Backend RIETI
 
-El cambio de estado con historial, la asignación a procuradores y la baja lógica
-están pendientes. Los acuerdos y requisitos para retomarlos están en [PENDIENTES.md](PENDIENTES.md).
+Login, sesiones y administración de cuentas ya se ejecutan en Express. Ver
+[AUTENTICACION.md](AUTENTICACION.md) para configuración, cuentas existentes y despliegue.
+`SESSION_SECRET` es obligatorio; el `.env.example` incluye las variables necesarias.
+
+El cambio de estado, comentarios, historial y baja lógica ya están integrados.
+Ver [REPORTES.md](REPORTES.md) para permisos, versiones, transacciones y pruebas.
+La autoridad se obtiene automáticamente del procurador activo del municipio del
+reporte; se retiró la asignación manual.
 
 Esqueleto básico de Node.js y Express para conectar el dashboard y, más adelante,
 la aplicación móvil con una base MySQL alojada en AWS RDS.
@@ -23,12 +29,12 @@ Git lo ignora; otros integrantes crearán el suyo a partir de `.env.example`.
 ## Pruebas disponibles
 
 - `GET http://127.0.0.1:3000/test`: comprueba Node.js y Express.
-- `GET http://127.0.0.1:3000/test-db`: ejecuta `SELECT 1` para comprobar RDS sin modificar datos.
+- `GET http://127.0.0.1:3000/test-db` (sesión de administrador): ejecuta `SELECT 1` para comprobar RDS sin modificar datos.
 
 ## Integración futura
 
-Las rutas de usuarios, reportes, autoridades y estadísticas se agregarán después
-de comprobar la conexión y revisar las tablas existentes.
+Las rutas de autenticación, reportes, mapas y rendimiento ya están integradas.
+Las acciones de cambio de estado, historial y baja lógica están implementadas; ver REPORTES.md.
 
 ## Consulta de reportes
 
@@ -36,9 +42,9 @@ de comprobar la conexión y revisar las tablas existentes.
 - `GET /api/reportes/:id`: seguimiento por `id_reporte` numérico; 400 si es inválido y 404 si no existe o está inactivo.
 - Respuesta: `{ "data": [...] }` en listado y `{ "data": {...} }` en detalle.
 
-Todas las consultas nuevas son SELECT parametrizados. Las relaciones demográficas
+Las consultas de reportes son SELECT parametrizados. Las relaciones demográficas
  y de ubicación se consultan por separado para evitar duplicar reportes. No se
-consultan contraseñas ni se crean rutas de escritura. Los campos inexistentes no
+consultan contraseñas ni se modifica la base desde estas rutas de reportes. Los campos inexistentes no
 se inventan: el frontend muestra “No disponible”.
 
 El frontend usa `http://127.0.0.1:3000` por defecto. Para otra dirección, definir
@@ -64,7 +70,7 @@ candidatos únicos, folio y motivos. Devuelve 400 para un ID inválido y 404 si 
 reporte no existe o está inactivo. Tanto el reporte original como los candidatos deben tener `active = 1`. Son consultas SELECT parametrizadas; no requiere tablas nuevas.
 
 El filtrado por `active` es obligatorio en el backend y no tiene parámetros para
-incluir inactivos. No se agrega una vista de bajas ni se modifican valores en RDS.
+incluir inactivos. No se agrega una vista de bajas. La baja lógica modifica active únicamente al confirmar la acción administrativa.
 
 Criterios iniciales: mismo municipio, registros dentro de ±7 días y ubicación a
 100 metros o menos, más coincidencia de tipo de trabajo o similitud de descripción
@@ -78,3 +84,29 @@ El detalle muestra los motivos y permite abrir el candidato por su ID interno,
 conservando el folio visible. El aviso solo aparece al encontrar coincidencias; permanece oculto durante la
 consulta, si no hay candidatos o si ocurre un error, sin bloquear el detalle. No guarda
 revisiones, no fusiona y no elimina datos.
+
+## Procurador municipal y rendimiento · 18 de octubre de 2026
+
+Listado y detalle incluyen `authority` y `authorityId`, derivados de
+`Procurador.id_municipio = Reporte.id_municipio` y `Procurador.activo = 1`.
+No se agregan columnas ni se guardan asignaciones en Reporte. Al cambiar el
+procurador, cambia la autoridad actual mostrada; no se modifica el historial.
+Si falta un procurador activo se muestra “Sin procurador registrado”. Si hay
+varios activos en un municipio se indica el conflicto sin elegir uno ni duplicar
+reportes.
+
+`GET /api/rendimiento` devuelve `{data: [...]}` con una fila por municipio:
+`municipalityId`, `municipality`, `authorityId`, `authority`, `authorityCount`,
+`total`, `pending`, `progress`, `resolved`, `efficiency`, `averageDays`,
+`measuredResolved` y `resolutionSeconds`.
+Solo incluye municipios con al menos un reporte con `active = 1`, en cualquier
+estado. Los municipios sin reportes activos no aparecen en la tabla, buscador ni CSV. `efficiency` es Concluido / total × 100, o null sin reportes.
+Los otros estados siguen incluidos en el total. `averageDays` es el promedio de
+días entre registro y último cambio a Concluido, únicamente entre concluidos con
+transición y fecha válidas en el historial. `measuredResolved` cuenta esos casos y
+`resolutionSeconds` suma sus duraciones sin redondear; permiten calcular un promedio
+global ponderado. Sin casos medibles, `averageDays` es null. Comentarios o cambios
+de prioridad posteriores no cambian la fecha de conclusión; si se reabre y concluye
+de nuevo se usa la última conclusión. Son SELECT; no devuelve datos de ciudadanos.
+Ver también REPORTES.md.
+La sesión valida el rol; el procurador activo recibe únicamente los datos de su municipio.

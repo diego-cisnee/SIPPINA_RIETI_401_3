@@ -3,6 +3,7 @@ import {createMap} from './map.js';
 const controller=new AbortController();
 let instance;
 async function mount(){
+ if(window.RIETI_AUTH_READY&&!await window.RIETI_AUTH_READY)return;
  document.getElementById('status').textContent='Cargando mapa…';
  try {
   if(!window.L?.heatLayer) throw new Error('No se pudieron cargar las librerías locales.');

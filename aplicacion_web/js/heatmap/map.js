@@ -7,7 +7,12 @@ export function createMap(geoData,points,catalog=[]) {
  const L=window.L;
     const geo = geoData;
     const features = geo.features;
-    const registered=new Map(catalog.map(m=>[String(m.clave).padStart(5,'0'),m]));
+    const scoped=window.RIETI_USER?.role==='procurador';
+    const assigned=scoped?catalog.find(m=>Number(m.id)===window.RIETI_USER.municipalityId):null;
+    const fixedMunicipality=assigned?String(assigned.clave).padStart(5,'0'):'';
+    const assignedFeature=scoped?features.find(f=>f.properties.cvegeo===fixedMunicipality):null;
+    if(scoped&&!assignedFeature)throw new Error('No se encontraron los límites del municipio asignado a tu cuenta.');
+    const registered=new Map((scoped?[assigned]:catalog).map(m=>[String(m.clave).padStart(5,'0'),m]));
     const enabled=feature=>registered.has(feature.properties.cvegeo);
     const map = L.map('map', mapOptions);
     L.control.zoom({position:'topright'}).addTo(map);
@@ -20,7 +25,7 @@ export function createMap(geoData,points,catalog=[]) {
     const assignment=createAssignment(features,L); assignment.ingest(points);
     // Restringir también en el cliente: servidores anteriores pueden devolver el catálogo completo.
     const municipalitiesWithReports=new Set(assignment.records.map(p=>p.municipio));
-    for(const key of registered.keys())if(!municipalitiesWithReports.has(key))registered.delete(key);
+    for(const key of registered.keys())if(!municipalitiesWithReports.has(key)&&key!==fixedMunicipality)registered.delete(key);
     const counts=new Map(assignment.counts);
     const maximum=()=>Math.max(1,...counts.values());
     function municipalColor(n){return colors[n===0?0:Math.min(5,Math.ceil(n/maximum()*5))];}
@@ -39,7 +44,7 @@ export function createMap(geoData,points,catalog=[]) {
       layer.on('click',()=>{if(!enabled(feature))return;$('municipio').value=feature.properties.cvegeo;update(true);});
     }}).addTo(map);
     const stateBounds=municipalities.getBounds();
-    map.fitBounds(stateBounds,{padding:[35,35]});
+    map.fitBounds(scoped?L.geoJSON(assignedFeature).getBounds():stateBounds,{padding:[35,35]});
     const heat=L.heatLayer([],heatOptions);
     // Clip the rendered heat to the official polygons, including holes and detached areas.
     const originalRedraw=heat._redraw;
@@ -62,8 +67,15 @@ export function createMap(geoData,points,catalog=[]) {
     features.filter(enabled).slice().sort((a,b)=>a.properties.nomgeo.localeCompare(b.properties.nomgeo,'es')).forEach(f=>{
       const option=document.createElement('option');option.value=f.properties.cvegeo;option.textContent=registered.get(f.properties.cvegeo).nombre;$('municipio').append(option);
     });
+    if(scoped){
+      $('municipio').value=fixedMunicipality;
+      $('municipio').disabled=$('mode').disabled=true;
+      $('map').setAttribute('aria-label',`Mapa interactivo de ${assigned.nombre}`);
+      document.querySelector('[data-map-region]').textContent=assigned.nombre;
+    }
     $('municipal-total').textContent=features.filter(enabled).length;
     function update(fit=false){
+      if(scoped){$('municipio').value=fixedMunicipality;$('mode').value='heat';}
       const selected=$('municipio').value;
       const priority=$('priority-filter').value;
       const filtered=assignment.records.filter(p=>registered.has(p.municipio)&&(!priority||(priorities.includes(p.prioridad)?p.prioridad:'Sin especificar')===priority));
@@ -99,7 +111,7 @@ export function createMap(geoData,points,catalog=[]) {
       $('status').textContent=notices.join(' · ');
       if(fit)map.fitBounds(feature?L.geoJSON(feature).getBounds():stateBounds,{padding:[40,40],maxZoom:12});
     }
-    const unbind=bindControls($, {update,map,streets});
+    const unbind=bindControls($, {update,map,streets,fixedMunicipality});
     update();
     // Desde el detalle: ubicar el folio sin cambiar los datos ni los conteos del mapa.
     const requestedReport = new URLSearchParams(location.search).get('reporte');

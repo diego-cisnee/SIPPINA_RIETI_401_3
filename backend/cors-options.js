@@ -15,7 +15,8 @@ function isAllowedOrigin(origin, configuredOrigins = '') {
 function corsOptions(configuredOrigins) {
   return {
     origin(origin, callback) { callback(null, isAllowedOrigin(origin, configuredOrigins)); },
-    methods: ['GET', 'HEAD', 'OPTIONS'],
+    methods: ['GET', 'HEAD', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true,
   };
 }
 module.exports = { isAllowedOrigin, corsOptions };

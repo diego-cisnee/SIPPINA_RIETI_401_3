@@ -9,46 +9,42 @@
     />
     <title>Iniciar sesión | RIETI</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/login.css" />
   </head>
-  <body class="login-page">
+  <body class="login-page" data-session-checking>
     <main class="login-layout">
-      <!--
-        PANEL DE MARCA
-        Este bloque puede sustituirse por una fotografía, ilustración o logotipo
-        oficial cuando el recurso visual definitivo sea aprobado.
-      -->
       <section class="login-brand" aria-label="RIETI, sistema de reportes">
         <div class="login-brand__content">
-          <span class="login-brand__mark" aria-hidden="true">R</span>
-          <p class="login-brand__name">RIETI</p>
-          <p class="login-brand__description">Sistema de gestión de reportes</p>
+          <img class="login-brand__image" src="assets/logo-rieti-completo.png" width="500" height="500" alt="RIETI: Ruta Intermunicipal para la Erradicación del Trabajo Infantil" fetchpriority="high" />
         </div>
       </section>
 
       <!-- PANEL DE AUTENTICACIÓN -->
       <section class="login-panel" aria-labelledby="login-title">
-        <form class="login-form">
+        <p class="login-session-status" role="status">Comprobando sesión…</p>
+        <noscript>Activa JavaScript para iniciar sesión.</noscript>
+        <form class="login-form" aria-busy="true">
           <div class="login-form__heading">
             <p class="eyebrow">Panel de control</p>
             <h1 id="login-title">Iniciar sesión</h1>
             <p>Ingresa tus datos para acceder al dashboard.</p>
           </div>
 
-          <!--
-            INTEGRACIÓN FUTURA — AUTENTICACIÓN:
-            El atributo name de cada campo permitirá enviar estos valores al backend.
-            JavaScript deberá validar la respuesta del servicio antes de navegar y
-            nunca deberá guardar la contraseña en el HTML o en la URL.
-          -->
           <div class="form-field">
-            <label for="email">Correo electrónico</label>
+            <label for="role">Tipo de cuenta</label>
+            <select id="role" name="role" required>
+              <option value="administrador">Administrador</option>
+              <option value="procurador">Procurador</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="email">Correo electrónico o nombre</label>
             <input
               id="email"
               name="email"
-              type="email"
-              autocomplete="email"
+              type="text"
+              autocomplete="username"
               placeholder="nombre@institucion.gob.mx"
-              value="control@rieti.gob.mx"
               required
             />
           </div>
@@ -94,50 +90,25 @@
               <span>Recordar sesión</span>
             </label>
 
-            <!-- INTEGRACIÓN FUTURA: reemplazar el aviso con la pantalla de recuperación. -->
-            <a href="#recuperar-contrasena-pendiente" data-action="recover-password">
-              ¿Olvidaste tu contraseña?
-            </a>
           </div>
 
-          <!--
-            PROTOTIPO:
-            Este enlace simula el acceso sin enviar los datos escritos. Cuando se
-            conecte la autenticación se convertirá en el envío seguro del formulario.
-          -->
+          <!-- Express valida las credenciales y crea una sesión HttpOnly. -->
             <button class="primary-button" type="submit" id="btn-login">
               Iniciar sesión
             </button>
-            <p id="mensaje-error" style="color: #d32f2f; text-align: center; display: none; margin-top: 10px; font-size: 0.9rem;"></p>
+            <p id="mensaje-error" role="alert" hidden></p>
 
           <p class="login-form__support">
             ¿Problemas para ingresar? Contacta al administrador del sistema.
           </p>
+          <p class="login-about" data-public-registration hidden><a href="pages/registro.html">Crear cuenta de administrador</a></p>
           <p class="login-about"><a href="pages/acerca.html">Acerca de RIETI</a></p>
         </form>
       </section>
     </main>
 
-    <!--
-      AVISO TEMPORAL DE RECUPERACIÓN
-      Más adelante este enlace navegará a la página real para solicitar el correo
-      de recuperación y conectarse con el servicio de autenticación.
-    -->
-    <aside
-      class="route-notice"
-      id="recuperar-contrasena-pendiente"
-      role="dialog"
-      aria-labelledby="recovery-notice-title"
-    >
-      <div>
-        <span class="route-notice__icon" aria-hidden="true">→</span>
-        <h2 id="recovery-notice-title">Recuperar contraseña</h2>
-        <p>Esta pantalla se agregará más adelante. El acceso ya está preparado.</p>
-        <a href="#">Volver al inicio de sesión</a>
-      </div>
-    </aside>
-
-    <!-- JavaScript de interacciones locales; no realiza conexiones externas. -->
+    <!-- Login y sesión contra el backend del proyecto. -->
+    <script src="js/api.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/login.js" defer></script>
   </body>

@@ -9,3 +9,6 @@ node_modules/
 # Archivos internos creados por macOS.
 .DS_Store
 
+
+# Sesiones privadas del backend, persistentes en cada servidor.
+.sessions/

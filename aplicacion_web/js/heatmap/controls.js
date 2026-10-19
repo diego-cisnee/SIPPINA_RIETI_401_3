@@ -1,5 +1,5 @@
 import {controls,priorities} from './config.js';
-export function bindControls($,{update,map,streets}) {
+export function bindControls($,{update,map,streets,fixedMunicipality=''}) {
  const removers=[];
  for(const priority of [...priorities,'Sin especificar']){
   const option=document.createElement('option');option.value=priority;option.textContent=priority;$('priority-filter').append(option);
@@ -10,9 +10,9 @@ export function bindControls($,{update,map,streets}) {
     on('municipio','change',()=>update(true));
     on('points','change',()=>update());
     on('basemap','change',()=>{if($('basemap').checked)streets.addTo(map);else map.removeLayer(streets);});
-    on('reset','click',()=>{$('municipio').value='';update(true);});
+    on('reset','click',()=>{$('municipio').value=fixedMunicipality;update(true);});
     on('clear-map-filters','click',()=>{
-      $('municipio').value='';
+      $('municipio').value=fixedMunicipality;
       $('priority-filter').value='';
       update(true);
     });

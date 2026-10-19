@@ -10,8 +10,11 @@
 .chart-hint { margin: 9px 0 16px; color: var(--color-primary-dark); font-size: .76rem; }
 .chart-visual { display: flex; flex-direction: column; justify-content: center; width: 100%; flex: 1; min-height: 300px; }
 .chart-visual svg { display: block; width: 100%; height: auto; max-height: 370px; }
+.chart-visual .status-donut { max-height: none; fill: none; stroke: none; }
 /* Evita que las etiquetas hereden el contorno de los iconos SVG y parezcan negritas. */
 .chart-visual svg text { font-weight: 400; stroke: none; }
+.chart-visual .status-donut .donut-total { font-weight: 750; }
+.chart-visual .status-donut .donut-percentage { font-weight: 650; }
 .chart-legend-list { display: flex; flex-wrap: wrap; gap: 9px 15px; font-size: .73rem; color: var(--color-muted); margin-bottom: 16px; }
 .chart-legend-list > span { display: inline-flex; align-items: center; gap: 6px; }
 .chart-legend-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
@@ -70,3 +73,9 @@
 }
 
 #card-resolution[hidden] { display: none; }
+
+/* Procuradores: dos tarjetas por renglón y tendencia compacta. */
+.charts-page[data-role="procurador"] #card-trend { grid-column: auto; }
+.charts-page[data-role="procurador"] #chart-trend { min-height: 220px; }
+.charts-page[data-role="procurador"] #chart-trend svg { max-height: 240px; }
+.charts-page[data-role="procurador"] .chart-period-controls { gap: 10px 14px; }

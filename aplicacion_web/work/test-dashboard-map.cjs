@@ -9,6 +9,7 @@ async function run(location, apiBase, response) {
  const handlers = {}, mapHandlers = {}, requests = [], markers = [], errors = [];
  const context = {
   location, AbortSignal, setTimeout,
+  getComputedStyle: () => ({getPropertyValue: key => ({'--color-status-cancelled':'#526d82','--color-status-recurrent':'#b1c6d8'})[key] || ''}),
   window: { RIETI_API_BASE: apiBase, RIETI_STATUS_LABEL: status => status === 'En_revision' ? 'En revisión' : status },
   console: { error: (...args) => errors.push(args) },
   document: {
@@ -29,6 +30,8 @@ async function run(location, apiBase, response) {
    },
   },
  };
+ context.window.maplibregl = context.maplibregl;
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../js/api.js'), 'utf8'), context);
  vm.runInNewContext(source, context);
  handlers.DOMContentLoaded();
  await mapHandlers.load();
@@ -60,6 +63,12 @@ async function run(location, apiBase, response) {
  }
  const [location] = scenarios[0];
  const empty = await run(location, undefined, { ok: true, json: async () => ({ data: { puntos: [] } }) });
+ const highlighted = await run(location, undefined, {ok:true,json:async()=>({data:{puntos:[
+  {id:1,latitud:19.2,longitud:-99.6,estatus:'Cancelado'},
+  {id:2,latitud:19.2,longitud:-99.6,estatus:'Reincidente'},
+  {id:3,latitud:19.2,longitud:-99.6,estatus:'Archivado'},
+ ]}})});
+ assert.deepEqual(highlighted.markers.map(marker=>marker.color),['#526d82','#b1c6d8','#69737e']);
  assert.equal(empty.markers.length, 0);
  assert.deepEqual(empty.errors, []);
  for (const response of [{ ok: false }, { ok: true, json: async () => ({ data: [] }) }]) {

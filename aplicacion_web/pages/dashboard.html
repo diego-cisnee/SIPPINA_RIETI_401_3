@@ -11,8 +11,10 @@
       <noscript><style>
       [data-load-block], [data-loading-only] { display: none !important; }
     </style></noscript>
+      <script src="../js/api.js" defer></script>
+    <script src="../js/auth.js" defer></script>
   </head>
-  <body data-report-loading class="dashboard-page">
+  <body data-auth-pending data-report-loading class="dashboard-page">
     <div class="dashboard-shell">
       <!--
         NAVEGACIÓN LATERAL
@@ -25,11 +27,11 @@
           <img class="brand-lockup__logo" src="../assets/logo-rieti.png" alt="RIETI · Panel de Control" width="190" height="60" />
         </div>
 
-<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil de administrador" title="Ver mi perfil">
+<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil" title="Ver mi perfil">
           <span class="user-summary__avatar" aria-hidden="true">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
           </span>
-          <!-- INTEGRACIÓN FUTURA: estos datos vendrán de la sesión del usuario. -->
+          <!-- Identidad obtenida de la sesión validada por Express. -->
           <strong data-field="user-name">RIETI Admin</strong>
           <span data-field="user-role">Panel de Control</span>
         </a>
@@ -43,9 +45,13 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
             Gestión de reportes
           </a>
-          <a class="sidebar-nav__item" href="estadisticas.html">
+          <a class="sidebar-nav__item" href="graficos.html">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
+          </a>
+          <a class="sidebar-nav__item" href="registro.html" data-admin-only hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2" /></svg>
+            Administrar cuentas
           </a>
           <a class="sidebar-nav__item" href="acerca.html?origen=panel">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
@@ -66,30 +72,20 @@
         </header>
 
         <!-- Cada data-field se reemplazará con el total recibido desde la API. -->
-        <section class="metric-grid" aria-label="Resumen de reportes">
+        <section class="metric-grid metric-grid--reports" aria-label="Resumen de reportes">
           <article class="metric-card" data-load-block inert aria-busy="true"><span>Total de reportes</span><strong data-field="reports-total">—</strong><small>Todos los registros</small></article>
           <article class="metric-card metric-card--warning" data-load-block inert aria-busy="true"><span title="Reportes con estado Registrado">Registrados</span><strong data-field="reports-pending">—</strong><small>Requieren atención</small></article>
           <article class="metric-card metric-card--progress" data-load-block inert aria-busy="true"><span title="En revisión, En seguimiento y Canalizado">En atención</span><strong data-field="reports-progress">—</strong><small>Con seguimiento</small></article>
           <article class="metric-card metric-card--success" data-load-block inert aria-busy="true"><span title="Reportes con estado Concluido">Concluidos</span><strong data-field="reports-resolved">—</strong><small>Casos concluidos</small></article>
+          <article class="metric-card" data-load-block inert aria-busy="true"><span title="Archivados, cancelados, reincidentes y otros estados">En otro estado</span><strong data-field="reports-other">—</strong><small>Con otro estado</small></article>
         </section>
 
         <section class="analytics-grid" aria-label="Visualizaciones de reportes">
           <article class="panel status-panel" data-load-block inert aria-busy="true">
             <header class="panel__header">
               <div><p class="panel__kicker">Distribución</p><h2>Reportes por estado</h2></div>
-              <span class="panel__period">Últimos 30 días</span>
             </header>
-            <ul class="chart-legend" aria-label="Leyenda del gráfico">
-              <li>Registrado</li>
-              <li>En revisión</li>
-              <li>En seguimiento</li>
-              <li>Canalizado</li>
-              <li>Concluido</li>
-              <li>Archivado</li>
-              <li>Cancelado</li>
-              <li>Reincidente</li>
-            </ul>
-            <!-- INTEGRACIÓN FUTURA: JavaScript sustituirá estos porcentajes ficticios con datos reales. -->
+            <!-- Las flechas de la dona identifican cada estado y su porcentaje. -->
             <div class="donut-chart" role="img" aria-label="Cargando reportes">
               <div class="donut-chart__center"><strong data-field="reports-total">—</strong><span>reportes</span></div>
             </div>
@@ -100,10 +96,6 @@
               <div><p class="panel__kicker">Ubicación</p><h2>Mapa de calor</h2></div>
               <span class="panel__period">Estado de México</span>
             </header>
-            <ul class="chart-legend" aria-label="Leyenda del mapa">
-              <li><span class="legend-dot legend-dot--heat-high"></span>Más casos</li>
-              <li><span class="legend-dot legend-dot--heat-low"></span>Menos casos</li>
-            </ul>
             <!-- Esta cuadrícula temporal se sustituirá por el mapa conectado a datos municipales. -->
              <div class="hoverMap" id="hoverMap" >
               <div class="heatmap" id="map" aria-label="Mapa de reportes por zona"></div>
@@ -133,10 +125,10 @@
           </article>
 
           <aside class="kpi-stack" aria-label="Indicadores de desempeño">
-            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Días promedio de resolución</span><div><strong data-field="average-resolution-days">No disponible</strong><small class="trend trend--neutral">No disponible</small></div></article>
-            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Tasa de resolución</span><div><strong data-field="resolution-rate">No disponible</strong><small class="trend trend--positive">No disponible</small></div></article>
-            <article class="kpi-card" data-load-block inert aria-busy="true"><span title="En revisión, En seguimiento y Canalizado">En atención</span><div><strong data-field="progress-rate">No disponible</strong><small class="trend trend--neutral">No disponible</small></div></article>
-            <article class="kpi-card" data-load-block inert aria-busy="true"><span title="Reportes con estado Registrado">Registrados</span><div><strong data-field="pending-rate">No disponible</strong><small class="trend trend--negative">No disponible</small></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Días promedio de resolución</span><div><strong data-field="average-resolution-days" aria-busy="true">Consultando…</strong></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Tasa de resolución</span><div><strong data-field="resolution-rate">No disponible</strong></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span>En atención</span><div><strong data-field="progress-rate">No disponible</strong></div></article>
+            <article class="kpi-card" data-load-block inert aria-busy="true"><span>Registrados</span><div><strong data-field="pending-rate">No disponible</strong></div></article>
           </aside>
         </section>
       </main>
@@ -144,8 +136,7 @@
 
     <!-- Avisos temporales sin JavaScript; se eliminan al crear las pantallas destino. -->
 
-    <!-- FORMULARIOS DEL PROTOTIPO: los datos escritos solo viven en memoria.
-         INTEGRACIÓN FUTURA: conectar el envío con la API antes de confirmar cambios. -->
+    <!-- Actualización con sesión, control de concurrencia e historial en la API. -->
     <dialog class="report-dialog" id="status-dialog" aria-labelledby="status-dialog-title">
       <form method="dialog" id="status-form">
         <h2 id="status-dialog-title">Cambiar estado del reporte:<span data-dialog-report-id></span></h2>
@@ -162,8 +153,8 @@
             <option value="Reincidente">Reincidente</option>
           </select>
         </label>
-        <div class="current-value"><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>
-        <label class="dialog-field">Nueva prioridad
+        <div class="current-value" data-admin-only hidden><p>Prioridad actual</p><span class="priority" data-current-priority></span></div>
+        <label class="dialog-field" data-admin-only hidden>Nueva prioridad
           <select name="priority" required><option>Baja</option><option>Media</option><option>Alta</option></select>
         </label>
         <label class="dialog-field">Comentarios
@@ -176,57 +167,40 @@
       </form>
     </dialog>
 
-    <dialog class="report-dialog" id="authority-dialog" aria-labelledby="authority-dialog-title">
-      <form method="dialog" id="authority-form">
-        <h2 id="authority-dialog-title">Asignar autoridad al reporte:<span data-dialog-report-id></span></h2>
-        <div class="current-value"><p>Autoridad actual</p><span class="priority">Sin asignar</span></div>
-        <label class="dialog-field">Nueva autoridad
-          <!-- No agregar autoridades reales hasta recibir el catálogo aprobado. -->
-          <select name="authority" required>
-            <option value="" disabled selected>Seleccionar…</option>
-            <option value="Por definir">Por definir</option>
-          </select>
-        </label>
-        <div class="dialog-actions">
-          <button type="button" data-close-dialog>Cancelar</button>
-          <button type="submit" class="dialog-primary">Actualizar autoridad</button>
-        </div>
-      </form>
-    </dialog>
 
     <dialog class="report-dialog confirmation-dialog" id="update-confirmation" aria-labelledby="confirmation-title" aria-describedby="confirmation-description">
       <span class="confirmation-check" aria-hidden="true">✓</span>
-      <h2 id="confirmation-title">Actualización simulada</h2>
-      <p id="confirmation-description">La solicitud se completó en el prototipo. No se guardaron cambios ni se enviaron datos.</p>
+      <h2 id="confirmation-title">Reporte actualizado</h2>
+      <p id="confirmation-description">El cambio se guardó correctamente.</p>
       <dl class="confirmation-summary" data-confirmation-summary></dl>
       <div class="dialog-actions"><button type="button" class="dialog-primary" data-close-dialog>Entendido</button></div>
     </dialog>
 
     <script src="../js/donut-visual.js" defer></script>
     <script src="../js/report-data.js" defer></script>
+    <script src="../js/performance-data.js" defer></script>
+    <script src="../js/dashboard-metrics.js" defer></script>
     <script src="../js/app.js" defer></script>
-    <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
+    <!-- Cerrar sesión invalida la sesión en Express. -->
     <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
       <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
       <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
-      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
-      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <p id="logout-description">Se cerrará tu sesión en este navegador.</p>
       <div class="dialog-actions">
         <button type="button" data-cancel-logout autofocus>Cancelar</button>
         <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>
       </div>
     </dialog>
     <script src="../js/session.js" defer></script>
-    <!-- ELIMINACIÓN DE PRUEBA: requiere aceptación explícita y no borra registros. -->
+    <!-- Baja lógica: solo administradores; guarda el historial y conserva el registro. -->
     <dialog class="report-dialog delete-dialog" id="delete-report-dialog" aria-labelledby="delete-report-title" aria-describedby="delete-report-description">
       <h2 id="delete-report-title">¿Eliminar este reporte?</h2>
       <p class="delete-dialog__folio">Folio <strong data-delete-folio></strong></p>
-      <p id="delete-report-description" class="delete-dialog__warning">¿Estás seguro de que quieres eliminar este folio? Esta acción no puede deshacerse.</p>
-      <p class="delete-dialog__demo">En este prototipo, la eliminación es simulada: no se borrará ningún reporte.</p>
+      <p id="delete-report-description" class="delete-dialog__warning">¿Seguro que deseas eliminar el reporte?</p>
       <form id="delete-report-form">
         <label class="delete-acknowledgement">
           <input type="checkbox" id="delete-acknowledgement" name="acknowledge" required />
-          <span>Entiendo que la acción no puede deshacerse y confirmo que deseo eliminar este reporte.</span>
+          <span>Confirmo que deseo eliminar este reporte</span>
         </label>
         <div class="dialog-actions">
           <button type="button" data-cancel-delete autofocus>Cancelar</button>

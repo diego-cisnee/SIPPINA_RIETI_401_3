@@ -6,16 +6,35 @@
   const SHOW_RESOLUTION_CHART = false;
   document.querySelector('#card-resolution').hidden = !SHOW_RESOLUTION_CHART;
   await window.RIETI_READY;
-  const records = Object.values(window.RIETI_REPORTS || {});
+  if (window.RIETI_AUTH_READY && !await window.RIETI_AUTH_READY) return;
+  // Conserva el orden de la API, igual que la dona del dashboard.
+  const records = window.RIETI_REPORT_LIST || Object.values(window.RIETI_REPORTS || {});
   const form = document.querySelector('#chart-filters');
   if (!form) return;
   const controls = Object.fromEntries(['municipality', 'work-type', 'start-date', 'end-date'].map(key => [key, form.querySelector(`[data-filter="${key}"]`)]));
   const dialog = document.querySelector('#chart-summary');
+  const exportButton = document.querySelector('[data-action="download-charts"]');
+  let exportSnapshot = null, exporting = false;
+  exportButton.addEventListener('click', async () => {
+    if(exporting || !exportSnapshot || window.RIETI_USER?.role !== 'administrador')return;
+    exporting=true;exportButton.disabled=true;
+    const feedback=document.getElementById('chart-export-feedback');
+    feedback.hidden=false;feedback.textContent='Generando PDF…';
+    const sections=[form,document.querySelector('.analytics-grid')];
+    sections.forEach(node=>{node.inert=true;});
+    try {
+      await window.RIETI_EXPORT_CHARTS(exportSnapshot);
+      feedback.textContent='PDF descargado.';
+    } catch {
+      feedback.textContent='No fue posible generar el PDF. Intenta nuevamente.';
+    } finally {
+      exporting=false;exportButton.disabled=false;
+      sections.forEach(node=>{node.inert=false;});
+    }
+  });
   const buttons = Array.from(document.querySelectorAll('[data-chart]'));
-  const colors = [...window.RIETI_DONUT_COLORS];
   const statusLabel = report => window.RIETI_STATISTICS.clean(report.status) || 'Sin especificar';
   const statuses = [...new Set(records.map(statusLabel))];
-  while (colors.length < statuses.length) colors.push('#858e9a');
   let summaries = {};
   let returnFocusTo;
   // Toda etiqueta futura se escapa antes de entrar en SVG/HTML; los resúmenes usan textContent.
@@ -28,11 +47,11 @@
   const empty = '<span class="chart-empty">No hay reportes para los filtros seleccionados.</span>';
   const setChart = (id, markup) => { document.querySelector(`#chart-${id}`).innerHTML = markup; };
 
-  // Dibuja una distribución circular proporcional, manteniendo los estados sin casos en la leyenda.
+  // Comparte la dona y las etiquetas del dashboard; el diálogo conserva todos los estados.
   function renderStatus(selected) {
     const counts = statuses.map(status => selected.filter(report => statusLabel(report) === status).length);
     const total = selected.length;
-    setChart('status', legend(statuses.map((status, i) => [window.RIETI_STATUS_LABEL(status), colors[i]])) + (total ? window.RIETI_DRAW_DONUT(statuses.map(window.RIETI_STATUS_LABEL), counts) : empty));
+    setChart('status', total ? window.RIETI_DRAW_DONUT(statuses.map(window.RIETI_STATUS_LABEL), counts) : empty);
     const max = Math.max(...counts);
     const leaders = statuses.filter((_, i) => counts[i] === max).map(window.RIETI_STATUS_LABEL).join(', ');
     summaries.status = { title: 'Distribución por estatus', description: total ? `Se muestran ${total} reportes. La mayor concentración corresponde a ${leaders}, con ${max} reporte(s) por estado. Cada segmento representa su proporción del total.` : 'No hay reportes que coincidan con los filtros.', values: statuses.map((status, i) => [window.RIETI_STATUS_LABEL(status), `${counts[i]} (${percentage(counts[i], total)})`]) };
@@ -138,7 +157,7 @@
     const note = (noEvents ? 'No hay reportes para el período y los filtros seleccionados. ' : '')
       + 'Los períodos sin reportes se muestran sin puntos; la línea une únicamente períodos con reportes. '
       + (unit === 'week' ? 'El cuarto tramo incluye del día 22 al último día del mes. ' : '')
-      + (!withDates ? 'Resoluciones: sin datos de fecha de resolución.' : `${missing} reporte(s) concluidos sin fecha válida, excluidos de la línea de resoluciones.`);
+      + (!withDates ? 'Resoluciones: sin fechas de conclusión válidas en el historial.' : `${missing} reporte(s) concluidos sin fecha válida en el historial, excluidos de la línea de resoluciones.`);
     const { top, markup } = axes(Math.max(1, ...groups.flatMap(r => [r.registered, r.resolved])));
     const x = i => 65 + i * 770 / Math.max(1, groups.length - 1);
     const axisLabel = (row, i) => unit === 'month' ? monthDate.format(stats.date(row.date)) : unit === 'week' ? `Semana ${i + 1}` : shortDate.format(stats.date(row.date));
@@ -158,7 +177,7 @@
       return label;
     }).join('');
     setChart('trend', legend([['Registrados', '#287cbb'], ['Concluidos' + (!withDates ? ' (sin datos)' : ''), '#27834d']]) + svg(900, 345, drawing) + `<span class="chart-footnote">${escape(note)}</span>`);
-    summaries.trend = { title: 'Tendencia de reportes', description: `Agrupación por ${labels[unit]}. Registros por fecha de registro y resoluciones por fecha de resolución. ${note}`, values: groups.map(row => [row.endDate ? `${row.date} al ${row.endDate}` : row.date, `${row.registered ? row.registered + ' registrados' : 'sin registros'} · ${withDates ? (row.resolved ? row.resolved + ' concluidos' : 'sin resoluciones') : 'concluidos: Sin datos'}`]) };
+    summaries.trend = { title: 'Tendencia de reportes', description: `Agrupación por ${labels[unit]}. Registros por fecha de registro y conclusiones por el último cambio a Concluido registrado en el historial. ${note}`, values: groups.map(row => [row.endDate ? `${row.date} al ${row.endDate}` : row.date, `${row.registered ? row.registered + ' registrados' : 'sin registros'} · ${withDates ? (row.resolved ? row.resolved + ' concluidos' : 'sin resoluciones') : 'concluidos: Sin datos'}`]) };
   }
 
   function render() {
@@ -186,6 +205,12 @@
     Object.values(summaries).forEach(summary => {
       summary.description += active ? ` Filtros: ${workType ? scope.replace(filters['work-type'], workType.label) : scope}.` : ' Sin filtros aplicados.';
     });
+    exportSnapshot = {
+      scope: document.querySelector('#chart-feedback').textContent,
+      filters: active ? Object.entries(filters).filter(([,value])=>value).map(([key,value])=>`${({'municipality':'Municipio','work-type':'Tipo de trabajo','start-date':'Desde','end-date':'Hasta'})[key]}: ${key==='work-type'&&workType?workType.label:value}`).join(' · ') : 'Sin filtros aplicados',
+      period: `Agrupación: ${grouping.selectedOptions[0].textContent} · Año: ${yearControl.value}` + (grouping.value!=='month'?` · Mes: ${monthControl.selectedOptions[0].textContent}`:'') + (grouping.value==='day'?` · ${weekControl.selectedOptions[0].textContent}`:''),
+    };
+    exportButton.disabled=selected.length===0;
   }
 
   grouping.addEventListener('change', render);

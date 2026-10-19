@@ -1,100 +1,78 @@
-const fs = require('node:fs');
-const vm = require('node:vm');
+// Integración de solo lectura con la API real en ejecución. No crea datos ni sustituye respuestas.
+// NODE_PATH debe permitir resolver Playwright. RIETI_TEST_BASE_URL es opcional (puerto 3000 por defecto).
+const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
-class Node {
-  constructor() { this.value = ''; this.children = []; this.handlers = {}; this.attrs = {}; this.dataset = {}; this.hidden = false; }
-  addEventListener(name, handler) { (this.handlers[name] ||= []).push(handler); }
-  fire(name, event = {}) { (this.handlers[name] || []).forEach(fn => fn({ preventDefault() {}, target: this, ...event })); }
-  setAttribute(name, value) { this.attrs[name] = value; }
-  removeAttribute(name) { delete this.attrs[name]; }
-  append(...nodes) { this.children.push(...nodes); }
-  replaceChildren() { this.children = []; }
-  focus() { this.focused = true; this.fire('focus'); }
-  contains(node) { return node === this || this.children.some(child => child.contains(node)); }
-  scrollIntoView() {}
-}
-const ids = ['municipality-search', 'municipality-combobox', 'municipality-suggestions', 'performance-rows', 'performance-feedback', 'clear-municipality'];
-const nodes = Object.fromEntries(ids.map(id => ['#' + id, new Node()]));
-const metricNodes = ['average', 'resolution', 'progress', 'pending'].map(key => Object.assign(new Node(), { dataset: { performanceMetric: key } }));
-const document = new Node();
-document.querySelector = selector => nodes[selector];
-document.querySelectorAll = () => metricNodes;
-document.createElement = () => new Node();
-const context = { window: {}, document };
-vm.runInNewContext(fs.readFileSync('js/performance-data.js', 'utf8'), context);
-const data = context.window.RIETI_AUTHORITY_PERFORMANCE;
-assert.equal(new Set(data.map(row => row.municipality)).size, data.length);
-assert.equal(new Set(data.map(row => row.id)).size, data.length);
-assert.ok(data.every(row => row.pending >= 0 && row.progress >= 0 && row.resolutionDays.every(days => days >= 0)));
-vm.runInNewContext(fs.readFileSync('js/performance.js', 'utf8'), context);
-const input = nodes['#municipality-search'], list = nodes['#municipality-suggestions'], body = nodes['#performance-rows'];
-const metric = key => metricNodes.find(node => node.dataset.performanceMetric === key).textContent;
-const search = query => { input.value = query; input.fire('input'); };
-const clear = () => nodes['#clear-municipality'].fire('click');
-assert.equal(body.children.length, 9);
-assert.match(nodes['#performance-feedback'].textContent, /39 reportes/);
-assert.equal(metric('average'), '5.3'); // 80 días / 15 casos: promedio ponderado.
-assert.equal(metric('resolution'), '38.5%');
-assert.equal(metric('progress'), '28.2%');
-assert.equal(metric('pending'), '33.3%');
-assert.equal(list.hidden, true);
-search('nau');
-assert.equal(body.children.length, 1);
-assert.equal(body.children[0].dataset.authorityId, 'demo-nau');
-assert.equal(list.children[0].textContent, 'Naucalpan de Juárez');
-assert.equal(input.attrs['aria-expanded'], 'true');
-assert.equal(metric('resolution'), '37.5%');
-assert.equal(metric('average'), '5');
-input.fire('keydown', { key: 'ArrowDown' });
-assert.equal(input.attrs['aria-activedescendant'], list.children[0].id);
-input.fire('keydown', { key: 'Enter' });
-assert.equal(input.value, 'Naucalpan de Juárez');
-assert.equal(list.hidden, true);
-search('NICOLAS');
-assert.equal(body.children[0].dataset.authorityId, 'demo-nro');
-list.children[0].fire('pointerdown');
-list.children[0].fire('click');
-assert.equal(input.value, 'Nicolás Romero');
-assert.equal(list.hidden, true);
-search('  villa   carbon ');
-assert.equal(body.children[0].dataset.authorityId, 'demo-vdc');
-search('tl');
-assert.ok(list.children.length > 1);
-input.fire('keydown', { key: 'ArrowUp' });
-assert.equal(input.attrs['aria-activedescendant'], list.children.at(-1).id);
-input.fire('keydown', { key: 'Escape' });
-assert.equal(list.hidden, true);
-assert.equal(input.attrs['aria-activedescendant'], undefined);
-input.fire('focus');
-input.fire('keydown', { key: 'Tab' });
-assert.equal(list.hidden, true);
-input.fire('focus');
-input.fire('blur');
-assert.equal(list.hidden, true);
-search('nau');
-document.fire('click', { target: new Node() });
-assert.equal(list.hidden, true);
-search('tulti');
-assert.equal(body.children[0].dataset.authorityId, 'demo-tul');
-assert.ok(metricNodes.every(node => node.textContent === '—')); // Sin divisiones por cero.
-search('atiza');
-assert.equal(metric('resolution'), '0%'); // Asignados pero aún ninguno finalizado.
-assert.equal(metric('average'), '—');
-search('municipio inexistente');
-assert.equal(body.children[0].className, 'performance-empty');
-assert.ok(metricNodes.every(node => node.textContent === '—'));
-assert.equal(list.hidden, true);
-assert.match(nodes['#performance-feedback'].textContent, /0 de 9/);
-clear();
-assert.equal(body.children.length, 9);
-assert.equal(input.value, '');
-assert.equal(list.hidden, true);
-assert.equal(metric('resolution'), '38.5%');
-const html = fs.readFileSync('pages/rendimiento.html', 'utf8');
-assert.match(html, /role="combobox"/);
-assert.match(html, /role="listbox"/);
-assert.match(html, /aria-live="polite"/);
-assert.equal((html.match(/<th scope="col">/g) || []).length, 8);
-assert.ok(html.indexOf('performance-data.js') < html.indexOf('performance.js'));
-for (const page of ['estadisticas', 'graficos']) assert.ok(fs.readFileSync(`pages/${page}.html`, 'utf8').includes('href="rendimiento.html"'));
-console.log('OK: autoridad única, métricas ponderadas, filtro instantáneo, acentos, autocompletar con clic/teclado, cierres, cero, vacío y limpiar.');
+const fs = require('node:fs/promises');
+const base = (process.env.RIETI_TEST_BASE_URL || 'http://127.0.0.1:3000').replace(/\/$/, '');
+const cookie = process.env.RIETI_TEST_COOKIE || '';
+const percent = (count, total) => total ? (count / total * 100).toLocaleString('es-MX', { maximumFractionDigits: 1 }) + '%' : '—';
+const days = value => value === null ? 'No disponible' : value > 0 && value < 0.005 ? '<0.01 días' : value.toLocaleString('es-MX', {maximumFractionDigits:2}) + (value === 1 ? ' día' : ' días');
+
+(async () => {
+ const response = await fetch(base + '/api/rendimiento', { headers: cookie ? { Cookie: cookie } : {} });
+ assert.equal(response.status, 200, 'Inicia el backend y configura RIETI_TEST_COOKIE con una sesión válida antes de ejecutar esta prueba.');
+ const { data } = await response.json();
+ assert.ok(Array.isArray(data));
+ const browser = await chromium.launch({ headless: true, channel: 'chrome' });
+ try {
+  const page = await browser.newPage({ acceptDownloads: true });
+  const [name, ...parts] = cookie.split(';')[0].split('=');
+  if (name === 'rieti.sid' && parts.length) await page.context().addCookies([{ name, value: parts.join('='), url: base, httpOnly: true, sameSite: 'Lax', secure: new URL(base).protocol === 'https:' }]);
+  await page.addInitScript(value => { window.RIETI_API_BASE = value; }, base);
+  const errors = [], apiRequests = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/*', route => {
+   const request = route.request();
+   if (!request.url().startsWith(base + '/') || request.method() !== 'GET') return route.abort();
+   if (request.url().includes('/api/')) apiRequests.push(new URL(request.url()).pathname);
+   return route.continue();
+  });
+  await page.goto(base + '/pages/rendimiento.html');
+  await page.evaluate(() => window.RIETI_PERFORMANCE_READY);
+  await page.waitForFunction(() => !document.body.hasAttribute('data-report-loading'));
+  assert.equal(await page.locator('#performance-rows tr[data-municipality-id]').count(), data.length);
+  const sum = key => data.reduce((total, row) => total + row[key], 0);
+  assert.equal(await page.locator('[data-performance-metric="resolution"]').textContent(), percent(sum('resolved'), sum('total')));
+  assert.equal(await page.locator('[data-performance-metric="progress"]').textContent(), percent(sum('progress'), sum('total')));
+  assert.equal(await page.locator('[data-performance-metric="pending"]').textContent(), percent(sum('pending'), sum('total')));
+  const measured = sum('measuredResolved');
+  assert.equal(await page.locator('[data-performance-metric="average"]').textContent(), days(measured ? sum('resolutionSeconds') / measured / 86400 : null));
+  for (const record of data) {
+   const cells = await page.locator(`[data-municipality-id="${record.municipalityId}"]`).locator('th, td').allTextContents();
+   assert.deepEqual(cells, [record.authority, record.municipality, record.total, record.pending, record.progress, record.resolved, days(record.averageDays), percent(record.resolved, record.total)].map(String));
+  }
+  if (data.length) {
+   const record = data.find(row => row.total > 0) || data[0];
+   const input = page.locator('#municipality-search');
+   await input.fill(record.municipality.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase());
+   await input.press('ArrowDown'); await input.press('Enter');
+   assert.ok((await page.locator('#performance-rows').textContent()).includes(record.authority));
+   await page.click('#clear-municipality');
+   assert.equal(await page.locator('#performance-rows tr[data-municipality-id]').count(), data.length);
+   await input.fill('\uE000');
+   assert.equal(await page.locator('#performance-rows tr[data-municipality-id]').count(), 0);
+   assert.equal(await page.locator('[data-action="download-performance"]').isDisabled(), true);
+   await page.click('#clear-municipality');
+   const downloadPromise = page.waitForEvent('download');
+   await page.click('[data-action="download-performance"]');
+   const download = await downloadPromise;
+   assert.equal(download.suggestedFilename(), 'rendimiento_rieti.csv');
+   const csv = await fs.readFile(await download.path(), 'utf8');
+   assert.ok(csv.includes('"Autoridad","Municipio","Total reportes"'));
+   assert.ok(csv.includes('"Tiempo promedio (días)","Concluidos con fecha registrada"'));
+  }
+  for (const width of [1440, 768, 390, 320]) {
+   await page.setViewportSize({ width, height: 1000 });
+   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `Desbordamiento a ${width}px`);
+  }
+  assert.ok(apiRequests.every(url => ['/api/rendimiento', '/api/auth/session'].includes(url)), 'No descargar datos personales de reportes para esta vista.');
+  await page.route('**/api/rendimiento', route => route.abort());
+  await page.reload(); await page.evaluate(() => window.RIETI_PERFORMANCE_READY);
+  await page.waitForFunction(() => !document.body.hasAttribute('data-report-loading'));
+  assert.equal(await page.locator('#municipality-search').isDisabled(), true);
+  assert.equal(await page.locator('[data-action="download-performance"]').isDisabled(), true);
+  assert.match(await page.locator('#performance-feedback').textContent(), /No fue posible/);
+  assert.deepEqual(errors, []);
+  console.log(`OK: ${data.length} municipios reales, tabla/métricas, búsqueda sin acentos, teclado, vacío, CSV, responsive y error de red. Solo GET.`);
+ } finally { await browser.close(); }
+})().catch(error => { console.error(error); process.exitCode = 1; });

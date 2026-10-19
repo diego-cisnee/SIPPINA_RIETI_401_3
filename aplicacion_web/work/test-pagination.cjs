@@ -1,3 +1,4 @@
+const { useAuthenticatedFixture } = require('./auth-fixture.cjs');
 const { chromium } = require('playwright');
 const http = require('node:http');
 const fs = require('node:fs');
@@ -25,6 +26,7 @@ const records = Array.from({ length: 51 }, (_, i) => ({
  try {
   browser = await chromium.launch({ headless: true, channel: 'chrome' });
   const page = await browser.newPage({ reducedMotion: 'reduce', acceptDownloads: true });
+  await useAuthenticatedFixture(page);
   const errors = [], requests = [];
   page.on('pageerror', error => errors.push(error.message));
   let count = 51, failure = false;
@@ -34,8 +36,8 @@ const records = Array.from({ length: 51 }, (_, i) => ({
   });
   const url = `http://127.0.0.1:${server.address().port}/pages/reportes.html`;
   const nav = page.locator('#report-pagination');
-  const next = nav.getByRole('button', { name: 'Página siguiente', exact: true });
-  const previous = nav.getByRole('button', { name: 'Página anterior', exact: true });
+  const next = nav.getByRole('button', { name: 'Página siguiente', exact: true, includeHidden: true });
+  const previous = nav.getByRole('button', { name: 'Página anterior', exact: true, includeHidden: true });
   const visibleRows = page.locator('[data-report-row]:visible');
   const visibleIds = () => visibleRows.evaluateAll(rows => rows.map(row => Number(row.dataset.reportId)));
   const current = () => nav.locator('[aria-current="page"]').textContent();
@@ -47,12 +49,13 @@ const records = Array.from({ length: 51 }, (_, i) => ({
   for (count of [0, 1, 10, 11, 20, 21, 51]) {
    await ready();
    assert.equal(await visibleRows.count(), Math.min(count, 10), `${count}: ${await page.locator('#filter-feedback').textContent()} · ${await page.evaluate(() => window.RIETI_API_ERROR)}`);
-   assert.equal(await nav.isVisible(), count > 0);
+   await nav.waitFor({ state: count > 10 ? 'visible' : 'hidden' });
    assert.equal(await page.locator('[data-empty-row]').isVisible(), count === 0);
    if (!count) continue;
    assert.equal(await current(), '1');
    assert.equal(await previous.isDisabled(), true);
    assert.equal(await next.isDisabled(), count <= 10);
+   if(count<=10)assert.equal(await nav.locator('button:not(:disabled)').count(),0);
    const seen = [];
    while (true) {
     seen.push(...await visibleIds());

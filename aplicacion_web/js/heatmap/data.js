@@ -6,8 +6,7 @@ export async function loadData(signal) {
  return [geo,data.puntos,data.municipios];
 }
 export async function loadCoordinates(signal) {
- const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
- const response=await fetch(apiBase+'/api/mapa-calor',{method:'GET',cache:'no-store',signal:AbortSignal.any([signal,AbortSignal.timeout(15000)])});
+ const response=await window.RIETI_API.request('/api/mapa-calor',{signal:AbortSignal.any([signal,AbortSignal.timeout(15000)])});
  if(!response.ok)throw new Error('No fue posible consultar los reportes y municipios.');
  const payload=await response.json();
  if(!Array.isArray(payload.data?.puntos)||!Array.isArray(payload.data?.municipios))throw new Error('Respuesta del mapa inválida.');

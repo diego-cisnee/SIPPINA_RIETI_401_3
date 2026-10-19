@@ -1,5 +1,6 @@
-/* Cálculos puros sobre RIETI_REPORTS. Contrato futuro: registeredAt y resolvedAt
-   en ISO 8601 (con zona horaria si incluyen hora); nunca usar updatedAt como resolución. */
+/* Cálculos puros sobre RIETI_REPORTS. resolvedAt es el día ISO de la última
+   conclusión obtenido del historial; nunca usar updatedAt como resolución.
+   También admite fechas ISO con hora y zona explícita. */
 (() => {
   const priorities = ['Baja', 'Media', 'Alta'];
   const colors = { Baja: '#27834d', Media: '#d6ac19', Alta: '#e58027' };

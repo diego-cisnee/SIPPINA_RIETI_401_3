@@ -76,7 +76,7 @@ for (const type of ['status', 'heat', 'municipality', 'trend']) assert.ok(!/NaN|
 const html = fs.readFileSync('pages/graficos.html', 'utf8');
 assert.equal((html.match(/data-chart=/g) || []).length, 4);
 assert.equal((html.match(/Presiona para ver más información/g) || []).length, 4);
-assert.match(html, /href="estadisticas.html"/);
+assert.doesNotMatch(html, /href="estadisticas.html"/);
 assert.match(html, /href="rendimiento.html">Rendimiento/);
 assert.ok(html.indexOf('report-data.js') < html.indexOf('charts.js'));
 console.log('OK: cuatro gráficas, resúmenes, filtros combinados, fechas inclusivas, rango inválido, ocultar/restaurar municipio, vacío y foco.');

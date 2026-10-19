@@ -1,3 +1,4 @@
+const { useAuthenticatedFixture } = require('./auth-fixture.cjs');
 // Datos exclusivos de prueba; no se incorporan al dashboard.
 const { chromium } = require('playwright');
 const http = require('node:http');
@@ -25,16 +26,26 @@ const reports = [
  try {
   browser = await chromium.launch({ headless: true, channel: 'chrome' });
   const page = await browser.newPage();
+  await useAuthenticatedFixture(page);
+  let sessionRole='administrador';
+  await page.route('**/api/auth/session',route=>route.fulfill({json:{user:{id:1,role:sessionRole,name:'Cuenta aislada',email:'cuenta@example.test',municipalityId:1}}}));
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   let data = reports, failure = false;
-  await page.route('http://127.0.0.1:3000/api/reportes', route => route.fulfill({ status: failure ? 500 : 200, json: { data } }));
+  await page.route('**/api/reportes', route => route.fulfill({ status: failure ? 500 : 200, json: { data } }));
   const ready = async () => { await page.goto(`http://127.0.0.1:${server.address().port}/pages/graficos.html`); await page.evaluate(() => window.RIETI_READY); await page.waitForFunction(() => document.querySelector('#chart-feedback').textContent.length > 0); };
   const summary = async key => {
    await page.locator(`[data-chart="${key}"]`).click();
    const values = await page.locator('#chart-summary-values').textContent();
    await page.locator('#close-chart-summary').click(); return values;
   };
+  await page.goto(`http://127.0.0.1:${server.address().port}/pages/estadisticas.html`);
+  await page.waitForURL('**/pages/graficos.html');
   await ready();
+  assert.deepEqual(await page.locator('.statistics-tabs').innerText().then(text => text.trim().split(/\n+/)), ['Gráficos', 'Mapa de calor', 'Rendimiento']);
+  assert.equal(await page.locator('[data-report-row], .statistics-list').count(), 0);
+  assert.equal(await page.locator('#chart-status .chart-legend-list').count(), 0);
+  assert.equal(await page.locator('#chart-status .status-donut').count(), 1);
+  assert.match(await summary('status'), /Concluido2 \(50%\)/);
   assert.match(await summary('category'), /Construcción2 reporte/);
   assert.match(await summary('priority'), /Alta2 reporte/);
   assert.match(await summary('municipality'), /Municipio A2 reporte/);
@@ -71,6 +82,14 @@ const reports = [
   assert.match(await summary('municipality'), /Municipio A2 reporte/);
   assert.equal(await page.locator('[data-chart="municipality"]').count(), 1);
   assert.equal(await page.locator('#card-location').count(), 0);
+  const downloadPromise=page.waitForEvent('download');
+  await page.getByRole('button',{name:'Exportar PDF',exact:true}).click();
+  const download=await downloadPromise;
+  assert.equal(download.suggestedFilename(),'graficas_rieti.pdf');
+  fs.copyFileSync(await download.path(),'/tmp/rieti-charts-export.pdf');
+  assert.equal(fs.readFileSync('/tmp/rieti-charts-export.pdf').subarray(0,5).toString(),'%PDF-');
+  await page.waitForFunction(()=>document.querySelector('#chart-export-feedback').textContent==='PDF descargado.');
+  assert.equal(await page.locator('[data-action="download-charts"]').isDisabled(),false);
   await page.fill('[data-filter="start-date"]', '2027-01-01');
   assert.match(await page.locator('#chart-category').textContent(), /No hay reportes/);
   assert.equal(await page.locator('#chart-trend circle').count(), 0);
@@ -104,8 +123,20 @@ const reports = [
    for (const key of ['status','category','priority','trend','municipality']) assert.equal(await page.locator(`#card-${key}`).isVisible(), true);
    if (width === 1440 || width === 375) await page.screenshot({ path: `/tmp/rieti-charts-${width}.png`, fullPage: true });
   }
+  sessionRole='procurador';await page.setViewportSize({width:1440,height:1000});await ready();
+  const cards=await page.locator('#card-status, #card-category, #card-priority, #card-trend').evaluateAll(nodes=>nodes.map(node=>node.getBoundingClientRect().top));
+  assert.ok(Math.abs(cards[0]-cards[1])<1&&Math.abs(cards[2]-cards[3])<1&&cards[2]>cards[0],'Dos gráficas por renglón para procuradores');
+  assert.equal(await page.locator('#card-municipality').isVisible(),false);
+  await page.screenshot({path:'/tmp/rieti-charts-procurador-1440.png',fullPage:true});
+  for(const width of [1200,390,320]){
+   await page.setViewportSize({width,height:1000});
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Procurador sin desbordamiento a '+width);
+  }
+  sessionRole='administrador';await page.setViewportSize({width:1440,height:1000});await ready();
+  assert.equal(await page.locator('#card-municipality').isVisible(),true);
+  assert.equal(await page.locator('.analytics-grid').evaluate(node=>getComputedStyle(node).gridTemplateColumns.split(' ').length),2,'Administrador conserva dos columnas');
   data = reports.map(({ resolvedAt, ...r }) => r); await ready();
-  assert.match(await page.locator('#chart-trend').textContent(), /sin datos de fecha/);
+  assert.match(await page.locator('#chart-trend').textContent(), /sin fechas de conclusión válidas en el historial/);
   assert.ok(!/concluidos: \d/.test(await summary('trend')));
   data = Array.from({ length: 12 }, (_, i) => ({ id_reporte: i + 1, status: 'Registrado', priority: 'Baja', date: '2026-10-01', municipality: 'Municipio ' + i })); await ready();
   assert.equal(await page.locator('#chart-municipality .horizontal-bar').count(), 10);

@@ -2,6 +2,8 @@ window.RIETI_MUNICIPIOS = [];
 window.RIETI_API_ERROR = null;
 
 window.RIETI_MUNICIPIOS_READY = (async () => {
+  const user = await window.RIETI_AUTH_READY;
+  if (!user && !window.RIETI_PUBLIC_REGISTRATION) return;
   const selectMunicipio = document.getElementById('id_municipio');
   if (!selectMunicipio) return;
   
@@ -9,16 +11,10 @@ window.RIETI_MUNICIPIOS_READY = (async () => {
   selectMunicipio.innerHTML = '<option value="" disabled selected>Cargando municipios...</option>';
 
 
-  const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
-  const apiURL = apiBase + '/api/municipios';
 
   try {
    
-    const response = await fetch(apiURL, { 
-        method: 'GET', 
-        signal: AbortSignal.timeout(15000), 
-        cache: 'no-store' 
-    });
+    const response = await window.RIETI_API.request(user ? '/api/municipios' : '/api/auth/registration/municipios');
     
     if (!response.ok) throw new Error('No fue posible consultar los municipios.');
     

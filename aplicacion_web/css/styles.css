@@ -18,6 +18,8 @@
   --color-slate-4: #3f4952;
   --color-warning: #d88a16;
   --color-success: #218a64;
+  --color-status-cancelled: #526d82;
+  --color-status-recurrent: #b1c6d8;
   --font-interface: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
   --radius-small: 12px;
@@ -429,6 +431,9 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
   gap: 18px;
   margin-bottom: 20px;
 }
+@media (min-width: 1121px) {
+  .metric-grid--reports { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
 
 .metric-card {
   position: relative;
@@ -510,7 +515,7 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
 .legend-dot--received { background: var(--color-slate-2); }
 .legend-dot--progress { background: var(--color-slate-3); }
 .legend-dot--resolved { background: var(--color-primary); }
-.legend-dot--cancelled { background: var(--color-slate-4); }
+.legend-dot--cancelled { background: var(--color-status-cancelled); }
 .legend-dot--heat-high { background: var(--color-primary-dark); }
 .legend-dot--heat-low { background: #dce8ff; }
 
@@ -635,9 +640,9 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
 .status--received { color: #4e5a65; background: #e4e8ec; }
 .status--progress { color: #fff; background: var(--color-slate-3); }
 .status--resolved { color: #fff; background: var(--color-slate-4); }
-.status--cancelled { color: #a62c2c; background: #fce8e8; }
+.status--cancelled { color: #fff; background: var(--color-status-cancelled); }
 .status--archived { color: #475467; background: #eaecf0; }
-.status--recurrent { color: #856a0f; background: #fff3d6; }
+.status--recurrent { color: var(--color-primary); background: var(--color-status-recurrent); }
 
 .row-action {
   padding: 8px;
@@ -779,6 +784,9 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
   gap: 20px;
   align-items: end;
   margin-bottom: 8px;
+}
+@media (min-width: 1121px) {
+  .reports-management-page[data-role="procurador"] #report-filters { grid-template-columns: repeat(4, minmax(0, 1fr)) auto; }
 }
 
 .filter-field {
@@ -991,6 +999,10 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
 .dialog-actions { display: flex; gap: 14px; margin-top: 28px; }
 .dialog-actions button { flex: 1; min-height: 46px; padding: 10px; border: 1px solid var(--color-muted); background: #fff; color: var(--color-muted); font-weight: 650; cursor: pointer; }
 .dialog-actions button.dialog-primary { border-color: var(--color-primary); color: var(--color-primary); }
+.logout-dialog button[data-confirm-logout] { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.logout-dialog button[data-confirm-logout]:hover:not(:disabled) { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
+#status-form .dialog-actions button[type="submit"] { color: #fff; background: var(--color-primary); border-color: var(--color-primary); }
+#status-form .dialog-actions button[type="submit"]:hover:not(:disabled) { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
 .dialog-actions button:hover { background: var(--color-surface-soft); }
 .dialog-actions button:focus-visible { outline: 3px solid rgb(23 105 255 / 25%); outline-offset: 3px; }
 /* Confirmación de eliminación: rojo únicamente cuando la aceptación está marcada. */
@@ -1382,3 +1394,8 @@ button.sidebar-nav__logout:focus-visible { outline: 2px solid var(--color-primar
 @media (max-width: 600px) {
   .dashboard-page:not(.statistics-page) .hoverMap { margin-top: 18px; }
 }
+
+/* Identidad y controles privados: ocultos hasta validar la sesión. */
+[data-auth-pending] main, [data-auth-pending] .sidebar { visibility: hidden; }
+.login-form select { width: 100%; min-height: 46px; padding: 10px 13px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); color: var(--color-text); font: inherit; }
+.login-form select:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }

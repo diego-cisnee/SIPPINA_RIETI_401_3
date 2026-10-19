@@ -1,0 +1,25 @@
+/* Administración dentro del mismo panel de navegación. */
+.accounts-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 24px; }
+.accounts-card { display: flex; flex-direction: column; min-width: 0; padding: 24px; }
+.accounts-card form { display: flex; flex-direction: column; }
+.accounts-card h2 { margin: 0 0 20px; font-size: 1.05rem; }
+.accounts-card > p { margin: 0 0 22px; line-height: 1.6; color: var(--color-muted); font-size: .85rem; }
+.accounts-card .accounts-message:empty { display: none; }
+.accounts-card .accounts-message:not(:empty) { padding: 12px 14px; border-radius: 8px; background: var(--color-surface-soft); }
+.accounts-card .form-group { min-width: 0; margin-bottom: 20px; }
+.accounts-card label { display: block; margin-bottom: 8px; font-size: .8rem; font-weight: 650; }
+.accounts-card input, .accounts-card select { width: 100%; min-height: 46px; padding: 10px 13px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); color: var(--color-text); font: inherit; }
+.accounts-card select { appearance: none; -webkit-appearance: none; padding-right: 44px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23526171' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px 8px; }
+.accounts-card input:focus-visible, .accounts-card select:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.accounts-card .password-input-wrapper { position: relative; }
+.accounts-card .password-input-wrapper input { padding-right: 48px; }
+.accounts-card .password-toggle { position: absolute; inset: 0 4px 0 auto; display: grid; place-items: center; width: 40px; height: auto; transform: none; border: 0; background: transparent; color: var(--color-muted); cursor: pointer; }
+.accounts-card .btn-primary { width: 100%; min-height: 46px; padding: 12px 18px; border: 0; border-radius: 999px; background: var(--color-primary); color: #fff; font: inherit; font-weight: 650; cursor: pointer; }
+.accounts-card .btn-primary:hover:not(:disabled) { background: var(--color-primary-dark); }
+.accounts-card button:focus-visible { outline: 3px solid #92b7ce; outline-offset: 3px; }
+.accounts-card button:disabled { opacity: .6; cursor: default; }
+.accounts-page[data-role="administrador"] .accounts-login { display: none; }
+#reset-confirmation-account { overflow-wrap: anywhere; }
+.accounts-page:not([data-role="administrador"]) .dashboard-shell { grid-template-columns: 1fr; }
+@media (max-width: 1100px) { .accounts-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .accounts-card { padding: 20px; } }

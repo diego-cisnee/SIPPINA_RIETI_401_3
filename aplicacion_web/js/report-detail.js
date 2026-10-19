@@ -5,6 +5,7 @@
 */
 (async () => {
   await window.RIETI_READY;
+  if (window.RIETI_AUTH_READY && !await window.RIETI_AUTH_READY) return;
   const content = document.querySelector("[data-report-context]");
   if (!content) return;
 
@@ -13,7 +14,7 @@
     dashboard: ["dashboard.html", "Dashboard"],
     reportes: ["reportes.html", "Gestión de reportes"],
     "mapa-calor": ["mapa-calor.html", "Estadísticas · Mapa de calor"],
-    estadisticas: ["estadisticas.html", "Estadísticas · Reportes"],
+    estadisticas: ["reportes.html", "Gestión de reportes"],
   };
   const origin = params.get("from");
   const [originPath, originName] = Object.hasOwn(origins, origin) ? origins[origin] : origins.reportes;
@@ -64,9 +65,8 @@
     duplicateStatus.textContent = 'Comprobando coincidencias…';
     duplicateList.hidden = true;
     duplicateList.replaceChildren();
-    const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
     try {
-      const response = await fetch(`${apiBase}/api/reportes/${encodeURIComponent(report.id)}/coincidencias`, { method: 'GET', cache: 'no-store', signal: AbortSignal.timeout(15000) });
+      const response = await window.RIETI_API.request(`/api/reportes/${encodeURIComponent(report.id)}/coincidencias`);
       if (!response.ok) throw new Error('No fue posible comprobar coincidencias.');
       const payload = await response.json();
       if (!Array.isArray(payload.data) || !payload.data.every(match => match && /^[1-9]\d*$/.test(String(match.id)) && String(match.id) !== report.id && Array.isArray(match.reasons) && match.reasons.every(reason => typeof reason === 'string'))) throw new Error('Respuesta de coincidencias inválida.');

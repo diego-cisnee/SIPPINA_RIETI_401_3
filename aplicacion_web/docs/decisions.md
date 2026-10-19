@@ -230,3 +230,125 @@
 - Registrados cuenta Registrado; En atención agrupa En_revision, En_seguimiento y Canalizado; Concluidos cuenta solo Concluido. Archivado, Cancelado y Reincidente aparecen en el total y la distribución.
 - Se alinean tablas, seguimiento, confirmaciones simuladas, gráficas y colores del mapa. El CSV conserva los valores originales.
 - No se implementan todavía escrituras, asignaciones a procuradores ni bajas lógicas. El usuario confirmó que las autoridades corresponden a Procurador, para una etapa posterior.
+
+## Autoridad automática y rendimiento municipal · 18 de octubre de 2026
+
+- El usuario elimina la asignación manual: el procurador activo del municipio del reporte es su autoridad actual. Al sustituirlo cambia la autoridad mostrada, conservando los autores del historial.
+- Retirados menús, acción rápida y formularios de asignación en dashboard, gestión, estadísticas y detalle. Cambiar estado y eliminar conservan su comportamiento simulado hasta integrar autenticación y escrituras.
+- RDS consultado en modo lectura: Procurador tiene id_municipio, nombre y activo. No se modificaron tablas ni registros.
+- La API entrega autoridad en listado/detalle. La relación municipal se agrupa para impedir duplicados; se informa ausencia o multiplicidad de procuradores activos.
+- Rendimiento consulta /api/rendimiento con totales reales de reportes activos por municipio y procurador actual. Incluye municipios sin reportes y sin procurador, sin inventar asignaciones.
+- Búsqueda automática por municipio con acentos/teclado, métricas sobre la selección, actualización y CSV de la selección. Tiempo promedio no disponible sin fecha de resolución.
+- Eficiencia = concluidos / total activo × 100. Archivados, cancelados y reincidentes permanecen en el denominador. Sin reportes se muestra —; tasa global sobre las sumas, sin promediar porcentajes.
+- No se modifica el login ni se implementan aún restricciones de acceso por rol. No se despliega desde este cambio local.
+
+## Autenticación en Express · 18 de octubre de 2026
+
+- El usuario retira Lambdas de login y registro y comparte sus implementaciones para adaptarlas a Express con el pool existente de RDS y bcrypt.
+- Confirma login compartido de administradores y procuradores y registro de administradores restringido a administradores autenticados.
+- Sesiones persistentes cifradas en el servidor, cookie HttpOnly, logout real, identidad consultada en RDS, protección de páginas y APIs. Sin identidad en localStorage.
+- Todas las consultas del procurador se restringen por el municipio de su identidad validada. El administrador conserva el alcance completo. Las acciones de reportes y el historial continúan pendientes.
+- Revisión de esquema confirma límites de 50 caracteres para nombre y correo de Administrador y ausencia de índices únicos. El alta valida municipio, duplicados y longitud, almacena bcrypt y serializa registros concurrentes con bloqueo por base.
+- Se detectaron contraseñas existentes fuera del formato bcrypt. El usuario desconoce el algoritmo anterior. Se agrega restablecimiento de una cuenta concreta desde una sesión de administrador; no hay comparación como texto ni migración masiva. Las sesiones de esa cuenta se invalidan al cambiar la contraseña.
+- Perfil muestra identidad real; desde allí el administrador accede a Administrar cuentas. Registro no cambia la sesión del administrador que da de alta otra cuenta.
+- No se crearon cuentas ni se cambiaron contraseñas reales durante el desarrollo. Las verificaciones contra RDS fueron de lectura. Preparación para EC2 documentada en backend/AUTENTICACION.md, sin despliegue realizado desde este trabajo.
+
+
+## Acciones rápidas e historial · 18/10/2026
+
+- Se sustituyen las acciones simuladas por PATCH de estado y DELETE de baja lógica.
+- Admin puede cambiar estado/prioridad o retirar cualquier reporte; procurador solo
+  estado/comentarios de su municipio. Autoridad manual permanece retirada.
+- Copia anterior e identidad real en Reporte_Historial, dentro de la transacción.
+- Versión obligatoria para conflictos y reintentos; un error conserva el formulario.
+- El detalle consulta movimientos, autores, estados, prioridades y comentarios.
+- Reiniciar la API para activar. Pruebas aisladas; ninguna escritura de reportes en RDS.
+
+
+## Días de resolución · 18/10/2026
+
+- Por indicación del usuario, se usa la fecha del cambio a Concluido del historial.
+- Duración desde el registro original hasta la última conclusión; comentarios
+  posteriores no alteran el cierre. Si se reabre, se excluye hasta concluir de nuevo.
+- Solo promediar concluidos activos con fecha válida; indicar la cobertura y no
+  reemplazar fechas ausentes con la fecha de registro o de última edición.
+- Promedio global ponderado por reportes; CSV incluye días y número de casos medibles.
+- Implementación solo de lectura, sin migraciones ni escrituras de prueba en RDS.
+
+
+## Municipios en Rendimiento · 18/10/2026
+
+Por solicitud del usuario, la API solo devuelve municipios que tienen reportes
+activos, cualquiera que sea su estado. La tabla, el buscador y el CSV usan ese
+mismo conjunto. Municipios sin reportes o únicamente con bajas no se muestran.
+
+
+## Promedio global del Dashboard · 18/10/2026
+
+La tarjeta Días promedio de resolución ya consulta las duraciones calculadas desde
+el historial. Suma segundos y casos medibles de todos los municipios accesibles
+para la sesión, en vez de promediar promedios municipales. No usa un período de
+30 días ni la lista de reportes recientes como límite del indicador. Los permisos
+municipales del procurador se conservan.
+
+
+## Ajustes de Iniciar sesión · 18/10/2026
+
+- Comprobar la cookie de sesión al abrir index y redirigir automáticamente si es válida.
+- Conservar next=registro para administradores y permitir login manual si falla
+  la comprobación. Evitar envíos simultáneos mientras se comprueba o se envía.
+- Retirar enlace y diálogo de Olvidaste tu contraseña; el restablecimiento desde
+  Administrar cuentas permanece disponible para administradores autenticados.
+- Pantalla completa, sin margen exterior ni scroll; logo-rieti-completo.png
+  sustituye la R y los textos de marca. Ajustes de altura para móvil y horizontal.
+- Verificar reingreso con cookie persistente, cierre de sesión y contenido sin recortes.
+
+
+## Colores de estados · 18/10/2026
+
+Cancelado usa azul pizarra #526d82 y Reincidente azul claro #b1c6d8,
+por la preferencia final del usuario de mantener ambos dentro de la paleta azul. Las variables de
+styles.css se comparten en etiquetas, donas, leyendas de estadísticas y marcadores
+del mapa del dashboard. Los colores dependen del nombre del estado y no de su
+posición en la consulta; los demás estados conservan sus estilos y paleta existentes.
+
+
+## Detalle con línea de tiempo · 18/10/2026
+
+- Retirar los mensajes de consulta de lectura/exitosa y el panel de evidencias.
+- Historial en panel propio de ancho completo, inspirado en historial-reportes:
+  iniciales, rol, fecha, estado/prioridad anterior y nuevo, y comentarios en recuadro.
+- Agrupar fechas y filtrar en el cliente sin nuevas escrituras ni eventos ficticios.
+- Los errores de consulta mantienen el aviso y el reintento; no se ocultan errores.
+- Separación uniforme de 24 px entre el resumen y las columnas y entre sus bloques.
+
+- En escritorio, la columna de ubicación se extiende hasta el final de la otra columna;
+  Ubicación ocupa el espacio disponible y Acciones rápidas queda al pie, antes del historial.
+
+## Estadísticas sin listado duplicado · 18/10/2026
+
+- Se elimina el apartado Reportes de Estadísticas; conserva Gráficos, Mapa de calor y Rendimiento.
+- El menú abre Gráficos y la ruta anterior estadisticas.html redirige a esa vista.
+- La lista completa y las acciones por reporte se concentran en Gestión de reportes.
+
+## Dona idéntica en Dashboard y Gráficos · 18/10/2026
+
+Ambas vistas usan el orden de reportes recibido de la API. Gráficos consume
+`RIETI_REPORT_LIST` para evitar que las claves numéricas de `RIETI_REPORTS`
+reordenen estados y cambien colores o posiciones. Con los mismos datos,
+ambas generan el mismo SVG; Estadísticas conserva sus filtros y resumen.
+
+## Administración de cuentas en el panel · 19/10/2026
+
+- El acceso Administrar cuentas forma parte del menú lateral y se muestra solo al administrador.
+- Se reutiliza registro.html con el mismo panel lateral y dos bloques: alta y restablecimiento.
+- Se conservan los formularios, las validaciones y las restricciones de acceso de la API.
+- Mi perfil conserva solo los datos personales, sin el botón Volver al dashboard.
+
+## Alta de ambos roles y ajuste de bloques · 19/10/2026
+
+El registro permite elegir Administrador o Procurador. La API valida el rol,
+los límites de cada tabla, el municipio y los duplicados; conserva la sesión del
+administrador. Los procuradores se crean activos con bcrypt y no pueden registrar cuentas.
+Cada bloque ajusta su altura al contenido, con el botón después de los campos, sin estirarse para igualar al otro.
+La nueva contraseña del restablecimiento se muestra como texto visible.

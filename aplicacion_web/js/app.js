@@ -1,9 +1,10 @@
 (async () => {
+  if (window.RIETI_AUTH_READY && !await window.RIETI_AUTH_READY) return;
   if (window.RIETI_READY) await window.RIETI_READY;
 /*
-  INTERACCIONES DEL PROTOTIPO
-  Este archivo contiene únicamente comportamiento local de interfaz.
-  Los reportes se cargan mediante RIETI_READY; autenticación y escrituras siguen pendientes.
+  INTERACCIONES DEL DASHBOARD
+  Los reportes se cargan mediante RIETI_READY. Los cambios de estado se guardan
+  en la API con la identidad de sesión y la versión consultada del reporte.
 */
 
 const passwordInput = document.querySelector("#password");
@@ -127,94 +128,82 @@ document.addEventListener("keydown", (event) => {
 */
 const filtersForm = document.querySelector("#report-filters");
 
-/*
-  FORMULARIOS COMPARTIDOS — ESTADO Y AUTORIDAD
-  Se usan desde ambas tablas. No se guardan datos en localStorage ni se envían a
-  ningún servicio. INTEGRACIÓN FUTURA: sustituir la confirmación simulada por una
-  petición autenticada a la API y confirmar solo después de recibir éxito.
-*/
-const statusDialog = document.querySelector("#status-dialog");
-const authorityDialog = document.querySelector("#authority-dialog");
-const confirmationDialog = document.querySelector("#update-confirmation");
-
-if (statusDialog && authorityDialog && confirmationDialog) {
-  let selectedReportFolio = "";
-  let returnFocusTo = null;
-  const dialogs = [statusDialog, authorityDialog, confirmationDialog];
-
-  document.querySelectorAll("[data-report-action]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const row = button.closest("[data-report-row], [data-report-context]");
-      if (!row) return;
-
-      selectedReportFolio = row.dataset.reportFolio || "No disponible";
-      // El menú se cierra, así que el foco vuelve a su activador y no al botón oculto.
-      returnFocusTo = row.querySelector("summary") || button;
-      reportMenus.forEach((menu) => { menu.open = false; });
-
-      const dialog = button.dataset.reportAction === "status" ? statusDialog : authorityDialog;
-      const form = dialog.querySelector("form");
-      form.reset();
-      dialog.querySelector("[data-dialog-report-id]").textContent = selectedReportFolio;
-
-      if (dialog === statusDialog) {
-        const status = row.dataset.status || row.querySelector(".status")?.textContent.trim() || "No disponible";
-        const priority = row.dataset.priority || "No disponible";
-        const currentStatus = dialog.querySelector("[data-current-status]");
-        currentStatus.textContent = window.RIETI_STATUS_LABEL(status);
-        currentStatus.className = 'status' + (window.RIETI_STATUS_CLASSES[status] ? ' status--' + window.RIETI_STATUS_CLASSES[status] : '');
-        dialog.querySelector("[data-current-priority]").textContent = priority;
-        dialog.querySelector("[data-current-priority]").dataset.priority = priority;
-        const statusSelect = form.elements.namedItem("status");
-        statusSelect.value = status;
-        const prioritySelect = form.elements.namedItem("priority");
-        if (![...prioritySelect.options].some(option => option.value === priority)) prioritySelect.add(new Option(priority, priority));
-        prioritySelect.value = priority;
-      }
-
-      // El diálogo nativo retiene el foco y bloquea la interacción con el fondo.
-      dialog.showModal();
+/* Cambios persistentes; la autoridad se obtiene del procurador municipal. */
+const statusDialog = document.querySelector('#status-dialog');
+const confirmationDialog = document.querySelector('#update-confirmation');
+if (statusDialog && confirmationDialog) {
+  const form = statusDialog.querySelector('form');
+  const submit = form.querySelector('[type="submit"]');
+  const errorMessage = document.createElement('p');
+  errorMessage.setAttribute('role', 'alert');
+  form.querySelector('.dialog-actions').before(errorMessage);
+  const reload = document.createElement('button');
+  reload.type = 'button'; reload.textContent = 'Recargar reporte'; reload.hidden = true;
+  reload.addEventListener('click', () => location.reload());
+  form.querySelector('.dialog-actions').prepend(reload);
+  let selected = null, returnFocusTo = null, saving = false, saved = false;
+  document.querySelectorAll('[data-report-action="status"]').forEach(button => {
+    button.addEventListener('click', () => {
+      const row = button.closest('[data-report-row], [data-report-context]');
+      const report = row && window.RIETI_REPORTS[row.dataset.reportId];
+      if (!report || saving) return;
+      selected = { ...report };
+      returnFocusTo = row.querySelector('summary') || button;
+      reportMenus.forEach(menu => { menu.open = false; });
+      form.reset(); errorMessage.textContent = ''; reload.hidden = true;
+      statusDialog.querySelector('[data-dialog-report-id]').textContent = selected.folio;
+      const currentStatus = statusDialog.querySelector('[data-current-status]');
+      currentStatus.textContent = window.RIETI_STATUS_LABEL(selected.status);
+      currentStatus.className = 'status' + (window.RIETI_STATUS_CLASSES[selected.status] ? ' status--' + window.RIETI_STATUS_CLASSES[selected.status] : '');
+      const currentPriority = statusDialog.querySelector('[data-current-priority]');
+      currentPriority.textContent = selected.priority; currentPriority.dataset.priority = selected.priority;
+      form.elements.status.value = selected.status;
+      const priority = form.elements.priority;
+      if (![...priority.options].some(option => option.value === selected.priority)) priority.add(new Option(selected.priority, selected.priority));
+      priority.value = selected.priority;
+      priority.disabled = window.RIETI_USER?.role === 'procurador';
+      statusDialog.showModal();
     });
   });
-
-  dialogs.forEach((dialog) => {
-    dialog.querySelectorAll("[data-close-dialog]").forEach((button) => {
-      button.addEventListener("click", () => { dialog.close(); });
-    });
-    dialog.addEventListener("close", () => {
-      dialog.querySelector("form")?.reset();
-      if (!dialogs.some((item) => item.open)) returnFocusTo?.focus();
-    });
-  });
-
-  [statusDialog, authorityDialog].forEach((dialog) => {
-    const form = dialog.querySelector("form");
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!form.reportValidity()) return;
-
-      const values = new FormData(form);
-      const summary = confirmationDialog.querySelector("[data-confirmation-summary]");
-      const fields = [["Folio", selectedReportFolio]];
-      if (dialog === statusDialog) {
-        fields.push(["Nuevo estado", window.RIETI_STATUS_LABEL(values.get("status"))], ["Nueva prioridad", values.get("priority")]);
-        fields.push(["Comentarios", String(values.get("comments") || "").trim() || "Sin comentarios"]);
-      } else {
-        fields.push(["Nueva autoridad", values.get("authority")]);
-      }
-
-      // textContent evita interpretar como HTML los comentarios escritos.
-      summary.replaceChildren();
-      fields.forEach(([label, value]) => {
-        const term = document.createElement("dt");
-        const description = document.createElement("dd");
-        term.textContent = label;
-        description.textContent = value;
-        summary.append(term, description);
+  statusDialog.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => { if (!saving) statusDialog.close(); }));
+  statusDialog.addEventListener('cancel', event => { if (saving) event.preventDefault(); });
+  statusDialog.addEventListener('close', () => { if (!saved) returnFocusTo?.focus(); });
+  confirmationDialog.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => confirmationDialog.close()));
+  confirmationDialog.addEventListener('close', () => { if (saved) location.reload(); });
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (saving || !selected || !form.reportValidity()) return;
+    const body = { version: selected.version, status: form.elements.status.value, comments: form.elements.comments.value.trim() };
+    if (window.RIETI_USER?.role === 'administrador') body.priority = form.elements.priority.value;
+    saving = true; submit.disabled = true; submit.textContent = 'Guardando…';
+    statusDialog.querySelectorAll('[data-close-dialog]').forEach(button => { button.disabled = true; });
+    errorMessage.textContent = ''; reload.hidden = true;
+    try {
+      const response = await window.RIETI_API.request(`/api/reportes/${encodeURIComponent(selected.id)}/estado`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       });
-      dialog.close();
-      confirmationDialog.showModal();
-    });
+      const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        reload.hidden = response.status !== 409;
+        throw new Error(payload.error || 'No fue posible actualizar el reporte.');
+      }
+      saved = true;
+      const summary = confirmationDialog.querySelector('[data-confirmation-summary]');
+      summary.replaceChildren();
+      const fields = [['Folio', selected.folio], ['Nuevo estado', window.RIETI_STATUS_LABEL(body.status)], ['Comentarios', body.comments || 'Sin comentarios']];
+      if (Object.hasOwn(body, 'priority')) fields.splice(2, 0, ['Nueva prioridad', body.priority]);
+      fields.forEach(([label, value]) => {
+        const term = document.createElement('dt'), detail = document.createElement('dd');
+        term.textContent = label; detail.textContent = value; summary.append(term, detail);
+      });
+      statusDialog.close(); confirmationDialog.showModal();
+    } catch (error) {
+      errorMessage.textContent = error instanceof TypeError || ['TimeoutError', 'SyntaxError'].includes(error.name)
+        ? 'No se pudo confirmar el guardado. Recarga el reporte para comprobar su estado antes de volver a enviar.' : error.message;
+    } finally {
+      saving = false; submit.disabled = false; submit.textContent = 'Actualizar estado';
+      statusDialog.querySelectorAll('[data-close-dialog]').forEach(button => { button.disabled = false; });
+    }
   });
 }
 
@@ -246,7 +235,7 @@ if (filtersForm) {
       ? `Mostrando ${start + 1}–${end} de ${total} ${total === 1 ? 'reporte' : 'reportes'}`
       : `Mostrando ${total} ${total === 1 ? 'reporte' : 'reportes'}`;
     if (!pagination) return;
-    pagination.hidden = total === 0;
+    pagination.hidden = pageCount < 2;
     pagination.replaceChildren();
     if (!total) return;
 
@@ -270,7 +259,7 @@ if (filtersForm) {
         gap.setAttribute('aria-hidden', 'true');
         pagination.append(gap);
       }
-      const button = addButton(String(page), page, `Ir a la página ${page}`);
+      const button = addButton(String(page), page, `Ir a la página ${page}`, pageCount < 2);
       if (page === currentPage) {
         button.className = 'is-current';
         button.setAttribute('aria-current', 'page');

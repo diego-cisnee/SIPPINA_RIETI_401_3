@@ -1,3 +1,4 @@
+const { useAuthenticatedFixture } = require('./auth-fixture.cjs');
 // Ejecutar con NODE_PATH apuntando a la dependencia Playwright instalada.
 const { chromium } = require('playwright');
 const http = require('node:http');
@@ -24,11 +25,13 @@ const statusFixture = rdsStatuses.map((status, i) => ({ id_reporte: 200 + i, id:
  try {
   browser = await chromium.launch({ headless: true, channel: 'chrome' });
   const page = await browser.newPage();
+  await useAuthenticatedFixture(page);
   const errors = [], methods = [];
   page.on('pageerror', error => errors.push(error.message));
   let mode = 'normal';
+  let reverseStatuses = false;
   let duplicateMode = 'matches';
-  await page.route('http://127.0.0.1:3000/api/reportes**', async route => {
+  await page.route('**/api/reportes**', async route => {
    methods.push(route.request().method());
    if (new URL(route.request().url()).pathname.endsWith('/coincidencias')) {
     if (duplicateMode === 'error') return route.fulfill({ status: 500, json: { message: 'Error' } });
@@ -36,21 +39,23 @@ const statusFixture = rdsStatuses.map((status, i) => ({ id_reporte: 200 + i, id:
    }
    if (mode === 'error') return route.fulfill({ status: 500, json: { message: 'Error' } });
    const id = new URL(route.request().url()).pathname.split('/')[3];
-   const records = mode === 'statuses' ? statusFixture : fixture;
+   const records = mode === 'statuses' ? (reverseStatuses ? [...statusFixture].reverse() : statusFixture) : fixture;
    const data = mode === 'empty' ? [] : id ? records.find(row => row.id === id) : records;
    await route.fulfill({ status: id && !data ? 404 : 200, json: { data } });
   });
   const base = `http://127.0.0.1:${server.address().port}/pages/`;
   const ready = async file => { await page.goto(base + file); await page.evaluate(() => window.RIETI_READY); await page.waitForTimeout(50); };
-  for (const file of ['dashboard.html', 'reportes.html', 'estadisticas.html']) {
+  for (const file of ['dashboard.html', 'reportes.html']) {
    await ready(file);
    assert.equal(await page.locator('[data-report-row]').count(), 2);
+   assert.equal(await page.locator('#authority-dialog, [data-report-action="authority"]').count(), 0);
    assert.equal(await page.locator('[data-report-row]').first().locator('td').first().textContent(), 'RIETI-2026-0012');
    assert.equal(await page.locator('[data-report-row]').nth(1).locator('td').first().textContent(), 'No disponible');
    assert.equal(await page.locator('[data-report-row]').first().getAttribute('data-report-id'), '12');
    assert.equal(await page.locator('[data-field="reports-total"]').first().textContent(), '2');
    assert.equal(await page.locator('[data-field="reports-pending"]').textContent(), '1');
    assert.equal(await page.locator('[data-field="reports-resolved"]').textContent(), '1');
+   assert.equal(await page.locator('[data-field="reports-other"]').textContent(), '0');
    assert.equal(await page.locator('tbody img').count(), 0);
    await page.locator('[data-report-row]').first().locator('summary').scrollIntoViewIfNeeded();
    await page.waitForTimeout(150);
@@ -120,17 +125,17 @@ const statusFixture = rdsStatuses.map((status, i) => ({ id_reporte: 200 + i, id:
   }
   await page.selectOption('[data-filter="municipality"]', 'Otro municipio');
   assert.equal(await page.locator('[data-report-row]:visible').count(), 1);
-  assert.equal(await page.locator('[data-field="reports-total"]').textContent(), '1');
   await ready('reporte.html?id=12&from=estadisticas');
   assert.equal(await page.locator('[data-detail="folio"]').first().textContent(), 'RIETI-2026-0012');
   assert.equal(await page.locator('[data-detail="updatedAt"]').textContent(), 'No disponible');
   assert.equal(await page.locator('[data-detail="authority"]').textContent(), 'No disponible');
-  assert.equal(await page.locator('[data-back-link]').getAttribute('href'), 'estadisticas.html');
+  assert.equal(await page.locator('[data-back-link]').getAttribute('href'), 'reportes.html');
   assert.equal(await page.locator('[data-heatmap-link]').getAttribute('href'), 'mapa-calor.html?reporte=12');
   await page.waitForFunction(() => document.querySelector('[data-duplicate-notice]').getAttribute('aria-busy') === 'false');
   assert.match(await page.locator('[data-duplicate-list]').textContent(), /RIETI-0003 <prueba>/);
   assert.equal(await page.locator('[data-duplicate-list] a').getAttribute('href'), 'reporte.html?id=3&from=estadisticas');
   await page.locator('[data-duplicate-list] a').click();
+  await page.waitForURL('**/reporte.html?id=3&from=estadisticas');
   await page.evaluate(() => window.RIETI_READY);
   assert.equal(new URL(page.url()).searchParams.get('id'), '3');
   assert.equal(await page.locator('[data-report-context]').getAttribute('data-report-id'), '3');
@@ -156,20 +161,22 @@ const statusFixture = rdsStatuses.map((status, i) => ({ id_reporte: 200 + i, id:
   await ready('reporte.html?id=99');
   assert.equal(await page.locator('[data-report-context]').isVisible(), false);
   assert.equal(await page.locator('[data-report-error]').isVisible(), true);
+  await ready('dashboard.html');
+  const dashboardDonut = await page.locator('.status-donut').evaluate(node=>node.outerHTML);
   await ready('graficos.html');
+  assert.equal(await page.locator('#chart-status .status-donut').evaluate(node=>node.outerHTML),dashboardDonut,'Dona idéntica con IDs fuera de orden');
   assert.match(await page.locator('#chart-feedback').textContent(), /2 de 2/);
   assert.equal(await page.locator('#card-heat').count(), 0);
   await page.locator('[data-chart="status"]').click();
   assert.match(await page.locator('#chart-summary-values').textContent(), /Concluido/);
-  await ready('rendimiento.html');
-  assert.match(await page.locator('#performance-rows').textContent(), /No disponible/);
   mode = 'statuses';
-  for (const file of ['dashboard.html', 'reportes.html', 'estadisticas.html']) {
+  for (const file of ['dashboard.html', 'reportes.html']) {
    await ready(file);
    assert.equal(await page.locator('[data-field="reports-total"]').first().textContent(), '8');
    assert.equal(await page.locator('[data-field="reports-pending"]').textContent(), '1');
    assert.equal(await page.locator('[data-field="reports-progress"]').textContent(), '3');
    assert.equal(await page.locator('[data-field="reports-resolved"]').textContent(), '1');
+   assert.equal(await page.locator('[data-field="reports-other"]').textContent(), '3','Archivado, Cancelado y Reincidente');
    assert.deepEqual(await page.locator('#status-form select[name="status"] option').evaluateAll(options => options.map(option => option.value)), rdsStatuses);
   }
   await ready('reportes.html');
@@ -180,6 +187,7 @@ const statusFixture = rdsStatuses.map((status, i) => ({ id_reporte: 200 + i, id:
    assert.equal(await row.count(), 1);
    assert.equal(await row.getAttribute('data-status'), status);
    assert.equal(await row.locator('.status').textContent(), statusLabels[i]);
+   if (status === 'Cancelado' || status === 'Reincidente') assert.equal(await row.locator('.status').evaluate(node=>getComputedStyle(node).backgroundColor),status==='Cancelado'?'rgb(82, 109, 130)':'rgb(177, 198, 216)');
    await row.locator('summary').click();
    await row.locator('[data-report-action="status"]').click();
    assert.equal(await page.locator('#status-form select[name="status"]').inputValue(), status);
@@ -193,18 +201,29 @@ const statusFixture = rdsStatuses.map((status, i) => ({ id_reporte: 200 + i, id:
   await page.locator('[data-report-action="status"]').click();
   assert.equal(await page.locator('#status-form select[name="status"]').inputValue(), 'En_revision');
   await page.selectOption('#status-form select[name="status"]', 'En_seguimiento');
-  await page.locator('#status-form').evaluate(form => form.requestSubmit());
-  assert.match(await page.locator('[data-confirmation-summary]').textContent(), /En seguimiento/);
-  assert.equal(await page.locator('[data-detail="status"]').textContent(), 'En revisión', 'El cambio sigue simulado');
+  // Este archivo prueba lecturas; los guardados reales se verifican en test-report-actions.cjs.
+  await page.locator('#status-dialog [data-close-dialog]').click();
   await ready('graficos.html');
   await page.locator('[data-chart="status"]').click();
   assert.deepEqual(await page.locator('#chart-summary-values dt').allTextContents(), statusLabels);
   assert.deepEqual(await page.locator('#chart-summary-values dd').allTextContents(), rdsStatuses.map(() => '1 (12.5%)'));
   await page.locator('#close-chart-summary').click();
   const segmentColors = await page.locator('#chart-status circle[stroke-width="46"]').evaluateAll(nodes => nodes.map(node => getComputedStyle(node).stroke));
-  const legendColors = await page.locator('#chart-status .chart-legend-swatch').evaluateAll(nodes => nodes.map(node => getComputedStyle(node).backgroundColor));
   assert.equal(new Set(segmentColors).size, 8);
-  assert.deepEqual(segmentColors, legendColors, 'Los ocho estados conservan su color en la gráfica y la leyenda');
+  const fullDonut = await page.locator('#chart-status .status-donut').evaluate(node=>node.outerHTML);
+  await ready('dashboard.html');
+  assert.equal(await page.locator('.status-donut').evaluate(node=>node.outerHTML),fullDonut,'Misma distribución y colores para los ocho estados');
+  await ready('graficos.html');
+  const expectedStateColors = {Cancelado:'rgb(82, 109, 130)',Reincidente:'rgb(177, 198, 216)'};
+  for(const [status,color] of Object.entries(expectedStateColors)) assert.equal(await page.locator(`.status-donut circle[data-status="${status}"]`).evaluate(node=>getComputedStyle(node).stroke),color);
+  reverseStatuses=true;
+  await ready('dashboard.html');
+  for(const [status,color] of Object.entries(expectedStateColors)) assert.equal(await page.locator(`.status-donut circle[data-status="${status}"]`).evaluate(node=>getComputedStyle(node).stroke),color,'El orden de la consulta no cambia el color del estado');
+  const reversedDashboard = await page.locator('.status-donut').evaluate(node=>node.outerHTML);
+  await ready('graficos.html');
+  assert.equal(await page.locator('#chart-status .status-donut').evaluate(node=>node.outerHTML),reversedDashboard,'Dona idéntica con consulta invertida');
+  for(const [status,color] of Object.entries(expectedStateColors)) assert.equal(await page.locator(`.status-donut circle[data-status="${status}"]`).evaluate(node=>getComputedStyle(node).stroke),color);
+  reverseStatuses=false;await ready('graficos.html');
   for (const width of [1440, 375, 320]) {
    await page.setViewportSize({ width, height: 1000 });
    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `ocho estados en ${width}px`);
@@ -214,14 +233,15 @@ const statusFixture = rdsStatuses.map((status, i) => ({ id_reporte: 200 + i, id:
   mode = 'empty';
   await ready('reportes.html');
   assert.equal(await page.locator('[data-report-row]').count(), 0);
+  assert.equal(await page.locator('[data-field="reports-other"]').textContent(), '0');
   assert.equal(await page.locator('[data-empty-row]').isVisible(), true);
   await page.locator('#clear-report-filters').click();
   assert.equal(await page.locator('[data-empty-row]').isVisible(), true);
   mode = 'error';
-  for (const file of ['dashboard.html', 'reportes.html', 'estadisticas.html', 'graficos.html', 'rendimiento.html']) {
+  for (const file of ['dashboard.html', 'reportes.html', 'graficos.html']) {
    await ready(file);
    assert.equal(await page.locator('[data-report-row]').count(), 0);
-   if (file === 'reportes.html' || file === 'estadisticas.html' || file === 'graficos.html') {
+   if (file === 'reportes.html' || file === 'graficos.html') {
     const feedback = page.locator(file === 'graficos.html' ? '#chart-feedback' : '#filter-feedback');
     const errorMessage = await feedback.textContent();
     await page.locator(file === 'graficos.html' ? '#clear-chart-filters' : '#clear-report-filters').click();

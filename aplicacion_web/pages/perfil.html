@@ -3,12 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Perfil experimental de administrador RIETI. Datos ficticios sujetos a cambios." />
+    <meta name="description" content="Perfil de la cuenta autenticada en RIETI." />
     <title>Mi perfil | RIETI</title>
     <link rel="stylesheet" href="../css/styles.css" />
     <link rel="stylesheet" href="../css/profile.css" />
+      <script src="../js/api.js" defer></script>
+    <script src="../js/auth.js" defer></script>
   </head>
-  <body class="dashboard-page profile-page">
+  <body data-auth-pending class="dashboard-page profile-page">
     <div class="dashboard-shell">
       <aside class="sidebar" aria-label="Navegación principal">
         <div class="brand-lockup">
@@ -16,11 +18,11 @@
           <img class="brand-lockup__logo" src="../assets/logo-rieti.png" alt="RIETI · Panel de Control" width="190" height="60" />
         </div>
 
-        <a class="user-summary user-summary--profile" href="perfil.html" aria-current="page" aria-label="Mi perfil de administrador">
+        <a class="user-summary user-summary--profile" href="perfil.html" aria-current="page" aria-label="Mi perfil">
           <span class="user-summary__avatar" aria-hidden="true">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
           </span>
-          <!-- INTEGRACIÓN FUTURA: estos datos se obtendrán de la sesión autenticada. -->
+          <!-- Identidad obtenida de la sesión validada por Express. -->
           <strong data-field="user-name">RIETI Admin</strong>
           <span data-field="user-role">Panel de Control</span>
         </a>
@@ -34,9 +36,13 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
             Gestión de reportes
           </a>
-          <a class="sidebar-nav__item" href="estadisticas.html">
+          <a class="sidebar-nav__item" href="graficos.html">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
+          </a>
+          <a class="sidebar-nav__item" href="registro.html" data-admin-only hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2" /></svg>
+            Administrar cuentas
           </a>
           <a class="sidebar-nav__item" href="acerca.html?origen=panel">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
@@ -51,35 +57,27 @@
       </aside>
       <main class="dashboard-main profile-main">
         <header class="management-header">
-          <div><p class="eyebrow">Mi cuenta</p><h1>Perfil del administrador</h1><p>Datos personales y de contacto del administrador.</p></div>
-          <a class="action-button action-button--secondary" href="dashboard.html">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5-7 7 7 7M3 12h18" /></svg>Volver al dashboard
-          </a>
+          <div><p class="eyebrow">Mi cuenta</p><h1>Mi perfil</h1><p>Datos de la cuenta autenticada.</p></div>
+
         </header>
-        <!-- EXPERIMENTO: este bloque y sus campos pueden cambiar o retirarse tras la revisión. -->
-        <p class="profile-trial"><span>Versión de prueba</span> Datos ficticios y estructura sujetos a cambios. Por ahora, este perfil es solo de consulta.</p>
+        <!-- Datos obtenidos de la sesión validada. -->
         <div class="profile-grid">
-          <!-- INTEGRACIÓN FUTURA: cargar estos campos desde la API del usuario autenticado.
-               No aceptar un ID enviado por el cliente como autorización para consultar perfiles. -->
+<!-- Campos de la identidad validada; no se aceptan IDs del navegador para consultar perfiles. -->
           <section class="panel profile-card" aria-labelledby="profile-contact-title">
             <h2 id="profile-contact-title">Información personal</h2>
             <dl class="profile-fields">
-              <div><dt>Nombre completo</dt><dd data-field="profile-full-name">Alejandro Martínez López</dd></div>
-              <div><dt>Correo electrónico</dt><dd data-field="profile-contact-email">administrador@example.com</dd></div>
-              <div><dt>Teléfono de contacto</dt><dd data-field="profile-phone">+52 55 0000 0000</dd></div>
-              <div><dt>Organización</dt><dd data-field="profile-organization">RIETI · Administración del sistema</dd></div>
+              <div><dt>Nombre completo</dt><dd data-field="profile-full-name">Consultando…</dd></div>
+              <div><dt>Correo electrónico</dt><dd data-field="profile-contact-email">Consultando…</dd></div>
             </dl>
           </section>
         </div>
-        <p class="demo-caption">Información ficticia de consulta. No se guardan ni se envían datos.</p>
       </main>
     </div>
-    <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
+    <!-- Cerrar sesión invalida la sesión en Express. -->
     <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
       <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
       <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
-      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
-      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <p id="logout-description">Se cerrará tu sesión en este navegador.</p>
       <div class="dialog-actions">
         <button type="button" data-cancel-logout autofocus>Cancelar</button>
         <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>

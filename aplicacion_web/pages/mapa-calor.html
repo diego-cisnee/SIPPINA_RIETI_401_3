@@ -11,21 +11,23 @@
       <noscript><style>
       [data-load-block], [data-loading-only] { display: none !important; }
     </style></noscript>
+      <script src="../js/api.js" defer></script>
+    <script src="../js/auth.js" defer></script>
   </head>
-  <body class="dashboard-page statistics-page heatmap-page">
+  <body data-auth-pending class="dashboard-page statistics-page heatmap-page">
     <div class="dashboard-shell">
-      <!-- La barra lateral conserva la navegación y la sesión simulada del dashboard. -->
+      <!-- Navegación compartida y sesión autenticada. -->
       <aside class="sidebar" aria-label="Navegación principal">
         <div class="brand-lockup">
           <!-- Coloca el PNG de la identidad en assets/logo-rieti.png. -->
           <img class="brand-lockup__logo" src="../assets/logo-rieti.png" alt="RIETI · Panel de Control" width="190" height="60" />
         </div>
 
-<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil de administrador" title="Ver mi perfil">
+<a class="user-summary user-summary--profile" href="perfil.html" aria-label="Ver mi perfil" title="Ver mi perfil">
           <span class="user-summary__avatar" aria-hidden="true">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" /><path d="M5.7 19c.4-4 2.5-6 6.3-6s5.9 2 6.3 6" /></svg>
           </span>
-          <!-- INTEGRACIÓN FUTURA: estos datos se obtendrán de la sesión autenticada. -->
+          <!-- Identidad obtenida de la sesión validada por Express. -->
           <strong data-field="user-name">RIETI Admin</strong>
           <span data-field="user-role">Panel de Control</span>
         </a>
@@ -43,6 +45,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2" /></svg>
             Estadísticas
           </span>
+          <a class="sidebar-nav__item" href="registro.html" data-admin-only hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3" /><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2" /></svg>
+            Administrar cuentas
+          </a>
           <a class="sidebar-nav__item" href="acerca.html?origen=panel">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7h.01" /></svg>
             Acerca de RIETI
@@ -66,7 +72,6 @@
         </header>
 
         <nav class="statistics-tabs" aria-label="Apartados de estadísticas">
-          <a href="estadisticas.html">Reportes</a>
           <a href="graficos.html">Gráficos</a>
           <span aria-current="page">Mapa de calor</span>
           <a href="rendimiento.html">Rendimiento</a>
@@ -74,35 +79,33 @@
         <section class="heatmap-layout" aria-label="Mapa de calor del Estado de México">
           <div class="heatmap-controls panel"><fieldset id="map-controls" disabled><legend>Mapa de calor</legend>
     <section class="detail"><h2 id="selection-name">Estado de México</h2></section>
-    <div class="stats"><div><strong id="total">—</strong><span>casos en la selección</span></div><div><strong id="municipal-total">—</strong><span>municipios</span></div></div>
+    <div class="stats"><div><strong id="total">—</strong><span>casos en la selección</span></div><div data-admin-only hidden><strong id="municipal-total">—</strong><span>municipios</span></div></div>
     <section class="case-priorities" aria-labelledby="priority-heading"><h2 id="priority-heading">Casos por prioridad</h2><ul id="priority-counts" data-list="priority-counts"></ul></section>
     <p id="recent-cases" class="recent-cases" role="status" aria-live="polite">Calculando reportes nuevos…</p>
-    <label for="mode">Visualización</label>
-    <select id="mode"><option value="heat">Por coordenadas</option><option value="municipal">Por municipio</option></select>
+    <label for="mode" data-admin-only hidden>Visualización</label>
+    <select id="mode" data-admin-only hidden><option value="heat">Por coordenadas</option><option value="municipal">Por municipio</option></select>
     <label for="priority-filter">Prioridad</label>
     <select id="priority-filter"><option value="">Todas las prioridades</option></select>
-    <label for="municipio">Municipio</label>
-    <select id="municipio"><option value="">Todo el estado</option></select>
+    <label for="municipio" data-admin-only hidden>Municipio</label>
+    <select id="municipio" data-admin-only hidden><option value="">Todo el estado</option></select>
     <label class="check"><input id="points" type="checkbox" checked> Mostrar coordenadas</label>
     <label class="check"><input id="basemap" type="checkbox"> Mostrar calles</label>
-    <button id="reset">↗ Ver todo el estado</button>
+    <button id="reset" data-admin-only hidden>↗ Ver todo el estado</button>
     <button type="button" id="clear-map-filters">Limpiar filtros</button>
 </fieldset></div>
-          <div class="heatmap-view"><div id="map" aria-label="Mapa interactivo de los municipios del Estado de México"></div><div class="map-title"><span class="live-dot"></span> Estado de México <span> / México</span></div><div id="status" role="status" aria-live="polite">Cargando mapa…</div><div class="legend"><strong id="legend-title">Concentración de registros</strong><div id="legend-gradient"></div><div class="legend-labels"><span id="legend-min">Baja</span><span id="legend-max">Alta</span></div><p id="legend-note">Intensidad relativa · reportes consultados</p></div></div>
+          <div class="heatmap-view"><div id="map" aria-label="Mapa interactivo de los municipios del Estado de México"></div><div class="map-title"><span class="live-dot"></span> <span data-map-region>Estado de México</span> <span> / México</span></div><div id="status" role="status" aria-live="polite">Cargando mapa…</div><div class="legend"><strong id="legend-title">Concentración de registros</strong><div id="legend-gradient"></div><div class="legend-labels"><span id="legend-min">Baja</span><span id="legend-max">Alta</span></div><p id="legend-note">Intensidad relativa · reportes consultados</p></div></div>
         </section>
-        <p class="demo-caption">El conteo municipal representa cantidad de casos; la intensidad del calor es relativa.</p>
         <noscript><p>Activa JavaScript para cargar el mapa.</p></noscript>
       </main>
     </div>
     <script defer src="../assets/heatmap/vendor/leaflet.js"></script>
     <script defer src="../assets/heatmap/vendor/leaflet-heat.js"></script>
     <script type="module" src="../js/heatmap/page.js"></script>
-    <!-- CIERRE SIMULADO: confirmar vuelve al login. La sesión real se invalidará mediante la API. -->
+    <!-- Cerrar sesión invalida la sesión en Express. -->
     <dialog class="report-dialog logout-dialog" id="logout-dialog" aria-labelledby="logout-title" aria-describedby="logout-description">
       <span class="logout-dialog__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M10 5H4v14h6m4-3 4-4-4-4m4 4H9" /></svg></span>
       <h2 id="logout-title">¿Quieres cerrar sesión?</h2>
-      <p id="logout-description">Volverás a la pantalla de inicio de sesión.</p>
-      <p class="logout-dialog__note">Acción de prueba: todavía no hay una sesión autenticada real.</p>
+      <p id="logout-description">Se cerrará tu sesión en este navegador.</p>
       <div class="dialog-actions">
         <button type="button" data-cancel-logout autofocus>Cancelar</button>
         <button type="button" class="dialog-primary" data-confirm-logout>Sí, cerrar sesión</button>

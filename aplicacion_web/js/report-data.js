@@ -1,5 +1,6 @@
 /* Fuente única de lectura. Nunca conserva muestras ni envía modificaciones. */
 window.RIETI_REPORTS = Object.create(null);
+window.RIETI_REPORT_LIST = [];
 window.RIETI_WORK_TYPES = [];
 window.RIETI_API_ERROR = null;
 // Valores de chk_reporte_estatus en RDS; las etiquetas no cambian el valor almacenado.
@@ -23,13 +24,13 @@ document.querySelectorAll('select[name="status"]').forEach(select => {
   select.replaceChildren(...options);
 });
 window.RIETI_READY = (async () => {
+  if (window.RIETI_AUTH_READY && !await window.RIETI_AUTH_READY) return;
   const unavailable = 'No disponible';
   const value = v => v === null || v === undefined || v === '' ? unavailable : String(v);
   const statusClasses = window.RIETI_STATUS_CLASSES;
   const context = document.querySelector('[data-report-context]');
   const id = new URLSearchParams(location.search).get('id');
   const apiBase = (window.RIETI_API_BASE || (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname) && location.port !== '3000' ? 'http://127.0.0.1:3000' : location.origin)).replace(/\/$/, '');
-  const apiURL = apiBase + '/api/reportes' + (context ? '/' + encodeURIComponent(id) : '');
   const feedback = document.createElement('p');
   feedback.className = 'demo-caption';
   feedback.setAttribute('role', 'status');
@@ -38,7 +39,7 @@ window.RIETI_READY = (async () => {
   document.querySelectorAll('[data-action="refresh-reports"]').forEach(button => button.addEventListener('click', event => { event.preventDefault(); location.reload(); }));
   try {
     if (context && (!id || !/^[1-9]\d*$/.test(id))) throw new Error('Identificador de reporte inválido.');
-    const response = await fetch(apiURL, { method: 'GET', signal: AbortSignal.timeout(15000), cache: 'no-store' });
+    const response = await window.RIETI_API.request('/api/reportes' + (context ? '/' + encodeURIComponent(id) : ''));
     if (!response.ok) throw new Error(response.status === 404 ? 'Reporte no encontrado.' : 'No fue posible consultar los reportes.');
     const payload = await response.json();
     const records = context ? [payload.data] : payload.data;
@@ -61,6 +62,7 @@ window.RIETI_READY = (async () => {
     });
     // Object.values reordena claves numéricas; conservar el orden de la API.
     const reports = records.map(raw => window.RIETI_REPORTS[String(raw.id_reporte)]);
+    window.RIETI_REPORT_LIST = reports;
     const tbody = document.querySelector('tbody[data-list]');
     if (tbody && !document.querySelector('#performance-rows')) {
       const statistics = document.body.classList.contains('statistics-page');
@@ -91,7 +93,8 @@ window.RIETI_READY = (async () => {
         const menuCell = document.createElement('td');
         menuCell.className = 'menu-cell';
         // Solo marcado fijo; los valores de la API siempre usan textContent.
-        menuCell.innerHTML = '<details class="row-menu"><summary>•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" data-report-action="authority">Asignar autoridad</button><button type="button" class="is-danger" data-delete-report>Eliminar</button></div></details>';
+        menuCell.innerHTML = '<details class="row-menu"><summary>•••</summary><div class="row-menu__content"><button type="button" data-report-action="status">Cambiar estado</button><button type="button" class="is-danger" data-delete-report>Eliminar</button></div></details>';
+        if (window.RIETI_USER?.role === 'procurador') menuCell.querySelector('[data-delete-report]').remove();
         menuCell.querySelector('summary').setAttribute('aria-label', 'Opciones del reporte ' + report.folio);
         row.append(menuCell);
         tbody.append(row);
@@ -107,6 +110,7 @@ window.RIETI_READY = (async () => {
       tbody.append(empty);
     }
     const counts = { 'reports-total': reports.length, 'reports-pending': reports.filter(r => window.RIETI_STATUS_GROUPS.pending.includes(r.status)).length, 'reports-progress': reports.filter(r => window.RIETI_STATUS_GROUPS.progress.includes(r.status)).length, 'reports-resolved': reports.filter(r => window.RIETI_STATUS_GROUPS.resolved.includes(r.status)).length };
+    counts['reports-other'] = counts['reports-total'] - counts['reports-pending'] - counts['reports-progress'] - counts['reports-resolved'];
     document.querySelectorAll('[data-field^="reports-"]').forEach(node => { node.textContent = counts[node.dataset.field] ?? unavailable; });
     const rates = { 'resolution-rate': counts['reports-resolved'], 'progress-rate': counts['reports-progress'], 'pending-rate': counts['reports-pending'] };
     Object.entries(rates).forEach(([key, count]) => {
@@ -120,16 +124,8 @@ window.RIETI_READY = (async () => {
     const donut = document.querySelector('.donut-chart');
     if (donut) {
       const statuses = [...new Set(reports.map(r => r.status))];
-      const palette = window.RIETI_DONUT_COLORS;
       donut.insertAdjacentHTML('beforeend', window.RIETI_DRAW_DONUT(statuses.map(window.RIETI_STATUS_LABEL), statuses.map(status => reports.filter(r => r.status === status).length)));
       donut.setAttribute('aria-label', statuses.map(status => `${window.RIETI_STATUS_LABEL(status)}: ${reports.filter(r => r.status === status).length}`).join(', ') || 'Sin reportes');
-      const legend = donut.closest('article').querySelector('.chart-legend');
-      legend.replaceChildren();
-      statuses.forEach((status, index) => {
-        const item = document.createElement('li'), dot = document.createElement('span');
-        dot.className = 'legend-dot'; dot.style.background = palette[index % palette.length];
-        item.append(dot, document.createTextNode(window.RIETI_STATUS_LABEL(status))); legend.append(item);
-      });
     }
     const lastQuery = document.querySelector('[data-last-report-query]');
     if (lastQuery) {
@@ -139,7 +135,8 @@ window.RIETI_READY = (async () => {
       });
       lastQuery.title = consultedAt.toLocaleString('es-MX', { timeZone: 'America/Mexico_City' }) + ' (hora de Ciudad de México)';
     }
-    feedback.textContent = context ? 'Consulta de lectura · Acciones de modificación simuladas.' : `${reports.length} reportes consultados · Acciones de modificación simuladas.`;
+    if (context) feedback.remove();
+    else feedback.textContent = `${reports.length} reportes consultados.`;
   } catch (error) {
     window.RIETI_API_ERROR = error.message;
     const lastQuery = document.querySelector('[data-last-report-query]');
@@ -151,7 +148,7 @@ window.RIETI_READY = (async () => {
         : error.message + ' Vuelve a cargar para reintentar.';
     document.querySelectorAll('[data-field^="reports-"]').forEach(node => { node.textContent = unavailable; });
     const donut = document.querySelector('.donut-chart');
-    if (donut) { donut.style.background = '#eef0f4'; donut.setAttribute('aria-label', unavailable); donut.closest('article').querySelector('.chart-legend').textContent = unavailable; }
+    if (donut) { donut.style.background = '#eef0f4'; donut.setAttribute('aria-label', unavailable); }
     const filterFeedback = document.querySelector('#filter-feedback');
     if (filterFeedback) filterFeedback.textContent = unavailable;
     const listCount = document.querySelector('[data-list-count]');

@@ -1,5 +1,9 @@
 /* Dibujo compartido; recibe los conteos existentes sin consultar ni modificar datos. */
 window.RIETI_DONUT_COLORS = ['#12344d', '#285b7b', '#4b83a5', '#8eafc5', '#cad9e3', '#527567', '#9a7545', '#7f6c8c'];
+// Los colores de estos estados dependen de su identidad, nunca de su posición
+// en la consulta o de los filtros. Las variables se comparten con las etiquetas.
+window.RIETI_STATUS_COLOR = (label, fallback) => label === 'Cancelado'
+  ? 'var(--color-status-cancelled)' : label === 'Reincidente' ? 'var(--color-status-recurrent)' : fallback;
 window.RIETI_DRAW_DONUT = (labels, counts) => {
   const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   const total = counts.reduce((sum, count) => sum + count, 0);
@@ -12,7 +16,8 @@ window.RIETI_DRAW_DONUT = (labels, counts) => {
     const angle = (offset + share / 2) * Math.PI * 2 - Math.PI / 2;
     const right = Math.cos(angle) >= 0;
     callouts.push({ index, right, x: cx + Math.cos(angle) * 113, y: cy + Math.sin(angle) * 113 });
-    const result = `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${window.RIETI_DONUT_COLORS[index % window.RIETI_DONUT_COLORS.length]}" stroke-width="46" stroke-linecap="butt" pathLength="100" stroke-dasharray="${share * 100} ${100 - share * 100}" stroke-dashoffset="${-offset * 100}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    const color = window.RIETI_STATUS_COLOR(labels[index], window.RIETI_DONUT_COLORS[index % window.RIETI_DONUT_COLORS.length]);
+    const result = `<circle data-status="${escape(labels[index])}" cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${color}" stroke-width="46" stroke-linecap="butt" pathLength="100" stroke-dasharray="${share * 100} ${100 - share * 100}" stroke-dashoffset="${-offset * 100}" transform="rotate(-90 ${cx} ${cy})"/>`;
     offset += share;
     return result;
   }).join('');
